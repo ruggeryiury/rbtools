@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2021",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "noImplicitOverride": true,
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "outDir": "dist",
+    "declaration": true,
+    "sourceMap": true,
+    "lib": ["ES2021"],
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["dev/**/*.ts", "tests/**/*.ts", "src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

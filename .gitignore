@@ -1,0 +1,12 @@
+__pycache__/
+node_modules/
+dev/
+tests/
+dist/
+src_*/
+src-old/
+tests/
+temp/
+pnpm-lock.yaml
+*.env
+/*.tgz
