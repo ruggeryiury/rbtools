@@ -1,49 +1,122 @@
+import axios from 'axios'
 import { fileTypeFromBuffer } from 'file-type'
-import { FilePath, PathError, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
-import { PythonAPI, type ImgFileStatPythonObject } from '../core.exports'
+import { temporaryFile } from 'tempy'
+import { PythonAPI, type ImageFileStatPythonObject } from '../core.exports'
+import { isURL } from '../lib.exports'
 
-export interface ImageFileJSONRepresentation extends FilePathJSONRepresentation, ImgFileStatPythonObject {}
+// #region Types
+
+export interface ImageFileJSONRepresentation extends FilePathJSONRepresentation, ImageFileStatPythonObject {}
 
 export type ImageFormatTypes = 'png' | 'bmp' | 'jpg' | 'webp'
 export type ImageInterpolationTypes = 'nearest' | 'box' | 'bilinear' | 'hamming' | 'bicubic' | 'lanczos'
 
 export interface ImageConvertingOptions {
+  /**
+   * The desired width of the image. Default is the source image width.
+   */
   width?: number
+  /**
+   * The desired height of the image. Default is the source image height.
+   */
   height?: number
+  /**
+   * The desired interpolation method used on image resizing. Default is `'lanczos'`.
+   */
   interpolation?: ImageInterpolationTypes
+  /**
+   * The desired quality value of the image. Default is `100`.
+   */
   quality?: number
 }
 
+// #region Main Class
+
 /**
  * `ImageFile` is a class that represents an image file.
- * - - - -
+ *
+ * This class can process most of the known image files, such as JPEG, PNG, BMP, WEBP. Other formats were not tested.
  */
 export class ImageFile {
+  /**
+   * The path to the image file.
+   */
   path: FilePath
-  private buffer = Buffer.alloc(0)
 
+  /**
+   * `ImageFile` is a class that represents an image file.
+   * - - - -
+   * @param {FilePathLikeTypes} imgFilePath The path of the image file.
+   */
   constructor(imgFilePath: FilePathLikeTypes) {
     this.path = pathLikeToFilePath(imgFilePath)
     if (this.path.ext === '.png_xbox' || this.path.ext === '.png_ps3' || this.path.ext === '.png_wii') throw new Error(`Tired to instance a ${this.path.ext.slice(1).toUpperCase()} file on the ImageFile class, use the TextureFile class instead`)
   }
 
   /**
+   * Fetches an image from an URL and return it as a Buffer.
+   * - - - -
+   * @param {string} url The URL of the image file.
+   * @returns {Promise<Buffer>}
+   */
+  static async urlToBuffer(url: string): Promise<Buffer> {
+    if (!isURL(url)) throw new TypeError(`Provided string "${url}" is not a valid URL.`)
+    const imgRes = await axios.get<ArrayBuffer>(url, {
+      responseType: 'arraybuffer',
+      timeout: 4000,
+    })
+
+    if (imgRes.status !== 200) throw new Error(`URL returned with error with status ${imgRes.status.toString()}.`)
+    return Buffer.from(imgRes.data)
+  }
+
+  /**
+   * Fetches an image from an URL and save it on your computer, returning an instance of `ImageFile` pointing to the downloaded image.
+   * - - - -
+   * @param {string} url The URL of the image file.
+   * @param {FilePathLikeTypes} destPath The path you want to save the image file.
+   * @returns {Promise<ImageFile>}
+   */
+  static async urlToFile(url: string, destPath: FilePathLikeTypes): Promise<ImageFile> {
+    const imgBuf = await this.urlToBuffer(url)
+    const temp = new ImageFile(temporaryFile({ extension: 'dat' }))
+    await temp.path.write(imgBuf)
+    const tempFileStat = await temp.stat()
+    const dest = pathLikeToFilePath(destPath).changeFileExt(tempFileStat.ext)
+    await temp.path.rename(dest.path, true)
+    return new ImageFile(dest.path)
+  }
+
+  /**
    * Checks if a path resolves to an existing image file.
    * - - - -
    * @returns {boolean}
-   * @throws {PathError} If the instance image file path does not exists.
+   * @throws {Error} If the instance image file path does not exists.
    */
   private checkExistence(): boolean {
-    if (!this.path.exists) throw new PathError(`Provided image file path "${this.path.path}" does not exists`)
+    if (!this.path.exists) throw new Error(`Provided image file path "${this.path.path}" does not exists`)
     return true
   }
 
-  async stat(): Promise<ImgFileStatPythonObject> {
+  /**
+   * Returns an object with stats of the image file.
+   * - - - -
+   * @returns {Promise<ImageFileStatPythonObject>}
+   */
+  async stat(): Promise<ImageFileStatPythonObject> {
     this.checkExistence()
-    return await PythonAPI.imgFileStat(this.path)
+    return await PythonAPI.imageFileStat(this.path)
   }
 
+  /**
+   * Returns a JSON representation of this `ImageFile` class.
+   *
+   * This method is very similar to `.stat()`, but also returns information about the image file path.
+   * - - - -
+   * @returns {Promise<ImageFileJSONRepresentation>}
+   */
   async toJSON(): Promise<ImageFileJSONRepresentation> {
     const returnValue = {
       ...this.path.toJSON(),
@@ -52,6 +125,16 @@ export class ImageFile {
     return returnValue
   }
 
+  /**
+   * Convert this image file to another image format, returning an instance of `ImageFile` pointing to the new converted image.
+   *
+   * By passing an argument to `options` parameter, you can tweak the dimensions of the new converted file.
+   * - - - -
+   * @param {FilePathLikeTypes} destPath The destination path of the new converted image. The new image extension is automatically placed based on the `toFormat` argument.
+   * @param {ImageFormatTypes} toFormat The format of the new converted image.
+   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
+   * @returns {Promise<ImageFile>}
+   */
   async convertToImage(destPath: FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<ImageFile> {
     const { width: srcWidth, height: srcHeight } = await this.stat()
     const opts = setDefaultOptions(
@@ -73,10 +156,20 @@ export class ImageFile {
     return await PythonAPI.imageConverter(this.path, dest, toFormat, opts)
   }
 
+  /**
+   * Reads all the image file contents and returns it as a Buffer.
+   * - - - -
+   * @returns {Promise<Buffer>}
+   */
   async toBuffer(): Promise<Buffer> {
     return await this.path.read()
   }
 
+  /**
+   * Converts the image file to Data URL, without processing.
+   * - - - -
+   * @returns {Promise<string>}
+   */
   async toDataURL(): Promise<string> {
     this.checkExistence()
     const imgBuf = await this.toBuffer()
@@ -87,6 +180,11 @@ export class ImageFile {
     return dataURL
   }
 
+  /**
+   * Converts the image file to Data URL, processing the image to generate a `256x256` version of the image file.
+   * - - - -
+   * @returns {Promise<string>}
+   */
   async toThumbnailDataURL(): Promise<string> {
     this.checkExistence()
     const imgBuf = await this.toBuffer()

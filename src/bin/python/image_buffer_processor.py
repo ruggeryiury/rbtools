@@ -26,7 +26,6 @@ def image_buffer_processor(img_base64: str, format: str, width: int = 256, heigh
           img_data = output.getvalue()
           img_base64_data = base64.b64encode(img_data).decode('utf-8')
           return img_base64_data
-        
   except Exception as e:
     raise e
 

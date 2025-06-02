@@ -23,7 +23,7 @@ def image_converter(src_path: str, dest_path: str, width: int = 256, height: int
   return dest_path
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser( description='RBToolsJS: Image Converter CLI', epilog='By Ruggery Iury Corrêa.')
+  parser = argparse.ArgumentParser( description='RBToolsJS: Image Converter', epilog='By Ruggery Iury Corrêa.')
   parser.add_argument('src_path', help='The source file path to be converted', type=str)
   parser.add_argument('dest_path', help='The destination file path of the converted file', type=str)
   parser.add_argument('-x', '--width', help='The width of the image', type=int, default=256, required=False)
