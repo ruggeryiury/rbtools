@@ -1,5 +1,5 @@
 import { execAsync, FilePath, pathLikeToFilePath, pathLikeToString, resolve, type FilePathLikeTypes } from 'node-lib'
-import { EDATFile, MIDIFile, RBTools } from '../core.exports'
+import { EDATFile, ImageFile, MIDIFile, RBTools } from '../core.exports'
 
 /**
  * A class with APIs to use RBTools executables.
@@ -16,7 +16,7 @@ export class BinaryAPI {
     const exeName = RBTools.binFolder.gotoFile('makemogg.exe').name
     const command = `${exeName} "${pathLikeToString(srcPath)}" -${encrypt ? 'e' : ''}m "${pathLikeToString(destPath)}"`
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
-    if (stderr) throw new Error(stderr)
+    if (stderr) throw new Error(stderr.trim())
   }
 
   /**
@@ -38,7 +38,7 @@ export class BinaryAPI {
     const command = `${exeName} encrypt -custom:${devKLic} ${contentID.slice(0, 36)} 03 02 00 "${midi.path}" "${dest.path}"`
     console.log(command)
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
-    if (stderr) throw new Error(stderr)
+    if (stderr) throw new Error(stderr.trim())
     if (!stdout.split('\r\n').slice(-2)[0].startsWith('COMPLETE:')) throw new Error(stdout.split('\r\n').slice(-2)[0].slice(7))
 
     return new EDATFile(dest)
@@ -64,9 +64,68 @@ export class BinaryAPI {
     else dest = pathLikeToFilePath(resolve(edat.root, edat.name))
     const command = `${exeName} decrypt -custom:${devKLicHash} "${edat.path}" "${dest.path}"`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
-    if (stderr) throw new Error(stderr)
+    if (stderr) throw new Error(stderr.trim())
     if (!stdout.split('\r\n').slice(-2)[0].startsWith('COMPLETE:')) throw new Error(stdout.split('\r\n').slice(-2)[0].slice(7))
 
     return new MIDIFile(dest)
+  }
+  /**
+   * Executes the Wiimms Image Tool encoder.
+   * - - - -
+   * @param {FilePathLikeTypes} srcPngFile The path to the PNG file to be converted.
+   * @param {FilePathLikeTypes} destTplFile The path to the new converted TPL file.
+   * @returns {Promise<FilePath>}
+   */
+  static async WimgtEnc(srcPngFile: FilePathLikeTypes, destTplFile: FilePathLikeTypes): Promise<FilePath> {
+    const exeName = RBTools.binFolder.gotoFile('wimgt.exe').name
+    const src = pathLikeToFilePath(srcPngFile)
+    const dest = pathLikeToFilePath(destTplFile)
+    const command = `${exeName} -d "${dest.path}" ENC -x TPL.CMPR "${src.path}"`
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
+    if (stderr) {
+      if (stderr.includes("find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer")) return pathLikeToFilePath(dest)
+      else throw new Error(stderr.trim())
+    }
+    return pathLikeToFilePath(dest)
+  }
+
+  /**
+   * Asynchronously executes the Wiimms Image Tool decoder.
+   * - - - -
+   * @param {FilePathLikeTypes} srcTexFile The path to the PNG_WII file to be converted.
+   * @param {FilePathLikeTypes} destImageFile The path to the new converted TPL file.
+   * @returns {Promise<FilePath>}
+   */
+  static async WimgtDec(srcTexFile: FilePathLikeTypes, destImageFile: FilePathLikeTypes): Promise<ImageFile> {
+    const exeName = RBTools.binFolder.gotoFile('wimgt.exe').name
+    const src = pathLikeToFilePath(srcTexFile)
+    const dest = pathLikeToFilePath(destImageFile)
+    const command = `${exeName} -d "${dest.path}" DEC -x TPL.CMPR "${src.path}"`
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
+    if (stderr) {
+      if (stderr.includes("find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer")) return new ImageFile(dest)
+      else throw new Error(stderr.trim())
+    }
+    return new ImageFile(dest)
+  }
+
+  /**
+   * Executes the NVIDIA Texture Tools.
+   *
+   * _NVIDIA Texture Tools converts any image file format to DDS image files._
+   * - - - -
+   * @param {FilePathLikeTypes} srcTgaFile The path to the TGA file to be converted.
+   * @param {FilePathLikeTypes} destDdsPath The path to the new converted DDS file.
+   * @returns {Promise<FilePath>}
+   */
+  static async NVCompress(srcTgaFile: FilePathLikeTypes, destDdsPath: FilePathLikeTypes): Promise<FilePath> {
+    const exeName = RBTools.binFolder.gotoFile('nvcompress.exe').name
+    const src = pathLikeToFilePath(srcTgaFile)
+    const dest = pathLikeToFilePath(destDdsPath)
+
+    const command = `${exeName} -nocuda -bc3 "${src.path}" "${dest.path}"`
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
+    if (stderr) throw new Error(stderr.trim())
+    return dest
   }
 }

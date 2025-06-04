@@ -17,42 +17,6 @@ def midi_file_stat(midi_file_path: str) -> dict:
   
   except Exception as e:
     raise e
-    # version = struct.unpack('<I', fin.read(4))[0]
-    # fin.seek(0)
-    # ogg_bytes = decrypt_mogg_bytes(True, False, fin.read())
-    # temp_ogg = tempfile.NamedTemporaryFile(delete=False, suffix=".ogg")
-    # try:
-    #   temp_ogg.write(ogg_bytes)
-    #   temp_ogg.flush()
-    #   audio = mediainfo(temp_ogg.name)
-      
-    #   return {
-    #   "bitRate": int(audio['bit_rate']),
-    #   "channels": int(audio['channels']),
-    #   "codec": audio['codec_name'],
-    #   "codecDesc": audio['codec_long_name'],
-    #   "duration": int(float(audio['duration']) * 1000),
-    #   "durationSec": float(audio['duration']),
-    #   "ext": audio['format_name'],
-    #   "extDesc": audio['format_long_name'],
-    #   "sampleRate": int(audio['sample_rate']),
-    #   "size": int(audio['size']),
-    #   "mogg": {
-    #     "size": os.path.getsize(midi_file_path),
-    #     "version": version,
-    #     "isEncrypted": version != 10,
-    #     "worksInPS3": version == 11
-    #   }
-    # }
-    # except Exception as e:
-    #   temp_ogg.close()
-    #   os.unlink(temp_ogg.name)
-    #   raise e
-    # finally:
-    #   temp_ogg.close()
-    #   os.unlink(temp_ogg.name)
-      
-    
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='RBTools: MOGG File Stat', epilog='By Ruggery Iury Corrêa.')

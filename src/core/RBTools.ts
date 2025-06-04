@@ -16,6 +16,7 @@ export class RBTools {
 
   /**
    * Gets the root of the `bin` folder, where all non-JavaScripts files are found.
+   * - - - -
    * @returns {DirPath}
    */
   static get binFolder(): DirPath {
@@ -24,9 +25,19 @@ export class RBTools {
 
   /**
    * Gets the root of the `python` folder, where all Python scripts are found.
+   * - - - -
    * @returns {DirPath}
    */
   static get pyFolder(): DirPath {
     return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/python` : 'dist/bin/python')
+  }
+
+  /**
+   * Gets the root of the `header` folder, where all DDS headers from PNG_XBOX and PNG_PS3 are kept.
+   * - - - -
+   * @returns {DirPath}
+   */
+  static get headersFolder(): DirPath {
+    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/headers` : 'dist/bin/headers')
   }
 }

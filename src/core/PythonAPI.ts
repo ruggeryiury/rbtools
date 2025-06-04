@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import { execAsync, FilePath, pathLikeToFilePath, pathLikeToString, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { ImageFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes } from '../core.exports'
+import type { TPLHeaderParserObject } from '../lib.exports'
 
 // #region Types
 
@@ -121,12 +122,12 @@ export class PythonAPI {
   /**
    * Processes an image buffer.
    * - - - -
-   * @param {Buffer} imgBuffer The buffer of an image file.
+   * @param {Buffer | FilePathLikeTypes} imgPathOrBuffer The path or buffer of an image file.
    * @param {ImageFormatTypes} toFormat The format of the new converted image.
    * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
    * @returns {Promise<Buffer>}
    */
-  static async imageBufferProcessor(imgBuffer: Buffer, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<Buffer> {
+  static async imageBufferProcessor(imgPathOrBuffer: Buffer | FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<Buffer> {
     return new Promise<Buffer>((resolve, reject) => {
       const opts = setDefaultOptions(
         {
@@ -139,7 +140,7 @@ export class PythonAPI {
       )
       const pythonScript = 'image_buffer_processor.py'
       const process = spawn('python', [pythonScript], { cwd: RBTools.pyFolder.path, windowsHide: true })
-      const imgBase64 = imgBuffer.toString('base64')
+      const imgBase64 = Buffer.isBuffer(imgPathOrBuffer) ? imgPathOrBuffer.toString('base64') : pathLikeToFilePath(imgPathOrBuffer).readSync().toString('base64')
 
       let stdout = ''
       let stderr = ''
@@ -222,5 +223,16 @@ export class PythonAPI {
     if (stderr) throw new Error(stderr)
     const returnValue = JSON.parse(stdout) as MIDIFileStatPythonObject
     return returnValue
+  }
+
+  static async texWiiToBase64Buffer(texWiiPath: FilePathLikeTypes, texHeader: TPLHeaderParserObject): Promise<string> {
+    const tex = pathLikeToFilePath(texWiiPath)
+    const base64Header = texHeader.data.toString('base64')
+    const pythonScript = 'texwii_to_base64_buffer.py'
+    const command = `python "${pythonScript}" "${tex.path}" -tpl "${base64Header}" -p`
+    const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    if (stderr) throw new Error(stderr)
+    const [dataURL] = stdout.split('\r\n')
+    return dataURL
   }
 }

@@ -3,14 +3,14 @@ import { fileTypeFromBuffer } from 'file-type'
 import { FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { temporaryFile } from 'tempy'
-import { PythonAPI, type ImageFileStatPythonObject } from '../core.exports'
-import { isURL } from '../lib.exports'
+import { PythonAPI, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'
+import { imageToTexWii, imageToTexXboxPs3, isURL } from '../lib.exports'
 
 // #region Types
 
 export interface ImageFileJSONRepresentation extends FilePathJSONRepresentation, ImageFileStatPythonObject {}
 
-export type ImageFormatTypes = 'png' | 'bmp' | 'jpg' | 'webp'
+export type ImageFormatTypes = 'png' | 'bmp' | 'jpg' | 'webp' | 'tga'
 export type ImageInterpolationTypes = 'nearest' | 'box' | 'bilinear' | 'hamming' | 'bicubic' | 'lanczos'
 
 export interface ImageConvertingOptions {
@@ -156,13 +156,12 @@ export class ImageFile {
     return await PythonAPI.imageConverter(this.path, dest, toFormat, opts)
   }
 
-  /**
-   * Reads all the image file contents and returns it as a Buffer.
-   * - - - -
-   * @returns {Promise<Buffer>}
-   */
-  async toBuffer(): Promise<Buffer> {
-    return await this.path.read()
+  async convertToTexture(destPath: FilePathLikeTypes, toFormat: TextureFormatTypes, size: TextureSizeTypes = 256) {
+    const dest = pathLikeToFilePath(destPath)
+    await dest.delete()
+
+    if (toFormat === 'png_wii') return await imageToTexWii(this.path, dest)
+    return await imageToTexXboxPs3(this.path, dest, toFormat, size)
   }
 
   /**
@@ -172,7 +171,7 @@ export class ImageFile {
    */
   async toDataURL(): Promise<string> {
     this.checkExistence()
-    const imgBuf = await this.toBuffer()
+    const imgBuf = await this.path.read()
     const fileType = await fileTypeFromBuffer(imgBuf)
     if (!fileType) throw new Error(`Unknown image file format for provided file "${this.path.path}"`)
     const { mime } = fileType
@@ -181,14 +180,13 @@ export class ImageFile {
   }
 
   /**
-   * Converts the image file to Data URL, processing the image to generate a `256x256` version of the image file.
+   * Converts the image file to Data URL, processing the image to generate a lighter `256x256` version (in WEBP format) of the image file.
    * - - - -
    * @returns {Promise<string>}
    */
-  async toThumbnailDataURL(): Promise<string> {
+  async toWEBPDataURL(): Promise<string> {
     this.checkExistence()
-    const imgBuf = await this.toBuffer()
-    const newBuf = await PythonAPI.imageBufferProcessor(imgBuf, 'webp', { height: 256, interpolation: 'lanczos', quality: 100, width: 256 })
+    const newBuf = await PythonAPI.imageBufferProcessor(this.path, 'webp', { height: 256, interpolation: 'lanczos', quality: 100, width: 256 })
     const dataURL = `data:image/webp;base64,${newBuf.toString('base64')}`
     return dataURL
   }

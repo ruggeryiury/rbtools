@@ -16,7 +16,7 @@ def image_converter(src_path: str, dest_path: str, width: int = 256, height: int
         new_im.paste(img, (int((size - x) / 2), int((size - y) / 2)))
         new_im.thumbnail((width,height), resample=Image.Resampling[interpolation])
         new_im.save(dest_path, quality=quality)
-      
+    
   except Exception as e:
     raise e
   
