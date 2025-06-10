@@ -9,6 +9,7 @@ export * from './lib/dta/dtaStruct'
 export * from './lib/dta/genNumericSongID'
 export * from './lib/dta/parseDTA'
 export * from './lib/dta/sortDTA'
+export * from './lib/dta/stringifyDTA'
 
 export * from './lib/imagetex/ddsHeader'
 export * from './lib/imagetex/getTPLHeader'

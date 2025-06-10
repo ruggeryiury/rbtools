@@ -1,7 +1,7 @@
 import { BinaryWriter } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import type { RequiredDeep } from 'type-fest'
-import { dtaRenderArray, dtaRenderBoolean, dtaRenderFloat, dtaRenderNumber, dtaRenderObject, dtaRenderString, dtaRenderVariable } from '../../lib.exports'
+import { dtaRenderArray, dtaRenderBoolean, dtaRenderComment, dtaRenderFloat, dtaRenderIfDef, dtaRenderNumber, dtaRenderObject, dtaRenderString, dtaRenderVariable } from '../../lib.exports'
 
 export type DTADocumentInlineTypes = boolean | 'expanded'
 
@@ -225,6 +225,40 @@ export interface UndefinedValueObject {
   __options: RequiredDeep<DTAIOFormattingOptions>
 }
 
+export interface CommentValueObject {
+  /**
+   * The type of the value.
+   */
+  __type: 'comment'
+  /**
+   * The value itself.
+   */
+  __value: string
+}
+
+export interface IfDefValueObject {
+  /**
+   * The type of the value.
+   */
+  __type: 'ifdef'
+  /**
+   * The condition where the IF ELSE will be evaluated.
+   */
+  __condition: string
+  /**
+   * The value you want place if the condition is `true`.
+   */
+  __valueIfTrue: string
+  /**
+   * The value you want place if the condition is `false`.
+   */
+  __valueIfFalse: string
+  /**
+   * An object that might override the options for specific rendering of this specific value.
+   */
+  __options: RequiredDeep<DTAIOFormattingOptions>
+}
+
 export interface DTAIOFormattingOptions {
   /**
    * An object that changes the behavior of string values rendering.
@@ -256,7 +290,7 @@ export interface DTAIOFormattingOptions {
   dta?: DTADocumentFormattionOptions
 }
 
-export type ValueObjectsTypes = StringValueObject | StringVariableValueObject | NumberValueObject | FloatValueObject | BooleanValueObject | ObjectValueObject | ArrayValueObject | UndefinedValueObject
+export type ValueObjectsTypes = StringValueObject | StringVariableValueObject | NumberValueObject | FloatValueObject | BooleanValueObject | ObjectValueObject | ArrayValueObject | UndefinedValueObject | CommentValueObject | IfDefValueObject
 
 export type DTAIOAddValueTypes = string | number | boolean | Record<string, any> | DTAIOAddValueTypes[] | ValueObjectsTypes | null | undefined
 
@@ -375,7 +409,7 @@ export class DTAIO {
    * @returns {boolean}
    */
   static isValueObject(obj: DTAIOAddValueTypes): obj is ValueObjectsTypes {
-    return obj !== null && typeof obj === 'object' && '__type' in obj && '__value' in obj && '__options' in obj
+    return obj !== null && typeof obj === 'object' && '__type' in obj
   }
 
   static valueToObject(value: DTAIOAddValueTypes, formatOptions?: RequiredDeep<DTAIOFormattingOptions>): ValueObjectsTypes {
@@ -528,6 +562,35 @@ export class DTAIO {
     __options: DTAIO.formatOptions.defaultMAGMA,
   })
 
+  /**
+   * Transforms a `variable` type value to `CommentValueObject`.
+   * - - - -
+   * @param {string} value The value you want to transform.
+   * @returns {CommentValueObject}
+   */
+  static useComment = (value: string): CommentValueObject => ({
+    __type: 'comment',
+    __value: value,
+  })
+
+  /**
+   * Transforms a `variable` type value to `IfDefValueObject`.
+   * - - - -
+   * @param {string} condition The condition where the IF ELSE will be evaluated.
+   * @param {string} valueIfTrue The value you want place if the condition is `true`.
+   * @param {string} valueIfFalse The value you want place if the condition is `false`.
+   * @param {DTAIOFormattingOptions} [formatOptions] `OPTIONAL` An object with values that manipulates the rendering of this value in specific.
+   * - - - -
+   * @returns {IfDefValueObject}
+   */
+  static useIfDef = (condition: string, valueIfTrue: string, valueIfFalse: string, formatOptions?: DTAIOFormattingOptions): IfDefValueObject => ({
+    __type: 'ifdef',
+    __condition: condition,
+    __valueIfTrue: valueIfTrue,
+    __valueIfFalse: valueIfFalse,
+    __options: setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
+  })
+
   // #region Class Methods
 
   /**
@@ -558,25 +621,31 @@ export class DTAIO {
 
       switch (val.__type) {
         case 'string':
-          dtaRenderString(key, val, 0, io, val.__options)
+          dtaRenderString(key, val, 0, io)
           break
         case 'str_var':
-          dtaRenderVariable(key, val, 0, io, val.__options)
+          dtaRenderVariable(key, val, 0, io)
           break
         case 'number':
-          dtaRenderNumber(key, val, 0, io, val.__options)
+          dtaRenderNumber(key, val, 0, io)
           break
         case 'float':
-          dtaRenderFloat(key, val, 0, io, val.__options)
+          dtaRenderFloat(key, val, 0, io)
           break
         case 'boolean':
-          dtaRenderBoolean(key, val, 0, io, val.__options)
+          dtaRenderBoolean(key, val, 0, io)
           break
         case 'object':
-          dtaRenderObject(key, val, 0, io, val.__options)
+          dtaRenderObject(key, val, 0, io)
           break
         case 'array':
-          dtaRenderArray(key, val, 0, io, val.__options)
+          dtaRenderArray(key, val, 0, io)
+          break
+        case 'comment':
+          dtaRenderComment(val.__value, io)
+          break
+        case 'ifdef':
+          dtaRenderIfDef(key, val, 0, io)
           break
         case 'undefined':
           break

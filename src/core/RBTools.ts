@@ -24,12 +24,12 @@ export class RBTools {
   }
 
   /**
-   * Gets the root of the `python` folder, where all Python scripts are found.
+   * Gets the root of the `header` folder, where all DDS headers from PNG_XBOX and PNG_PS3 are kept.
    * - - - -
    * @returns {DirPath}
    */
-  static get pyFolder(): DirPath {
-    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/python` : 'dist/bin/python')
+  static get dbFolder(): DirPath {
+    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/db` : 'dist/bin/db')
   }
 
   /**
@@ -39,5 +39,14 @@ export class RBTools {
    */
   static get headersFolder(): DirPath {
     return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/headers` : 'dist/bin/headers')
+  }
+
+  /**
+   * Gets the root of the `python` folder, where all Python scripts are found.
+   * - - - -
+   * @returns {DirPath}
+   */
+  static get pyFolder(): DirPath {
+    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/python` : 'dist/bin/python')
   }
 }

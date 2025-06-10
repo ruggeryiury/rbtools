@@ -1,4 +1,5 @@
-import { DTAParser } from '../core.exports'
+import { resolve } from 'node-lib'
+import { DTAParser, type MAGMAProjectSongData } from '../core.exports'
 import { sortDTA, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export class RuggyCustoms {
@@ -67,6 +68,7 @@ export class RuggyCustoms {
       songLength: 36318,
       yearReleased: 1998,
       songKey: 'D#m',
+      author: 'Ruggy',
       customsource: { game_origin: 'ruggy' },
     }),
     DTAParser.create({
@@ -93,6 +95,8 @@ export class RuggyCustoms {
       songLength: 272649,
       yearReleased: 2005,
       songKey: 'A',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -138,8 +142,9 @@ export class RuggyCustoms {
       songLength: 145042,
       yearReleased: 1972,
       songKey: 'G',
+      author: 'Ruggy',
       customsource: {
-        game_origin: 'ruggy',
+        game_origin: 'rbbr',
         genre: 'mpb',
         sub_genre: 'subgenre_mpb',
       },
@@ -178,6 +183,7 @@ export class RuggyCustoms {
       songLength: 109098,
       yearReleased: 2002,
       songKey: 'Cm',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -205,6 +211,8 @@ export class RuggyCustoms {
       songLength: 67301,
       yearReleased: 2004,
       songKey: 'Dm',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -244,6 +252,8 @@ export class RuggyCustoms {
     //   songLength: 83000,
     //   yearReleased: 1998,
     //   songKey: 'B',
+    //   author: 'Ruggy',
+    // multitrack: 'full',
     //   customsource: {
     //     game_origin: 'ruggy',
     //   },
@@ -324,6 +334,8 @@ export class RuggyCustoms {
       songLength: 132705,
       yearReleased: 1995,
       songKey: 'Cm',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -363,6 +375,8 @@ export class RuggyCustoms {
       songLength: 65454,
       yearReleased: 1995,
       songKey: 'G#m',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -402,6 +416,8 @@ export class RuggyCustoms {
       songLength: 65454,
       yearReleased: 1995,
       songKey: 'G#m',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -444,6 +460,7 @@ export class RuggyCustoms {
       songLength: 194425,
       yearReleased: 2009,
       songKey: 'C#m',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -478,8 +495,10 @@ export class RuggyCustoms {
       songLength: 89593,
       yearReleased: 1973,
       songKey: 'Eb',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
-        game_origin: 'ruggy',
+        game_origin: 'rbbr',
         genre: 'mpb',
         sub_genre: 'subgenre_mpb',
       },
@@ -522,6 +541,7 @@ export class RuggyCustoms {
       songLength: 300000,
       yearReleased: 2014,
       songKey: 'Fm',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -564,6 +584,7 @@ export class RuggyCustoms {
       songLength: 184968,
       yearReleased: 2015,
       songKey: 'C',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -606,6 +627,7 @@ export class RuggyCustoms {
       songLength: 87583,
       yearReleased: 2017,
       songKey: 'C',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -644,6 +666,7 @@ export class RuggyCustoms {
       songLength: 163582,
       yearReleased: 1981,
       songKey: 'G',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -691,6 +714,7 @@ export class RuggyCustoms {
       songLength: 236430,
       yearReleased: 2010,
       songKey: 'G',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -725,6 +749,8 @@ export class RuggyCustoms {
       songLength: 222647,
       yearReleased: 2008,
       songKey: 'Fm',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -766,6 +792,8 @@ export class RuggyCustoms {
       songLength: 85239,
       yearReleased: 2018,
       songKey: 'E',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -814,6 +842,7 @@ export class RuggyCustoms {
       songLength: 276114,
       yearReleased: 2012,
       songKey: 'F#',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -856,6 +885,8 @@ export class RuggyCustoms {
       songLength: 249333,
       yearReleased: 2014,
       songKey: 'C',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -904,6 +935,7 @@ export class RuggyCustoms {
       songLength: 144000,
       yearReleased: 2018,
       songKey: 'E',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -945,6 +977,8 @@ export class RuggyCustoms {
       songLength: 223784,
       yearReleased: 2010,
       songKey: 'Gm',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -985,8 +1019,10 @@ export class RuggyCustoms {
       songLength: 135401,
       yearReleased: 1973,
       songKey: 'D',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
-        game_origin: 'ruggy',
+        game_origin: 'rbbr',
       },
     }),
     DTAParser.create({
@@ -1025,6 +1061,7 @@ export class RuggyCustoms {
       songLength: 135401,
       yearReleased: 2004,
       songKey: 'D#m',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1067,6 +1104,7 @@ export class RuggyCustoms {
       songLength: 130025,
       yearReleased: 2007,
       songKey: 'A',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1108,6 +1146,8 @@ export class RuggyCustoms {
       songLength: 102679,
       yearReleased: 1989,
       songKey: 'F',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1146,6 +1186,8 @@ export class RuggyCustoms {
       songLength: 71333,
       yearReleased: 1989,
       songKey: 'A',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1189,6 +1231,8 @@ export class RuggyCustoms {
       songLength: 135401,
       yearReleased: 2006,
       songKey: 'G',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1231,6 +1275,8 @@ export class RuggyCustoms {
       songLength: 119477,
       yearReleased: 1989,
       songKey: 'G',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1273,6 +1319,8 @@ export class RuggyCustoms {
       songLength: 121610,
       yearReleased: 1989,
       songKey: 'D',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1315,6 +1363,8 @@ export class RuggyCustoms {
       songLength: 126408,
       yearReleased: 1989,
       songKey: 'A',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1356,8 +1406,10 @@ export class RuggyCustoms {
       songLength: 215036,
       yearReleased: 2005,
       songKey: 'C#m',
+      author: 'Ruggy, NãoNemEu',
+      multitrack: 'full',
       customsource: {
-        game_origin: 'ruggy',
+        game_origin: 'rbbr',
       },
     }),
     DTAParser.create({
@@ -1394,6 +1446,8 @@ export class RuggyCustoms {
       songLength: 116955,
       yearReleased: 1992,
       songKey: 'C',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1436,6 +1490,8 @@ export class RuggyCustoms {
       songLength: 147797,
       yearReleased: 1992,
       songKey: 'Db',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1472,6 +1528,8 @@ export class RuggyCustoms {
       songLength: 95032,
       yearReleased: 1992,
       songKey: 'F#',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1509,6 +1567,8 @@ export class RuggyCustoms {
       songLength: 147797,
       yearReleased: 1989,
       songKey: 'C',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1551,6 +1611,8 @@ export class RuggyCustoms {
       songLength: 147797,
       yearReleased: 1988,
       songKey: 'C',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1594,6 +1656,8 @@ export class RuggyCustoms {
       songLength: 286408,
       yearReleased: 2014,
       songKey: 'Eb',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1633,6 +1697,8 @@ export class RuggyCustoms {
       songLength: 173105,
       yearReleased: 1989,
       songKey: 'C',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1676,6 +1742,8 @@ export class RuggyCustoms {
       songLength: 223784,
       yearReleased: 1990,
       songKey: 'Am',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1719,6 +1787,8 @@ export class RuggyCustoms {
       songLength: 122409,
       yearReleased: 1989,
       songKey: 'Ab',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1761,6 +1831,8 @@ export class RuggyCustoms {
       songLength: 97610,
       yearReleased: 1989,
       songKey: 'A',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1798,6 +1870,8 @@ export class RuggyCustoms {
       songLength: 149576,
       yearReleased: 1998,
       songKey: 'Cm',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1838,8 +1912,9 @@ export class RuggyCustoms {
       songLength: 147789,
       yearReleased: 2018,
       songKey: 'C',
+      author: 'Ruggy',
       customsource: {
-        game_origin: 'ruggy',
+        game_origin: 'rbbr',
       },
     }),
     DTAParser.create({
@@ -1874,6 +1949,8 @@ export class RuggyCustoms {
       songLength: 107214,
       yearReleased: 1989,
       songKey: 'G',
+      author: 'Ruggy',
+      multitrack: 'full',
       customsource: {
         game_origin: 'ruggy',
         genre: 'chiptune',
@@ -1916,6 +1993,7 @@ export class RuggyCustoms {
       songLength: 95341,
       yearReleased: 2020,
       songKey: 'Gm',
+      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -1955,10 +2033,10 @@ export class RuggyCustoms {
         subGenre: 'Indie Rock',
       },
       songKey: 'F#',
+      author: 'Ruggy',
       albumArt: true,
       yearReleased: 2025,
       rating: 'Family Friendly',
-      author: 'Ruggy',
       customsource: {
         game_origin: 'ruggy',
       },
@@ -2009,13 +2087,17 @@ export class RuggyCustoms {
       multitrack: 'diy_stems',
       emh: 'cat',
       customsource: {
-        game_origin: 'ruggy',
+        game_origin: 'rbbr',
       },
       magma: {
         hasLipsyncFiles: null,
       },
     }),
   ]
+
+  static get getSongs(): RB3CompatibleDTAFile[] {
+    return this.songs.map((song) => ({ ...song, magma: RuggyCustoms.magmaConfig }))
+  }
 
   /**
    * Returns an array with all songs shortnames as `string`
@@ -2051,5 +2133,11 @@ export class RuggyCustoms {
    */
   static getSongByID(id: string): RB3CompatibleDTAFile | undefined {
     return this.songs.find((song) => String(song.id) === String(id))
+  }
+
+  static readonly magmaConfig: MAGMAProjectSongData = {
+    magmaPath: 'C:/Users/Ruggery/Desktop/Rock Band/Magma',
+    songsProjectRootFolderPath: 'C:/Users/Ruggery/Documents/Visual Studio Code/projects/ruggy-customs-projects/songs',
+    destPath: resolve(process.env.USERPROFILE ?? '', 'Desktop/RB/{{songname}}.rba'),
   }
 }

@@ -64,7 +64,7 @@ export type MAGMAPathMapperReturnObject = Record<'magmaPath' | 'songsProjectRoot
  * - - - -
  */
 export class MAGMAProject {
-  song: RB3CompatibleDTAFile
+  songData: RB3CompatibleDTAFile
   options: Required<MAGMAProjectSongData>
 
   static readonly defaultMAGMAProjectOptions: Required<MAGMAProjectSongData> = {
@@ -102,16 +102,23 @@ export class MAGMAProject {
   }
 
   /**
+   * A class to create MAGMA files based on a parsed song object.
+   * - - - -
    * @param {RB3CompatibleDTAFile} song A parsed song object.
+   * @param {MAGMAProjectSongData} [options] a
    */
-  constructor(song: RB3CompatibleDTAFile) {
-    const { magma, ...songValues } = song
-    this.song = songValues
+  constructor(song: RB3CompatibleDTAFile, options?: MAGMAProjectSongData) {
+    const { magma: songMagmaConfig, ...songValues } = song
+    this.songData = songValues
+    const magma = {
+      ...songMagmaConfig,
+      ...options,
+    }
     this.options = setDefaultOptions<Required<MAGMAProjectSongData>>(MAGMAProject.defaultMAGMAProjectOptions, magma)
   }
 
   mapAllOptionsPaths(): MAGMAPathMapperReturnObject {
-    const song = this.song
+    const song = this.songData
     const options = this.options
 
     let magmaPath: FilePath
@@ -190,7 +197,7 @@ export class MAGMAProject {
   }
 
   getMAGMAC3FileContents(): [string, string] {
-    const song = this.song
+    const song = this.songData
     const options = this.options
     const { backing, bass, crowd, drum, guitar, keys, vocals } = genAudioFileStructure(song)
     const paths = this.mapAllOptionsPaths()
@@ -399,8 +406,8 @@ export class MAGMAProject {
 
   saveMAGMAC3FileContentsSync(): [FilePath, FilePath] {
     const [rbprojFile, c3File] = this.getMAGMAC3FileContents()
-    const rbprojFilePath = FilePath.of(formatStringFromDTA(this.song, this.options.destPath)).changeFileExt('.rbproj')
-    const c3FilePath = FilePath.of(formatStringFromDTA(this.song, this.options.destPath)).changeFileExt('.rok')
+    const rbprojFilePath = FilePath.of(formatStringFromDTA(this.songData, this.options.destPath)).changeFileExt('.rbproj')
+    const c3FilePath = FilePath.of(formatStringFromDTA(this.songData, this.options.destPath)).changeFileExt('.rok')
 
     rbprojFilePath.writeSync(rbprojFile.replace(new RegExp('\\n', 'g'), '\r\n'), 'latin1')
     c3FilePath.writeWithBOMSync(c3File.replace(new RegExp('\\n', 'g'), '\r\n'))

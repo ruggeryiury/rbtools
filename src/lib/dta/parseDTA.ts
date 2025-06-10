@@ -28,7 +28,33 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
     .map((val) => val.trim())
     .filter((val, valIndex) => valIndex !== 0 && !val.startsWith(')') && !(val.startsWith('songs/') || val.startsWith('"songs/')) && !(val.startsWith('sfx/') || val.startsWith('"sfx/')) && !(val.endsWith('.mid') || val.endsWith('.mid"')) && !(val.endsWith('.cue') || val.endsWith('.cue"')))
 
-  const splitValues = songContent.split(/[(;)]/).map((value) => value.replace(/'/g, '').trim())
+  const splitValues = songContent.split(/[()]/).map((value) => value.replace(/'/g, '').trim())
+  const splitComments = songContent
+    .split(/[;]/)
+    .map((value) => value.trim())
+    .filter((val) => !val.startsWith('(') && !val.startsWith('Song=') && !val.startsWith('DO') && !val.startsWith('Created'))
+
+  // Parsing MAGMA generated values
+  for (const lines of splitComments) {
+    const [key, ...values] = lines.split(' ')
+    if (key === 'Song' && values[0] === 'authored' && values[1] === 'by' && values[2]) map.set('author', values.slice(2).join(' '))
+    else if (key.includes('=') && !key.startsWith('=')) {
+      const proof = Boolean(Number(key.split('=')[1].slice(0, 1).trim()))
+      if (proof) {
+        if (key.startsWith('Karaoke=')) map.set('multitrack', 'karaoke')
+        else if (key.startsWith('Multitrack=')) map.set('multitrack', 'multitrack')
+        else if (key.startsWith('DIYStems=')) map.set('multitrack', 'diy_stems')
+        else if (key.startsWith('PartialMultitrack=')) map.set('multitrack', 'partial')
+        else if (key.startsWith('UnpitchedVocals=')) map.set('unpitchedVocals', true)
+        else if (key.startsWith('Convert=')) map.set('convert', true)
+        else if (key.startsWith('2xBass=')) map.set('doubleKick', true)
+        else if (key.startsWith('RhythmKeys=')) map.set('rhythmOn', 'keys')
+        else if (key.startsWith('RhythmBass=')) map.set('rhythmOn', 'bass')
+        else if (key.startsWith('CATemh=')) map.set('emh', 'cat')
+        else if (key.startsWith('ExpertOnly=')) map.set('emh', 'expert_only')
+      }
+    }
+  }
 
   // This is the index of used strings as the file is read.
   let stringIndex = 0
@@ -66,15 +92,18 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
     const valuesJoin = values.join(' ')
     const valuesLength = values.length
 
+    // console.log(i, key, values)
+
     // Always empty
     if (!key && valuesLength === 0 && !tracksStarted && !processedArrayName && !ranksStarted) continue
     // Song identifier must always be here on "key" variable and "values" array must always be zero
-    else if (i === 1 && (!key || valuesLength > 0)) throw new Error(`DTA Parsing error: No ID is present parsing song at index ${i.toString()}`)
-    else if (i === 1 && key && valuesLength === 0) map.set('id', key)
+    else if (i === 1 && !key) throw new Error(`DTA Parsing error: No ID is present parsing song at index ${i.toString()}`)
+    else if (i === 1 && key) map.set('id', key)
     // On unfinished strings, if key equals to `"` it means that the string has finished
     else if (unfinishedString) {
       if (key === '"') unfinishedString = false
     }
+
     // This is where tracks info like channels
     else if (tracksStarted) {
       if (tracksIndex === -1) {
@@ -84,12 +113,14 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
         tracksName = ''
         tracksIndex++
       } else if (key && isNaN(Number(key))) {
-        tracksName = key
-        if (valuesLength === 1) {
-          tracksCount[keyToTracksCountIndex(key)] = valuesLength
-          tracksName = ''
+        if (!key.startsWith(';')) {
+          tracksName = key
+          if (valuesLength === 1) {
+            tracksCount[keyToTracksCountIndex(key)] = valuesLength
+            tracksName = ''
+          }
+          tracksIndex++
         }
-        tracksIndex++
       } else {
         tracksIndex--
       }
@@ -120,13 +151,13 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       }
       processedArrayName = ''
     } else if (ranksStarted) {
-      if (ranksIndex === -1) ranksStarted = false
       if (!key && valuesLength === 0) ranksIndex--
       else {
         const rankKey = `rank_${key}` as DTAFileKeys
         map.set(rankKey, Number(valuesJoin))
         ranksIndex++
       }
+      if (ranksIndex === -1) ranksStarted = false
     } else {
       // Get songname used by the song files
       if (key === 'name' && (valuesJoin.startsWith('songs/') || valuesJoin.startsWith('"songs/'))) map.set('songname', valuesJoin.split('/')[1])
@@ -178,37 +209,6 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       else if (key === 'rank') ranksStarted = true
       // Starts to parse specific array values
       else if (key === 'pans' || key === 'vols' || key === 'cores' || key === 'real_guitar_tuning' || key === 'real_bass_tuning' || key === 'solo') processedArrayName = key
-      // Parsing MAGMA generated values
-      else if (key === 'Song') {
-        const [, , ...author] = values
-        if (!map.has('author')) map.set('author', author.join(' ').trim())
-      } else if (key.startsWith('=')) {
-        const lang1 = key.slice(1, -1).toLowerCase()
-        languages.push(lang1)
-        if (valuesLength > 0) {
-          languages.push(
-            ...valuesJoin
-              .split(/,/)
-              .map((val) => val.toLowerCase())
-              .filter((val) => val)
-          )
-        }
-      } else if (key.includes('=') && !key.startsWith('=')) {
-        const proof = Boolean(Number(key.split('=')[1].trim()))
-        if (proof) {
-          if (key.startsWith('Karaoke')) map.set('multitrack', 'karaoke')
-          else if (key.startsWith('Multitrack')) map.set('multitrack', 'multitrack')
-          else if (key.startsWith('DIYStems')) map.set('multitrack', 'diy_stems')
-          else if (key.startsWith('PartialMultitrack')) map.set('multitrack', 'partial')
-          else if (key.startsWith('UnpitchedVocals')) map.set('unpitchedVocals', true)
-          else if (key.startsWith('Convert')) map.set('convert', true)
-          else if (key.startsWith('2xBass')) map.set('doubleKick', true)
-          else if (key.startsWith('RhythmKeys')) map.set('rhythmOn', 'keys')
-          else if (key.startsWith('RhythmBass')) map.set('rhythmOn', 'bass')
-          else if (key.startsWith('CATemh')) map.set('emh', 'cat')
-          else if (key.startsWith('ExpertOnly')) map.set('emh', 'expert_only')
-        }
-      }
     }
   }
 

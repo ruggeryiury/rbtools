@@ -53,7 +53,7 @@ export const leadingArticleToTrailing = (text: string): string => {
  * @param {string} text The text you want to be processed.
  * @returns {string} The text processed.
  */
-export const quoteToSlashQ = (text: string): string => text.replace(/\\/g, '\\\\').replace(/"/g, '\\q')
+export const quoteToSlashQ = (text: string): string => text.replace(/"/g, '\\q')
 
 /**
  * Replaces slash Q (`\q`) to quote character (`"`).

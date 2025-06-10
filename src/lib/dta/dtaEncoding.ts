@@ -86,7 +86,7 @@ export const patchDTAEncodingFromDTAFileObject = (song: PartialDTAFile): SongEnc
     hasAnyStringValue = true
   }
 
-  if (!hasAnyStringValue && !encoding) return
+  if (!hasAnyStringValue && !encoding) return 'latin1'
   else if (!hasAnyStringValue && encoding) return encoding
   return hasNonASCIIChars ? 'utf8' : 'latin1'
 }
