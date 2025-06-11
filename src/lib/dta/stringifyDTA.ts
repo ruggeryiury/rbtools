@@ -1,11 +1,20 @@
 import { setDefaultOptions } from 'set-default-options'
 import type { LiteralUnion } from 'type-fest'
 import type { DTAParser } from '../../core.exports'
-import { DTAIO, genTracksCountArray, quoteToSlashQ, tabNewLineFormatter, type DTAFileKeys, type FloatValueObject, type PartialDTAFile, type SongSortingTypes } from '../../lib.exports'
+import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type SongSortingTypes } from '../../lib.exports'
 
 export interface SongDataStringifyOptions {
+  /**
+   * Default is `false`.
+   */
   ignoreFakeSongs?: boolean
+  /**
+   * Default is `null`.
+   */
   wiiMode?: `SZ${string}E/${number}` | null
+  /**
+   * Default is `true`.
+   */
   addMAGMAComments?: boolean
   /**
    * Changes the sorting of the songs. This property has no influence if you want to stringify a single song. Default is `null`.
@@ -15,28 +24,208 @@ export interface SongDataStringifyOptions {
    * Default if `true`.
    */
   omitUnusedValues?: boolean
+  /**
+   * Defaults to RB3-style DTA format options.
+   */
+  formatOptions?: DTAIOFormattingOptions
 }
 
 export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptions) => {
-  const { ignoreFakeSongs, wiiMode, addMAGMAComments, sortBy, omitUnusedValues } = setDefaultOptions(
+  const { ignoreFakeSongs, wiiMode, addMAGMAComments, sortBy, omitUnusedValues, formatOptions } = setDefaultOptions(
     {
       ignoreFakeSongs: false,
       wiiMode: null,
       addMAGMAComments: true,
       sortBy: null,
       omitUnusedValues: true,
+      formatOptions: DTAIO.formatOptions.defaultRB3,
     },
     options
   )
-  const io = new DTAIO(DTAIO.formatOptions.defaultRB3)
-  if (parser.songs.length === 0 && parser.updates.length === 0) throw new Error('No songs or updates to be stringified.')
-  else if (parser.songs.length === 0 && parser.updates.length > 0) {
+  const io = new DTAIO(formatOptions)
+  if (parser.songsLength === 0 && parser.updatesLength === 0) throw new Error('No songs or updates to be stringified.')
+  else if (parser.updatesLength > 0) {
     // Song metadata updates
-  } else if (parser.songs.length > 0 && parser.updates.length === 0) {
+    parser.updates = sortDTA(parser.updates, 'ID')
+    io.options = { ...io.options, object: { ...io.options.object, closeParenthesisInline: true } }
+
+    for (const upd of parser.updates) {
+      const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, cores, customsource, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, loading_phrase, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, upgrade_version, version, vocal_tonic_note, vols, year_recorded } = upd
+      const map = new Map<LiteralUnion<keyof PartialDTAFile, string>, unknown>()
+
+      const allValuesKeys = Object.keys(upd) as DTAFileKeys[]
+      const tracks = tracks_count ? genTracksCountArray(tracks_count) : undefined
+      const customSource = customsource
+
+      let hasSongSpecific = false,
+        hasAnyRank = false
+      for (const key of allValuesKeys) {
+        if (key === 'songname' || key === 'tracks_count' || key === 'pans' || key === 'vols' || key === 'cores' || key === 'vocal_parts' || key === 'mute_volume' || key === 'mute_volume_vocals' || key === 'hopo_threshold') {
+          hasSongSpecific = true
+        } else if (key === 'rank_drum' || key === 'rank_guitar' || key === 'rank_bass' || key === 'rank_vocals' || key === 'rank_keys' || key === 'rank_real_keys' || key === 'rank_real_guitar' || key === 'rank_real_bass' || key === 'rank_band') {
+          hasAnyRank = true
+        } else continue
+      }
+
+      if (name !== undefined) map.set('name', quoteToSlashQ(name))
+      if (artist !== undefined) map.set('artist', quoteToSlashQ(artist))
+      if (fake === true) map.set('fake', fake)
+      if (master !== undefined) map.set('master', master)
+      if (song_id !== undefined) map.set('song_id', song_id)
+      if (upgrade_version !== undefined) map.set('upgrade_version', upgrade_version)
+      if (context !== undefined) map.set('context', context)
+
+      if (hasSongSpecific) {
+        const songMap = new Map<string, unknown>()
+        if (songname !== undefined) {
+          if (wiiMode) songMap.set('name', DTAIO.useString(`dlc/${wiiMode}/content/${songname}/${songname}`, io.options.string))
+          else songMap.set('name', DTAIO.useString(`songs/${songname}/${songname}`, io.options.string))
+        }
+        if (tracks_count !== undefined && tracks) {
+          if (io.options.array.keyAndValueInline === 'expanded') {
+            // MAGMA style
+            songMap.set('tracks_count', tracks_count)
+            const tracksArray: object[] = []
+            if (tracks.drum) tracksArray.push({ drum: tracks.drum })
+            if (tracks.bass) tracksArray.push({ bass: tracks.bass })
+            if (tracks.guitar) tracksArray.push({ guitar: tracks.guitar })
+            if (tracks.vocals) tracksArray.push({ vocals: tracks.vocals })
+            if (tracks.keys) tracksArray.push({ keys: tracks.keys })
+            songMap.set('tracks', DTAIO.useArray(tracksArray, io.options))
+          } else {
+            // RB3 style
+            let firstInstrument = true
+            let content = '('
+            if (tracks.drum) {
+              content += `(drum ${tracks.drum.length > 1 ? `(${tracks.drum.join(' ')})` : tracks.drum.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.bass) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(bass ${tracks.bass.length > 1 ? `(${tracks.bass.join(' ')})` : tracks.bass.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.guitar) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(guitar ${tracks.guitar.length > 1 ? `(${tracks.guitar.join(' ')})` : tracks.guitar.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.vocals) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(vocals ${tracks.vocals.length > 1 ? `(${tracks.vocals.join(' ')})` : tracks.vocals.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.keys) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(keys ${tracks.keys.length > 1 ? `(${tracks.keys.join(' ')})` : tracks.keys.join(' ')})`
+              firstInstrument = false
+            }
+            content += '){n}{t}{t}'
+            songMap.set('tracks', DTAIO.useVariable(tabNewLineFormatter(content), { ...io.options.string, keyAndValueInline: false, apostropheOnVariable: false }))
+          }
+        }
+        if (vocal_parts !== undefined) songMap.set('vocal_parts', vocal_parts)
+        if (pans) {
+          songMap.set(
+            'pans',
+            DTAIO.useArray(
+              pans.map((val) =>
+                DTAIO.useFloat(val, {
+                  ...io.options.number,
+                  floatMaxDecimals: 1,
+                })
+              ),
+              io.options
+            )
+          )
+        }
+        if (vols) {
+          songMap.set(
+            'vols',
+            DTAIO.useArray(
+              vols.map((val) =>
+                DTAIO.useFloat(val, {
+                  ...io.options.number,
+                  floatMaxDecimals: 1,
+                })
+              ),
+              io.options
+            )
+          )
+        }
+        if (cores) songMap.set('cores', cores)
+        if (tracks?.crowd !== undefined) songMap.set('crowd_channels', tracks.crowd)
+        if (mute_volume !== undefined) songMap.set('mute_volume', mute_volume)
+        if (mute_volume_vocals !== undefined) songMap.set('mute_volume_vocals', mute_volume_vocals)
+        if (hopo_threshold !== undefined) songMap.set('hopo_threshold', hopo_threshold)
+
+        if (omitUnusedValues) {
+          if (songMap.get('mute_volume') === -96) songMap.delete('mute_volume')
+          if (songMap.get('mute_volume_vocals') === -12) songMap.delete('mute_volume_vocals')
+          if (songMap.get('hopo_threshold') === 170) songMap.delete('hopo_threshold')
+        }
+
+        map.set('song', Object.fromEntries(songMap.entries()))
+      }
+
+      if (bank !== undefined) map.set('bank', bank)
+      if (drum_bank !== undefined) map.set('drum_bank', drum_bank)
+      if (anim_tempo !== undefined) map.set('anim_tempo', anim_tempo)
+      if (band_fail_cue !== undefined) map.set('band_fail_cue', band_fail_cue)
+      if (song_scroll_speed !== undefined) map.set('song_scroll_speed', song_scroll_speed)
+      if (preview !== undefined) map.set('preview', DTAIO.useArray(preview, { ...io.options, array: { ...io.options.array, parenthesisForValues: false } }))
+      if (song_length !== undefined) map.set('song_length', song_length)
+
+      if (hasAnyRank) {
+        const rankMap = new Map<string, unknown>()
+        if (rank_drum !== undefined) rankMap.set('drum', rank_drum)
+        if (rank_guitar !== undefined) rankMap.set('guitar', rank_guitar)
+        if (rank_bass !== undefined) rankMap.set('bass', rank_bass)
+        if (rank_vocals !== undefined) rankMap.set('vocals', rank_vocals)
+        if (rank_keys !== undefined) rankMap.set('keys', rank_keys)
+        if (rank_real_keys !== undefined) rankMap.set('real_keys', rank_real_keys)
+        if (rank_real_guitar !== undefined) rankMap.set('real_guitar', rank_real_guitar)
+        if (rank_real_bass !== undefined) rankMap.set('real_bass', rank_real_bass)
+        if (rank_band !== undefined) rankMap.set('band', rank_band)
+        map.set('rank', Object.fromEntries(rankMap.entries()))
+      }
+      if (solo !== undefined && solo.length > 0) map.set('solo', DTAIO.useArray(solo, io.options))
+      if (format !== undefined) map.set('format', format)
+      if (version !== undefined) map.set('version', version)
+      if (game_origin !== undefined) map.set('game_origin', !customSource?.game_origin ? game_origin : DTAIO.useIfDef('CUSTOMSOURCE', customSource.game_origin, game_origin, io.options))
+      if (rating !== undefined) map.set('rating', rating)
+      if (genre !== undefined) map.set('genre', !customSource?.genre ? genre : DTAIO.useIfDef('CUSTOMSOURCE', customSource.genre, genre, io.options))
+      if (sub_genre !== undefined) map.set('sub_genre', !customSource?.sub_genre ? sub_genre : DTAIO.useIfDef('CUSTOMSOURCE', customSource.sub_genre, sub_genre, io.options))
+      if (vocal_gender !== undefined) map.set('vocal_gender', vocal_gender)
+      if (year_released !== undefined) map.set('year_released', year_released)
+      if (year_recorded !== undefined) map.set('year_recorded', year_recorded)
+      if (album_art !== undefined) map.set('album_art', album_art)
+      if (album_name !== undefined) map.set('album_name', album_name)
+      if (album_track_number !== undefined) map.set('album_track_number', album_track_number)
+      if (vocal_tonic_note !== undefined) map.set('vocal_tonic_note', vocal_tonic_note)
+      if (song_tonality !== undefined) map.set('song_tonality', song_tonality)
+      if (song_key !== undefined) map.set('song_key', song_key)
+      if (encoding !== undefined) map.set('encoding', encoding)
+      if (tuning_offset_cents !== undefined) map.set('tuning_offset_cents', tuning_offset_cents)
+      if (guide_pitch_volume !== undefined) map.set('guide_pitch_volume', DTAIO.useFloat(guide_pitch_volume, { ...io.options.number, floatMaxDecimals: 1 }))
+      if (real_guitar_tuning !== undefined) map.set('real_guitar_tuning', real_guitar_tuning)
+      if (real_bass_tuning !== undefined) map.set('real_bass_tuning', real_bass_tuning)
+      if (alternate_path !== undefined) map.set('alternate_path', alternate_path)
+      if (base_points !== undefined) map.set('base_points', base_points)
+      if (extra_authoring !== undefined && extra_authoring.length > 0) map.set('extra_authoring', DTAIO.useArray(extra_authoring, { ...io.options, array: { ...io.options.array, parenthesisForValues: false } }))
+      if (author !== undefined) map.set('author', quoteToSlashQ(author))
+      if (strings_author !== undefined) map.set('strings_author', quoteToSlashQ(strings_author))
+      if (keys_author !== undefined) map.set('keys_author', quoteToSlashQ(keys_author))
+      if (loading_phrase !== undefined) map.set('loading_phrase', quoteToSlashQ(loading_phrase))
+      if (pack_name !== undefined) map.set('pack_name', quoteToSlashQ(pack_name))
+
+      io.addValue(id, Object.fromEntries(map.entries()))
+    }
+  } else if (parser.songsLength > 0) {
     // Songs only
     if (sortBy) parser.sort(sortBy)
     for (const song of parser.songs) {
-      const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, convert, cores, customsource, doubleKick, emh, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, languages, loading_phrase, multitrack, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, rhythmOn, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, unpitchedVocals, upgrade_version, version, vocal_tonic_note, vols, year_recorded } = song as PartialDTAFile
+      const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, convert, cores, customsource, doubleKick, emh, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, languages, loading_phrase, multitrack, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, rhythmOn, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, unpitchedVocals, upgrade_version, version, vocal_tonic_note, vols, year_recorded, original_id } = song as PartialDTAFile
       const map = new Map<LiteralUnion<keyof PartialDTAFile, string>, unknown>()
 
       if (ignoreFakeSongs && fake) continue
@@ -57,7 +246,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
 
       if (name !== undefined) map.set('name', quoteToSlashQ(name))
       if (artist !== undefined) map.set('artist', quoteToSlashQ(artist))
-      if (fake !== undefined) map.set('fake', fake)
+      if (fake === true) map.set('fake', fake)
       if (master !== undefined) map.set('master', master)
       if (song_id !== undefined) map.set('song_id', song_id)
       if (upgrade_version !== undefined) map.set('upgrade_version', upgrade_version)
@@ -70,34 +259,47 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
           else songMap.set('name', DTAIO.useString(`songs/${songname}/${songname}`, io.options.string))
         }
         if (tracks_count !== undefined && tracks) {
-          let firstInstrument = true
-          let content = '('
-          if (tracks.drum) {
-            content += `(drum ${tracks.drum.length > 1 ? `(${tracks.drum.join(' ')})` : tracks.drum.join(' ')})`
-            firstInstrument = false
+          if (io.options.array.keyAndValueInline === 'expanded') {
+            // MAGMA style
+            songMap.set('tracks_count', tracks_count)
+            const tracksArray: object[] = []
+            if (tracks.drum) tracksArray.push({ drum: tracks.drum })
+            if (tracks.bass) tracksArray.push({ bass: tracks.bass })
+            if (tracks.guitar) tracksArray.push({ guitar: tracks.guitar })
+            if (tracks.vocals) tracksArray.push({ vocals: tracks.vocals })
+            if (tracks.keys) tracksArray.push({ keys: tracks.keys })
+            songMap.set('tracks', DTAIO.useArray(tracksArray, io.options))
+          } else {
+            // RB3 style
+            let firstInstrument = true
+            let content = '('
+            if (tracks.drum) {
+              content += `(drum ${tracks.drum.length > 1 ? `(${tracks.drum.join(' ')})` : tracks.drum.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.bass) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(bass ${tracks.bass.length > 1 ? `(${tracks.bass.join(' ')})` : tracks.bass.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.guitar) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(guitar ${tracks.guitar.length > 1 ? `(${tracks.guitar.join(' ')})` : tracks.guitar.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.vocals) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(vocals ${tracks.vocals.length > 1 ? `(${tracks.vocals.join(' ')})` : tracks.vocals.join(' ')})`
+              firstInstrument = false
+            }
+            if (tracks.keys) {
+              if (!firstInstrument) content += '{n}{t}{t}{t} '
+              content += `(keys ${tracks.keys.length > 1 ? `(${tracks.keys.join(' ')})` : tracks.keys.join(' ')})`
+              firstInstrument = false
+            }
+            content += '){n}{t}{t}'
+            songMap.set('tracks', DTAIO.useVariable(tabNewLineFormatter(content), { ...io.options.string, keyAndValueInline: false, apostropheOnVariable: false }))
           }
-          if (tracks.bass) {
-            if (!firstInstrument) content += '{n}{t}{t}{t} '
-            content += `(bass ${tracks.bass.length > 1 ? `(${tracks.bass.join(' ')})` : tracks.bass.join(' ')})`
-            firstInstrument = false
-          }
-          if (tracks.guitar) {
-            if (!firstInstrument) content += '{n}{t}{t}{t} '
-            content += `(guitar ${tracks.guitar.length > 1 ? `(${tracks.guitar.join(' ')})` : tracks.guitar.join(' ')})`
-            firstInstrument = false
-          }
-          if (tracks.vocals) {
-            if (!firstInstrument) content += '{n}{t}{t}{t} '
-            content += `(vocals ${tracks.vocals.length > 1 ? `(${tracks.vocals.join(' ')})` : tracks.vocals.join(' ')})`
-            firstInstrument = false
-          }
-          if (tracks.keys) {
-            if (!firstInstrument) content += '{n}{t}{t}{t} '
-            content += `(keys ${tracks.keys.length > 1 ? `(${tracks.keys.join(' ')})` : tracks.keys.join(' ')})`
-            firstInstrument = false
-          }
-          content += '){n}{t}{t}'
-          songMap.set('tracks', DTAIO.useVariable(tabNewLineFormatter(content), { ...io.options.string, keyAndValueInline: false, apostropheOnVariable: false }))
         }
         if (vocal_parts !== undefined) songMap.set('vocal_parts', vocal_parts)
         if (pans) {
@@ -252,6 +454,8 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         content += `;CATemh=${CATemh ? '1' : '0'}{n}`
         const expertOnly = emh === 'expert_only'
         content += `;ExpertOnly=${expertOnly ? '1' : '0'}{n}`
+
+        if (original_id) content += `;ORIG_ID=${original_id}{n}`
 
         map.set('magma', DTAIO.useComment(tabNewLineFormatter(content)))
       }

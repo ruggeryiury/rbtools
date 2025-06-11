@@ -11,7 +11,7 @@ import { crc32 } from 'crc'
  */
 export const genNumericSongID = (id: string | number): number => {
   if (typeof id === 'number' || !isNaN(Number(id))) return Number(id)
-  let newSongID = crc32('someonelikeyou')
+  let newSongID = crc32(id)
   newSongID %= 9999999
   newSongID += 2130000000
   return newSongID

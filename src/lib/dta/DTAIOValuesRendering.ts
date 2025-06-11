@@ -239,9 +239,9 @@ export const dtaRenderArray = (key: string | null, value: ArrayValueObject, tabA
           .filter((str) => Boolean(str))
           .map((str, strIndex) => {
             if (strIndex === 0) {
-              return `${tabNewLineFormatter(`{n}${'{t}'.repeat(tabAmount + 2)}`)}${str.slice(1)}`
-            } else if (strIndex !== val.split('\n').length - 1) return `${tabNewLineFormatter('{t}'.repeat(tabAmount + 2))}${str.slice(1)}`
-            else return `${tabNewLineFormatter('{t}'.repeat(tabAmount + 2))}${str.slice(1)}`
+              return `${tabNewLineFormatter(`{n}${'{t}'.repeat(tabAmount)}`)}${str.slice(1)}`
+            } else if (strIndex !== val.split('\n').length - 1) return `${tabNewLineFormatter('{t}'.repeat(tabAmount))}${str.slice(1)}`
+            else return `${tabNewLineFormatter('{t}'.repeat(tabAmount))}${str.slice(1)}`
           })
           .filter((str) => Boolean(str))
           .join('\n')

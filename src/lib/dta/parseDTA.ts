@@ -1,5 +1,11 @@
 import { customSourceIfdefDeconstructor, isTracksCountEmpty, slashQToQuote, sortDTAMap, type DTAFileKeys, type DTAMap, type DTARecord, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
 
+/**
+ * Parses a DTA song content to a `RB3CompatibleDTAFile` or `PartialDTAFile` object.
+ * - - - -
+ * @param {string} songContent The depacked content of a song's data.
+ * @returns {RB3CompatibleDTAFile | PartialDTAFile}
+ */
 export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTAFile => {
   const keyToTracksCountIndex = (key: string): number => {
     switch (key) {
@@ -38,6 +44,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
   for (const lines of splitComments) {
     const [key, ...values] = lines.split(' ')
     if (key === 'Song' && values[0] === 'authored' && values[1] === 'by' && values[2]) map.set('author', values.slice(2).join(' '))
+    else if (key.startsWith('ORIG_ID=')) map.set('original_id', key.split('=')[1].slice(0, -1))
     else if (key.includes('=') && !key.startsWith('=')) {
       const proof = Boolean(Number(key.split('=')[1].slice(0, 1).trim()))
       if (proof) {
@@ -52,6 +59,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
         else if (key.startsWith('RhythmBass=')) map.set('rhythmOn', 'bass')
         else if (key.startsWith('CATemh=')) map.set('emh', 'cat')
         else if (key.startsWith('ExpertOnly=')) map.set('emh', 'expert_only')
+        else if (key.startsWith('ORIG_ID=')) map.set('original_id', '1')
       }
     }
   }
@@ -212,7 +220,8 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
     }
   }
 
-  if (!isTracksCountEmpty(tracksCount)) map.set('tracks_count', tracksCount)
+  if (!(tracksCount[5] > 2) && !isTracksCountEmpty(tracksCount)) map.set('tracks_count', tracksCount)
+  if (tracksCount[3] > 0 && map.has('rank_vocals') && (map.get('rank_vocals') as number) > 0 && !map.has('vocal_parts')) map.set('vocal_parts', 1)
   if (preview[1] !== 0) map.set('preview', preview)
   if (solo.length > 0) map.set('solo', solo)
   if (extraAuthoring.length > 0) map.set('extra_authoring', extraAuthoring)

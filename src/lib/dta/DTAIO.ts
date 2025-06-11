@@ -606,12 +606,18 @@ export class DTAIO {
 
   /**
    * Returns an object with all values added to the DTA file contents.
+   * - - - -
    * @returns {Record<string, any>}
    */
   toJSON(): Record<string, any> {
     return this.content
   }
 
+  /**
+   * Converts the DTA structure to DTA file contents.
+   * - - - -
+   * @returns {string}
+   */
   toString(): string {
     const io = new BinaryWriter()
 

@@ -4,11 +4,12 @@ export type AnyDTATypeArray = RB3CompatibleDTAFile[] | PartialDTAFile[]
 export type DTASelfReturnType<T> = T
 
 /**
- * Sorts an array of parsed song objects.
+ * Sorts an array of `RB3CompatibleDTAFile` objects based on a song data value.
  * - - - -
- * @param {AnyDTATypeArray} songs An array with parsed song objects.
+ * @template {AnyDTATypeArray} T
+ * @param {AnyDTATypeArray} songs An array with `RB3CompatibleDTAFile` objects.
  * @param {SongSortingTypes} sortBy The sorting type.
- * @returns {DTASelfReturnType<AnyDTATypeArray>} A sorted array of parsed song objects.
+ * @returns {DTASelfReturnType<T>}
  */
 export const sortDTA = <T extends AnyDTATypeArray>(songs: T, sortBy: SongSortingTypes): T => {
   if (sortBy === 'Song Title') {
@@ -94,16 +95,14 @@ export const sortDTA = <T extends AnyDTATypeArray>(songs: T, sortBy: SongSorting
   } else if (sortBy === 'Song ID') {
     // Sorting by Song ID
     return songs.sort((a, b) => {
-      const AID = a.id.toLowerCase()
-      const BID = b.id.toLowerCase()
-      const ASID = a.song_id ? (typeof a.song_id === 'number' ? a.song_id.toString().toLowerCase() : a.song_id.toLowerCase()) : undefined
-      const BSID = b.song_id ? (typeof b.song_id === 'number' ? b.song_id.toString().toLowerCase() : b.song_id.toLowerCase()) : undefined
+      const AID = Number(a.song_id)
+      const BID = Number(b.song_id)
+      if (isNaN(AID)) return -1
+      if (isNaN(BID)) return -1
 
-      if (ASID !== undefined && BSID !== undefined) return ASID.localeCompare(BSID)
-
-      if (ASID !== undefined) return -1
-      if (BSID !== undefined) return 1
-      return AID.localeCompare(BID)
+      if (AID > BID) return 1
+      else if (AID < BID) return -1
+      else return 0
     }) as DTASelfReturnType<T>
   }
   return songs

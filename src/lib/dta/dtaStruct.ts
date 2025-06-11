@@ -690,6 +690,10 @@ export interface RB3CompatibleDTAFile {
    * An object with values that will be used to configure the `MAGMAProject` module.
    */
   magma?: MAGMAProjectSongData
+  /**
+   * The original ID of the song's name.
+   */
+  original_id?: string
 }
 
 export interface CustomSourceValuesObject {
@@ -731,7 +735,7 @@ export type DTAFileKeys = keyof RB3CompatibleDTAFile
  * @returns {boolean} A boolean value that tells the provided parsed song is a `DTAFile` object.
  */
 export const isRB3CompatibleDTA = (song: unknown): song is RB3CompatibleDTAFile => {
-  return !Array.isArray(song) && typeof song === 'object' && song !== null && 'name' in song && 'artist' in song && 'id' in song && 'tracks_count' in song && 'song_id' in song && 'preview' in song && 'vocal_parts' in song && 'bank' in song && 'anim_tempo' in song && 'rank_band' in song && 'game_origin' in song && 'rating' in song && 'genre' in song && 'vocal_gender' in song && 'year_released' in song && 'format' in song && 'version' in song
+  return !Array.isArray(song) && typeof song === 'object' && song !== null && 'name' in song && 'artist' in song && 'id' in song && 'master' in song && 'tracks_count' in song && 'song_id' in song && 'preview' in song && 'vocal_parts' in song && 'pans' in song && 'vols' in song && 'cores' in song && 'bank' in song && 'anim_tempo' in song && 'rank_band' in song && 'game_origin' in song && 'rating' in song && 'genre' in song && 'vocal_gender' in song && 'year_released' in song && 'format' in song && 'version' in song
 }
 
 /**
@@ -751,10 +755,14 @@ export const getCompleteDTAMissingValues = (song: PartialDTAFile): DTAFileKeys[]
   let hasName = false,
     hasArtist = false,
     hasID = false,
+    hasMaster = false,
     hasTracksCount = false,
     hasSongID = false,
     hasPreview = false,
     hasVocalParts = false,
+    hasPans = false,
+    hasVols = false,
+    hasCores = false,
     hasBank = false,
     hasAnimTempo = false,
     hasRankBand = false,
@@ -765,7 +773,6 @@ export const getCompleteDTAMissingValues = (song: PartialDTAFile): DTAFileKeys[]
     hasYearReleased = false,
     hasFormat = false,
     hasVersion = false
-  // hasEncoding = false
 
   const allKeys = Object.keys(song) as DTAFileKeys[]
 
@@ -773,10 +780,14 @@ export const getCompleteDTAMissingValues = (song: PartialDTAFile): DTAFileKeys[]
     if (key === 'name') hasName = true
     if (key === 'artist') hasArtist = true
     if (key === 'id') hasID = true
+    if (key === 'master') hasMaster = true
     if (key === 'tracks_count') hasTracksCount = true
     if (key === 'song_id') hasSongID = true
     if (key === 'preview') hasPreview = true
     if (key === 'vocal_parts') hasVocalParts = true
+    if (key === 'pans') hasPans = true
+    if (key === 'vols') hasVols = true
+    if (key === 'cores') hasCores = true
     if (key === 'bank') hasBank = true
     if (key === 'anim_tempo') hasAnimTempo = true
     if (key === 'rank_band') hasRankBand = true
@@ -787,16 +798,19 @@ export const getCompleteDTAMissingValues = (song: PartialDTAFile): DTAFileKeys[]
     if (key === 'year_released') hasYearReleased = true
     if (key === 'format') hasFormat = true
     if (key === 'version') hasVersion = true
-    // if (key === 'encoding') hasEncoding = true
   }
 
   if (!hasName) missingValues.push('name')
   if (!hasArtist) missingValues.push('artist')
   if (!hasID) missingValues.push('id')
+  if (!hasMaster) missingValues.push('master')
   if (!hasTracksCount) missingValues.push('tracks_count')
   if (!hasSongID) missingValues.push('song_id')
   if (!hasPreview) missingValues.push('preview')
   if (!hasVocalParts) missingValues.push('vocal_parts')
+  if (!hasPans) missingValues.push('pans')
+  if (!hasVols) missingValues.push('vols')
+  if (!hasCores) missingValues.push('cores')
   if (!hasBank) missingValues.push('bank')
   if (!hasAnimTempo) missingValues.push('anim_tempo')
   if (!hasRankBand) missingValues.push('rank_band')
@@ -807,7 +821,6 @@ export const getCompleteDTAMissingValues = (song: PartialDTAFile): DTAFileKeys[]
   if (!hasYearReleased) missingValues.push('year_released')
   if (!hasFormat) missingValues.push('format')
   if (!hasVersion) missingValues.push('version')
-  // if (!hasEncoding) missingValues.push('encoding')
 
   return missingValues
 }
