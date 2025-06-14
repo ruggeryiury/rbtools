@@ -1,4 +1,4 @@
-import { BinaryReader, FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, HexVal, pathLikeToFilePath, randomByteFromRanges } from 'node-lib'
+import { BinaryReader, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, HexVal, pathLikeToFilePath, randomByteFromRanges } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { BinaryAPI, EDATFile, PythonAPI, type MIDIFileStatPythonObject } from '../core.exports'
 

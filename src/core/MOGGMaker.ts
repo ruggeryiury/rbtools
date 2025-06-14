@@ -1,4 +1,4 @@
-import { FilePath, pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
+import { type FilePath, pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
 import { temporaryFile } from 'tempy'
 import { BinaryAPI, MOGGFile, PythonAPI } from '../core.exports'
 

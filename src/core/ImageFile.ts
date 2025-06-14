@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { fileTypeFromBuffer } from 'file-type'
-import { FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+// import type { FilePath } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { temporaryFile } from 'tempy'
 import { PythonAPI, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'

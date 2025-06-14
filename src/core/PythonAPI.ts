@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { execAsync, FilePath, pathLikeToFilePath, pathLikeToString, type FilePathLikeTypes } from 'node-lib'
+import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { ImageFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes } from '../core.exports'
 import type { TPLHeaderParserObject } from '../lib.exports'

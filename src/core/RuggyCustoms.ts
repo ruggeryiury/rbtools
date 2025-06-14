@@ -3,6 +3,48 @@ import { DTAParser, type MAGMAProjectSongData } from '../core.exports'
 import { sortDTA, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export class RuggyCustoms {
+  static readonly magmaConfig: MAGMAProjectSongData = {
+    magmaPath: 'C:/Users/Ruggery/Desktop/Rock Band/Magma',
+    songsProjectRootFolderPath: 'C:/Users/Ruggery/Documents/Visual Studio Code/projects/ruggy-customs/songs',
+    destPath: process.env.USERPROFILE ? resolve(process.env.USERPROFILE, 'Desktop/{{songname}}.rba') : resolve('{{songname}}.rba'),
+  }
+
+  /**
+   * Returns an array with all songs shortnames as `string`
+   * - - - -
+   * @returns {string[]}
+   */
+  static getAllSongsShortname(): string[] {
+    return this.songs.map((song) => song.id)
+  }
+
+  /**
+   * Returns a list of IDs used on all songs as `string`.
+   * - - - -
+   * @returns {string}
+   */
+  static get idListString(): string {
+    let output = ''
+    const sortedSongs = sortDTA(this.songs, 'Song ID')
+
+    for (const songs of sortedSongs) {
+      output += `${String(songs.song_id).slice(-3)} ${songs.name}\n`
+    }
+
+    return output
+  }
+
+  /**
+   * Get the parsed song object based on its ID (shortname).
+   * - - - -
+   * @param {string} id The ID (shortname) of the song.
+   * @returns {RB3CompatibleDTAFile | undefined} Returns the found parsed song object or
+   * `undefined` if no song is found.
+   */
+  static getSongByID(id: string): RB3CompatibleDTAFile | undefined {
+    return this.songs.find((song) => String(song.id) === String(id))
+  }
+
   static readonly songs: RB3CompatibleDTAFile[] = [
     DTAParser.create({
       id: '7748paintwar',
@@ -10,7 +52,7 @@ export class RuggyCustoms {
       artist: 'Dream Avenue',
       albumName: 'Our Shared Universes',
       albumTrackNumber: 4,
-      songID: 1774800001,
+      songID: 1,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -55,7 +97,7 @@ export class RuggyCustoms {
       artist: 'Primus',
       albumName: 'Chef Aid: The South Park Album',
       albumTrackNumber: 1,
-      songID: 1774800002,
+      songID: 2,
       genre: { genre: 'Alternative', subGenre: 'Alternative' },
       backingTracksCount: 2,
       bandRank: 3,
@@ -77,7 +119,7 @@ export class RuggyCustoms {
       artist: 'Imogen Heap',
       albumName: 'Speak for Yourself',
       albumTrackNumber: 5,
-      songID: 1774800003,
+      songID: 3,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Other',
@@ -107,7 +149,7 @@ export class RuggyCustoms {
       artist: 'Clube da Esquina',
       albumName: 'Clube da Esquina',
       albumTrackNumber: 6,
-      songID: 1774800004,
+      songID: 4,
       genre: {
         genre: 'Latin',
         subGenre: 'Latin',
@@ -155,7 +197,7 @@ export class RuggyCustoms {
       artist: 'Death From Above 1979',
       albumName: 'Heads Up',
       albumTrackNumber: 1,
-      songID: 1774800005,
+      songID: 5,
       genre: {
         genre: 'Punk',
         subGenre: 'Dance Punk',
@@ -194,7 +236,7 @@ export class RuggyCustoms {
       artist: 'From First to Last',
       albumName: 'Dear Diary, My Teen Angst Has a Body Count',
       albumTrackNumber: 10,
-      songID: 1774800006,
+      songID: 6,
       genre: {
         genre: 'Other',
         subGenre: 'Acoustic',
@@ -221,7 +263,7 @@ export class RuggyCustoms {
     //   id: '7748town',
     //   name: 'Town',
     //   artist: 'Nathan Grigg',
-    //   songID: 1774800008,
+    //   songID: 8,
     //   genre: {
     //     genre: 'Fusion',
     //     subGenre: 'Fusion',
@@ -262,7 +304,7 @@ export class RuggyCustoms {
     //   id: '7748canyon',
     //   name: 'Trip Through the Great Canyon',
     //   artist: 'George Stone',
-    //   songID: 1774800010,
+    //   songID: 10,
     //   genre: {
     //     genre: 'Fusion',
     //     subGenre: 'Fusion',
@@ -302,7 +344,7 @@ export class RuggyCustoms {
       id: '7748passport',
       name: 'Passport',
       artist: 'George Stone',
-      songID: 1774800011,
+      songID: 11,
       genre: {
         genre: 'Fusion',
         subGenre: 'Fusion',
@@ -344,7 +386,7 @@ export class RuggyCustoms {
       id: '7748spacecadet',
       name: '3D Pinball Space Cadet: Level 1',
       artist: 'Matt Ridgeway',
-      songID: 1774800012,
+      songID: 12,
       genre: {
         genre: 'Fusion',
         subGenre: 'Fusion',
@@ -385,7 +427,7 @@ export class RuggyCustoms {
       id: '7748spacecadet2x',
       name: '3D Pinball Space Cadet: Level 1 (2x Bass Pedal)',
       artist: 'Matt Ridgeway',
-      songID: 1774800013,
+      songID: 13,
       genre: {
         genre: 'Fusion',
         subGenre: 'Fusion',
@@ -428,7 +470,7 @@ export class RuggyCustoms {
       artist: 'The Raveonettes',
       albumName: 'In and Out of Control',
       albumTrackNumber: 9,
-      songID: 1774800014,
+      songID: 14,
       genre: {
         genre: 'Indie Rock',
         subGenre: 'Indie Rock',
@@ -471,7 +513,7 @@ export class RuggyCustoms {
       artist: 'Caetano Veloso',
       albumName: 'Araçá Azul',
       albumTrackNumber: 10,
-      songID: 1774800015,
+      songID: 15,
       genre: {
         genre: 'Latin',
         subGenre: 'Latin',
@@ -509,7 +551,7 @@ export class RuggyCustoms {
       artist: 'Bear In Heaven',
       albumName: 'Time Is Over One Day Old',
       albumTrackNumber: 7,
-      songID: 1774800016,
+      songID: 16,
       genre: {
         genre: 'Indie Rock',
         subGenre: 'Indie Rock',
@@ -552,7 +594,7 @@ export class RuggyCustoms {
       artist: 'Turnover',
       albumName: 'Peripheral Vision',
       albumTrackNumber: 1,
-      songID: 1774800017,
+      songID: 17,
       genre: {
         genre: 'Indie Rock',
         subGenre: 'Indie Rock',
@@ -595,7 +637,7 @@ export class RuggyCustoms {
       artist: 'The Blasting Company',
       albumName: 'Over The Garden Wall',
       albumTrackNumber: 25,
-      songID: 1774800018,
+      songID: 18,
       genre: {
         genre: 'Glam',
         subGenre: 'Glam',
@@ -638,7 +680,7 @@ export class RuggyCustoms {
       artist: 'Depeche Mode',
       albumName: 'Speak & Spell',
       albumTrackNumber: 10,
-      songID: 1774800019,
+      songID: 19,
       genre: {
         genre: 'New Wave',
         subGenre: 'Synthpop',
@@ -677,7 +719,7 @@ export class RuggyCustoms {
       artist: 'MGMT',
       albumName: 'Congratulations',
       albumTrackNumber: 9,
-      songID: 1774800020,
+      songID: 20,
       genre: {
         genre: 'Rock',
         subGenre: 'Psychedelic',
@@ -725,7 +767,7 @@ export class RuggyCustoms {
       artist: 'Nine Inch Nails',
       albumName: 'The Slip',
       albumTrackNumber: 7,
-      songID: 1774800021,
+      songID: 21,
       genre: {
         genre: 'Rock',
         subGenre: 'Rock',
@@ -761,7 +803,7 @@ export class RuggyCustoms {
       artist: 'Dream Avenue',
       albumName: 'Our Shared Universes',
       albumTrackNumber: 1,
-      songID: 1774800022,
+      songID: 22,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -805,7 +847,7 @@ export class RuggyCustoms {
       artist: 'Tame Impala',
       albumName: 'Lonerism',
       albumTrackNumber: 4,
-      songID: 1774800023,
+      songID: 23,
       genre: {
         genre: 'Rock',
         subGenre: 'Psychedelic',
@@ -853,7 +895,7 @@ export class RuggyCustoms {
       artist: 'Dream Avenue',
       albumName: 'Moonstone',
       albumTrackNumber: 3,
-      songID: 1774800024,
+      songID: 24,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -898,7 +940,7 @@ export class RuggyCustoms {
       artist: 'Mitski',
       albumName: 'Be the Cowboy',
       albumTrackNumber: 2,
-      songID: 1774800025,
+      songID: 25,
       genre: {
         genre: 'Indie Rock',
         subGenre: 'Indie Rock',
@@ -946,7 +988,7 @@ export class RuggyCustoms {
       artist: 'How to Destroy Angels',
       albumName: 'How to Destroy Angels',
       albumTrackNumber: 1,
-      songID: 1774800026,
+      songID: 26,
       genre: {
         genre: 'Rock',
         subGenre: 'Rock',
@@ -989,7 +1031,7 @@ export class RuggyCustoms {
       artist: 'Secos & Molhados',
       albumName: 'Secos & Molhados',
       albumTrackNumber: 1,
-      songID: 1774800027,
+      songID: 27,
       genre: {
         genre: 'Glam',
         subGenre: 'Glam',
@@ -1031,7 +1073,7 @@ export class RuggyCustoms {
       artist: 'Autolux',
       albumName: 'Future Perfect',
       albumTrackNumber: 7,
-      songID: 1774800028,
+      songID: 28,
       genre: {
         genre: 'Rock',
         subGenre: 'Rock',
@@ -1072,7 +1114,7 @@ export class RuggyCustoms {
       artist: 'Panda Bear',
       albumName: 'Person Pitch',
       albumTrackNumber: 7,
-      songID: 1774800029,
+      songID: 29,
       genre: {
         genre: 'Indie Rock',
         subGenre: 'Indie Rock',
@@ -1115,7 +1157,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 21,
-      songID: 1774800030,
+      songID: 30,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1125,21 +1167,27 @@ export class RuggyCustoms {
       drum: {
         channels: 4,
         rank: 3,
+        vols: [-1.5, 0, -3.2, -3.2],
       },
       bass: {
         channels: 1,
         rank: 2,
         rankPRO: 3,
+        vols: [-4],
       },
       guitar: {
         channels: 1,
         rank: 3,
         rankPRO: 4,
+        vols: [-3],
+        pans: [0.2],
       },
       keys: {
         channels: 1,
         rank: 2,
         rankPRO: 2,
+        vols: [-3],
+        pans: [-0.2],
       },
       rating: 'Family Friendly',
       preview: [3734, 33734],
@@ -1159,7 +1207,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 7,
-      songID: 1774800031,
+      songID: 31,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1169,16 +1217,20 @@ export class RuggyCustoms {
       drum: {
         channels: 4,
         rank: 2,
+        vols: [-1.5, 0, -3.2, -3.2],
       },
       bass: {
         channels: 1,
         rank: 3,
         rankPRO: 3,
+        vols: [-2],
       },
       guitar: {
         channels: 1,
         rank: 3,
         rankPRO: 3,
+        vols: [-2.8],
+        pans: [0.1],
       },
       rating: 'Family Friendly',
       animTempo: 'Fast (over 160bpm)',
@@ -1199,7 +1251,7 @@ export class RuggyCustoms {
       artist: 'CSS',
       albumName: 'Cansei de Ser Sexy (International Release)',
       albumTrackNumber: 2,
-      songID: 1774800032,
+      songID: 32,
       genre: {
         genre: 'Indie Rock',
         subGenre: 'Indie Rock',
@@ -1243,31 +1295,38 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 1,
-      songID: 1774800033,
+      songID: 33,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
       },
-      backingTracksCount: 2,
+      backingTracksCount: {
+        channels: 2,
+        vols: [-5, -5],
+      },
       bandRank: 0,
       drum: {
         channels: 2,
         rank: 0,
+        vols: [-4, -4],
       },
       bass: {
         channels: 1,
         rank: 1,
         rankPRO: 1,
+        vols: [-5],
       },
       guitar: {
         channels: 1,
         rank: 2,
         rankPRO: 2,
+        vols: [-5],
       },
       keys: {
         channels: 1,
         rank: 0,
         rankPRO: 0,
+        vols: [-6],
       },
       rating: 'Family Friendly',
       animTempo: 'Slow (under 100bpm)',
@@ -1288,7 +1347,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 4,
-      songID: 1774800034,
+      songID: 34,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1332,7 +1391,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 19,
-      songID: 1774800035,
+      songID: 35,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1376,7 +1435,7 @@ export class RuggyCustoms {
       artist: 'Pitty',
       albumName: 'Admirável Chip Novo',
       albumTrackNumber: 1,
-      songID: 1774800036,
+      songID: 36,
       genre: {
         genre: 'Rock',
         subGenre: 'Rock',
@@ -1418,7 +1477,7 @@ export class RuggyCustoms {
       artist: 'Nobuo Uematsu',
       albumName: 'Final Fantasy V (Original Soundtrack)',
       albumTrackNumber: 5,
-      songID: 1774800037,
+      songID: 37,
       genre: {
         genre: 'Classical',
         subGenre: 'Classical',
@@ -1458,7 +1517,7 @@ export class RuggyCustoms {
       artist: 'Nobuo Uematsu',
       albumName: 'Final Fantasy V (Original Soundtrack)',
       albumTrackNumber: 6,
-      songID: 1774800038,
+      songID: 38,
       genre: {
         genre: 'Classical',
         subGenre: 'Classical',
@@ -1502,7 +1561,7 @@ export class RuggyCustoms {
       artist: 'Nobuo Uematsu',
       albumName: 'Final Fantasy V (Original Soundtrack)',
       albumTrackNumber: 21,
-      songID: 1774800039,
+      songID: 39,
       genre: {
         genre: 'Classical',
         subGenre: 'Classical',
@@ -1540,7 +1599,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 17,
-      songID: 1774800040,
+      songID: 40,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1550,16 +1609,19 @@ export class RuggyCustoms {
       drum: {
         channels: 4,
         rank: 0,
+        vols: [-1.5, 0, -3.2, -3.2],
       },
       bass: {
         channels: 1,
         rank: 1,
         rankPRO: 4,
+        vols: [-2],
       },
       keys: {
         channels: 1,
         rank: 0,
         rankPRO: 0,
+        vols: [-3],
       },
       rating: 'Family Friendly',
       animTempo: 'Slow (under 100bpm)',
@@ -1580,7 +1642,7 @@ export class RuggyCustoms {
       artist: 'Koji Kondo',
       albumName: 'Super Mario Bros 2 (Original Soundtrack)',
       albumTrackNumber: 2,
-      songID: 1774800041,
+      songID: 41,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1624,7 +1686,7 @@ export class RuggyCustoms {
       artist: 'Dream Avenue',
       albumName: 'Moonstone',
       albumTrackNumber: 11,
-      songID: 1774800042,
+      songID: 42,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1669,7 +1731,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 15,
-      songID: 1774800043,
+      songID: 43,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1710,7 +1772,7 @@ export class RuggyCustoms {
       artist: 'Ryuichi Nitta & Mayuko Okamura',
       albumName: 'Ninja Gaiden II: The Dark Sword of Chaos (Original Soundtrack)',
       albumTrackNumber: 12,
-      songID: 1774800044,
+      songID: 44,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1755,7 +1817,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 2,
-      songID: 1774800045,
+      songID: 45,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1800,7 +1862,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 31,
-      songID: 1774800046,
+      songID: 46,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1810,21 +1872,27 @@ export class RuggyCustoms {
       drum: {
         channels: 4,
         rank: 2,
+        vols: [-1.5, 0, -3.2, -3.2],
       },
       bass: {
         channels: 1,
         rank: 1,
         rankPRO: 1,
+        vols: [-4],
       },
       guitar: {
         channels: 1,
         rank: 3,
         rankPRO: 3,
+        vols: [-3],
+        pans: [0.2],
       },
       keys: {
         channels: 1,
         rank: 2,
         rankPRO: 2,
+        vols: [-3],
+        pans: [-0.2],
       },
       rating: 'Family Friendly',
       preview: [3200, 33200],
@@ -1844,7 +1912,7 @@ export class RuggyCustoms {
       artist: 'David Rippy & Stephen Rippy',
       albumName: 'Age of Empires: The Rise of Rome (Original Soundtrack)',
       albumTrackNumber: 5,
-      songID: 1774800047,
+      songID: 47,
       genre: {
         genre: 'Classical',
         subGenre: 'Classical',
@@ -1882,7 +1950,7 @@ export class RuggyCustoms {
       artist: 'marianaa',
       albumName: 'sdds rolê lixo',
       albumTrackNumber: 2,
-      songID: 1774800048,
+      songID: 48,
       genre: {
         genre: 'Emo',
         subGenre: 'Emo',
@@ -1923,7 +1991,7 @@ export class RuggyCustoms {
       artist: 'Keiichi Suzuki & Hirokazu Tanaka',
       albumName: 'MOTHER (Original Soundtrack)',
       albumTrackNumber: 12,
-      songID: 1774800049,
+      songID: 49,
       genre: {
         genre: 'Pop/Dance/Electronic',
         subGenre: 'Chiptune',
@@ -1962,7 +2030,7 @@ export class RuggyCustoms {
       artist: 'Dean Blunt',
       albumName: 'ZUCHI',
       albumTrackNumber: 9,
-      songID: 1774800050,
+      songID: 50,
       genre: {
         genre: 'Indie Rock',
         subGenre: 'Indie Rock',
@@ -2003,7 +2071,7 @@ export class RuggyCustoms {
       artist: 'Panda Bear',
       albumName: 'Sinister Grift',
       albumTrackNumber: 10,
-      songID: 1774800051,
+      songID: 51,
       id: '7748defense',
       backingTracksCount: 2,
       drum: {
@@ -2013,10 +2081,12 @@ export class RuggyCustoms {
       bass: {
         channels: 1,
         rank: 0,
+        rankPRO: 0,
       },
       guitar: {
         channels: 1,
         rank: 1,
+        rankPRO: 1,
         hasSolo: true,
       },
       vocals: {
@@ -2047,7 +2117,7 @@ export class RuggyCustoms {
       artist: 'Legião Urbana',
       albumName: 'Dois',
       albumTrackNumber: 6,
-      songID: 1774800052,
+      songID: 52,
       genre: {
         genre: 'New Wave',
         subGenre: 'New Wave',
@@ -2093,51 +2163,53 @@ export class RuggyCustoms {
         hasLipsyncFiles: null,
       },
     }),
-  ]
-
-  static get getSongs(): RB3CompatibleDTAFile[] {
-    return this.songs.map((song) => ({ ...song, magma: RuggyCustoms.magmaConfig }))
-  }
-
-  /**
-   * Returns an array with all songs shortnames as `string`
-   * - - - -
-   * @returns {string[]}
-   */
-  static get allSongsShortname(): string[] {
-    return this.songs.map((song) => song.id)
-  }
-
-  /**
-   * Returns a list of IDs used on all songs as `string`.
-   * - - - -
-   * @returns {string}
-   */
-  static get idListString(): string {
-    let output = ''
-    const sortedSongs = sortDTA(this.songs, 'Song ID')
-
-    for (const songs of sortedSongs) {
-      output += `${String(songs.song_id).slice(-3)} ${songs.name}\n`
-    }
-
-    return output
-  }
-
-  /**
-   * Get the parsed song object based on its ID (shortname).
-   * - - - -
-   * @param {string} id The ID (shortname) of the song.
-   * @returns {RB3CompatibleDTAFile | undefined} Returns the found parsed song object or
-   * `undefined` if no song is found.
-   */
-  static getSongByID(id: string): RB3CompatibleDTAFile | undefined {
-    return this.songs.find((song) => String(song.id) === String(id))
-  }
-
-  static readonly magmaConfig: MAGMAProjectSongData = {
-    magmaPath: 'C:/Users/Ruggery/Desktop/Rock Band/Magma',
-    songsProjectRootFolderPath: 'C:/Users/Ruggery/Documents/Visual Studio Code/projects/ruggy-customs-projects/songs',
-    destPath: resolve(process.env.USERPROFILE ?? '', 'Desktop/RB/{{songname}}.rba'),
-  }
+    DTAParser.create({
+      id: '7748umminutofimdomundo',
+      name: 'Um Minuto para o Fim do Mundo',
+      artist: 'CPM 22',
+      albumName: 'Felicidade Instantânea',
+      albumTrackNumber: 2,
+      songID: 53,
+      genre: {
+        genre: 'Rock',
+        subGenre: 'Hard Rock',
+      },
+      backingTracksCount: 2,
+      bandRank: 3,
+      drum: {
+        channels: 2,
+        rank: 3,
+      },
+      bass: {
+        channels: 1,
+        rank: 2,
+      },
+      guitar: {
+        channels: 2,
+        rank: 3,
+      },
+      vocals: {
+        channels: 2,
+        rank: 2,
+        vocalParts: 1,
+      },
+      rating: 'Family Friendly',
+      bank: 'Tambourine',
+      animTempo: 'Medium (100-160bpm)',
+      drumBank: 'Hard Rock Kit',
+      bandFailCue: 'Hard (Mix)',
+      preview: [22490, 52490],
+      songLength: 235725,
+      yearReleased: 2005,
+      songKey: 'C',
+      author: 'Naonemeu, Spike.MP3, Nero149, PistolofRB6, Ruggy',
+      multitrack: 'diy_stems',
+      customsource: {
+        game_origin: 'rbbr',
+      },
+      magma: {
+        hasLipsyncFiles: null,
+      },
+    }),
+  ].map((val) => ({ ...val, magma: { ...val.magma, ...RuggyCustoms.magmaConfig }, song_id: Number(`17748${val.song_id.toString().padStart(5, '0')}`) }))
 }

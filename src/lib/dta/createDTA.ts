@@ -499,6 +499,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
   const tracksCount: number[] = []
   let pans: number[] = []
   let vols: number[] = []
+  const cores: number[] = []
   const solo: SoloFlags[] = []
   let instrumentCount = 0
   let gtrTuning: number[] = [0, 0, 0, 0, 0, 0]
@@ -536,6 +537,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     channelsCountToPanArray(drum.channels).forEach((pan) => {
       pans.push(pan)
       vols.push(0)
+      cores.push(-1)
     })
 
     if (drum.pans as typeof drum.pans | undefined) {
@@ -566,6 +568,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     channelsCountToPanArray(bass.channels).forEach((pan) => {
       pans.push(pan)
       vols.push(0)
+      cores.push(-1)
     })
 
     if (bass.pans as typeof bass.pans | undefined) {
@@ -596,6 +599,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     channelsCountToPanArray(guitar.channels).forEach((pan) => {
       pans.push(pan)
       vols.push(0)
+      cores.push(1)
     })
 
     if (guitar.pans as typeof guitar.pans | undefined) {
@@ -622,6 +626,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     channelsCountToPanArray(vocals.channels).forEach((pan) => {
       pans.push(pan)
       vols.push(0)
+      cores.push(-1)
     })
 
     if (vocals.pans as typeof vocals.pans | undefined) {
@@ -651,6 +656,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     channelsCountToPanArray(keys.channels).forEach((pan) => {
       pans.push(pan)
       vols.push(0)
+      cores.push(-1)
     })
 
     if (keys.pans as typeof keys.pans | undefined) {
@@ -670,6 +676,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     channelsCountToPanArray(backingTracksCount.channels).forEach((pan) => {
       pans.push(pan)
       vols.push(0)
+      cores.push(-1)
     })
 
     if (backingTracksCount.pans as typeof backingTracksCount.pans | undefined) {
@@ -685,12 +692,14 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     channelsCountToPanArray(backingTracksCount).forEach((pan) => {
       pans.push(pan)
       vols.push(0)
+      cores.push(-1)
     })
   }
 
   if (crowdChannels) {
     tracksCount.push(2)
     pans.push(-2.5, 2.5)
+    cores.push(-1, -1)
     if (crowdChannels === true) vols.push(0, 0)
     else if (typeof crowdChannels === 'number') vols.push(crowdChannels)
     else {
@@ -705,6 +714,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
 
   map.set('pans', pans)
   map.set('vols', vols)
+  map.set('cores', cores)
   if (solo.length > 0) map.set('solo', solo)
 
   map.set('mute_volume', muteVolume)

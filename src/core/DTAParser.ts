@@ -82,34 +82,15 @@ export class DTAParser {
           if (isRB3CompatibleDTA(song)) this.songs.push(song)
           else this.updates.push(song)
         }
+      } else {
+        if (isRB3CompatibleDTA(songs)) this.songs.push(songs)
+        else this.updates.push(songs)
       }
     }
   }
 
   private _cleanUpdates() {
     this.updates = []
-  }
-
-  private _cleanSongs() {
-    this.songs = []
-  }
-
-  /**
-   * Gets the amount of entries on the `songs` array.
-   * - - - -
-   * @returns {number}
-   */
-  get songsLength(): number {
-    return this.songs.length
-  }
-
-  /**
-   * Gets the amount of entries on the `updates` array.
-   * - - - -
-   * @returns {number}
-   */
-  get updatesLength(): number {
-    return this.updates.length
   }
 
   /**

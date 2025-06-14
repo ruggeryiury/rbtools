@@ -1,4 +1,4 @@
-import { execAsync, FilePath, pathLikeToFilePath, pathLikeToString, resolve, type FilePathLikeTypes } from 'node-lib'
+import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, resolve, type FilePathLikeTypes } from 'node-lib'
 import { EDATFile, ImageFile, MIDIFile, RBTools } from '../core.exports'
 
 /**

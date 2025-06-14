@@ -43,8 +43,9 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
     options
   )
   const io = new DTAIO(formatOptions)
-  if (parser.songsLength === 0 && parser.updatesLength === 0) throw new Error('No songs or updates to be stringified.')
-  else if (parser.updatesLength > 0) {
+
+  if (parser.songs.length === 0 && parser.updates.length === 0) throw new Error('No songs or updates to be stringified.')
+  else if (parser.updates.length > 0) {
     // Song metadata updates
     parser.updates = sortDTA(parser.updates, 'ID')
     io.options = { ...io.options, object: { ...io.options.object, closeParenthesisInline: true } }
@@ -221,7 +222,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
 
       io.addValue(id, Object.fromEntries(map.entries()))
     }
-  } else if (parser.songsLength > 0) {
+  } else if (parser.songs.length > 0) {
     // Songs only
     if (sortBy) parser.sort(sortBy)
     for (const song of parser.songs) {

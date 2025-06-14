@@ -1,4 +1,4 @@
-import { BinaryReader, BinaryWriter, FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, BinaryWriter, type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { PythonAPI, type ImageConvertingOptions, type ImageFile, type ImageFormatTypes } from '../core.exports'
 import { getDDSHeader, getTPLHeader, texWiiStat, texWiiToImage, texXboxPs3Stat, texXboxPs3ToImage, type TextureFileStatReturnObject } from '../lib.exports'

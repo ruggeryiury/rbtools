@@ -1,7 +1,7 @@
 import { once } from 'node:events'
 import { pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
 import { temporaryFile } from 'tempy'
-import { BinaryAPI, ImageFile, PythonAPI, type ImageFormatTypes } from '../../core.exports'
+import { BinaryAPI, type ImageFile, PythonAPI, type ImageFormatTypes } from '../../core.exports'
 import { getDDSHeader, getTPLHeader } from '../../lib.exports'
 
 /**
