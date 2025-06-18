@@ -33,6 +33,7 @@ export interface MAGMAProjectSongData {
   magmaPath?: string
   songsProjectRootFolderPath?: string
   destPath?: string
+  rbaPath?: string
   songFolderName?: string
   dryVox1Name?: string
   dryVox2Name?: string
@@ -77,6 +78,7 @@ export class MAGMAProject {
     magmaPath: '',
     songsProjectRootFolderPath: '',
     destPath: process.env.USERPROFILE ? resolve(process.env.USERPROFILE, 'Desktop/{{songname}}.rba') : resolve('{{songname}}.rba'),
+    rbaPath: process.env.USERPROFILE ? resolve(process.env.USERPROFILE, 'Desktop/{{songname}}.rba') : resolve('{{songname}}.rba'),
     songFolderName: '{{songname}}',
     albumArtName: 'gen/{{songname}}_keep_x256.bmp',
     albumArtNamePNG: 'gen/{{songname}}_keep.png',
@@ -139,8 +141,7 @@ export class MAGMAProject {
     const dryVoxBlank = FilePath.of(magmaPath.path, `audio/blank_dryvox.wav`)
     const defaultMAGMAArt = FilePath.of(magmaPath.path, `default.bmp`)
 
-    let rbaFilePath = FilePath.of(formatStringFromDTA(song, options.destPath))
-    rbaFilePath = rbaFilePath.ext.endsWith('.rba') ? rbaFilePath : rbaFilePath.changeFileExt('.rba')
+    const rbaFilePath = FilePath.of(formatStringFromDTA(song, options.rbaPath)).changeFileExt('.rba')
 
     const songFolderPath = FilePath.of(songsProjectRootFolderPath.path, formatStringFromDTA(song, options.songFolderName))
 
@@ -216,7 +217,7 @@ export class MAGMAProject {
     const vocalsSolo = song.solo?.find((flags) => flags === 'vocal_percussion') ? 'True' : 'False'
 
     const rbprojFile = new DTAIO(DTAIO.formatOptions.defaultRB3)
-    const c3File = new BinaryWriter()
+    const rokFile = new BinaryWriter()
 
     rbprojFile.addValue('project', {
       tool_version: '110411_A',
@@ -391,17 +392,138 @@ export class MAGMAProject {
       },
     })
 
-    c3File.write(`//Created by Magma: Rok On Edition v4.0.2\n//DO NOT EDIT MANUALLY\nSong=${song.name}\nArtist=${song.artist}\nAlbum=${song.album_name ?? ''}\nCustomID=\nVersion=${options.releaseVer.toString()}\nIsMaster=${song.master ? 'True' : 'False'}\nEncodingQuality=3\n${song.tracks_count[6] !== undefined ? `CrowdAudio=${paths.stereoBlank.path}\nCrowdVol=${crowd.vol?.toString() ?? '-5'}\n` : ''}${song.year_recorded ? `ReRecordYear=${song.year_recorded.toString()}` : ''}2xBass=${song.doubleKick ? 'True' : 'False'}\nRhythmKeys=${song.rhythmOn === `keys` ? 'True' : 'False'}\nRhythmBass=${song.rhythmOn === 'bass' ? 'True' : 'False'}\nKaraoke=${song.multitrack === 'karaoke' ? 'True' : 'False'}\nMultitrack=${song.multitrack ? 'True' : 'False'}\nConvert=${song.convert ? 'True' : 'False'}\nExpertOnly=${song.emh === 'expert_only' ? 'True' : 'False'}\n`)
+    rokFile.write('//Created by Magma: Rok On Edition v4.0.3\n//DO NOT EDIT MANUALLY\n')
+    rokFile.write(`Song=${song.name}\n`)
+    rokFile.write(`Artist=${song.artist}\n`)
+    rokFile.write(`Album=${song.album_name ?? ''}\n`)
+    rokFile.write(`CustomID=\nVersion=${options.releaseVer.toString()}\nIsMaster=${song.master ? 'True' : 'False'}\n`)
+    rokFile.write('EncodingQuality=7\n')
 
-    if (song.rank_real_bass && song.real_bass_tuning) c3File.write(`ProBassDiff=${song.rank_real_bass.toString()}\nProBassTuning4=(real_bass_tuning (${song.real_bass_tuning.join(' ')}))\n`)
+    if (song.tracks_count[6] !== undefined) rokFile.write(`CrowdAudio=${paths.stereoBlank.path}\nCrowdVol=${crowd.vol?.toString() ?? '-5'}\n`)
+    if (song.year_recorded) rokFile.write(`ReRecordYear=${song.year_recorded.toString()}`)
 
-    if (song.rank_real_guitar && song.real_guitar_tuning) c3File.write(`ProGuitarDiff=${song.rank_real_guitar.toString()}\nProGuitarTuning=(real_guitar_tuning (${song.real_guitar_tuning.join(' ')}))\n`)
+    rokFile.write(`2xBass=${song.doubleKick ? 'True' : 'False'}\n`)
+    rokFile.write(`RhythmKeys=${song.rhythmOn === 'keys' ? 'True' : 'False'}\n`)
+    rokFile.write(`RhythmBass=${song.rhythmOn === 'bass' ? 'True' : 'False'}\n`)
+    rokFile.write(`Karaoke=${song.multitrack === 'karaoke' ? 'True' : 'False'}\n`)
+    rokFile.write(`Multitrack=${song.multitrack === 'full' ? 'True' : 'False'}\n`)
+    rokFile.write(`Convert=${song.convert ? 'True' : 'False'}\n`)
+    rokFile.write(`ExpertOnly=${song.emh === 'expert_only' ? 'True' : 'False'}\n`)
 
-    c3File.write(`DisableProKeys=${keys.enabled ? 'True' : 'False'}\nTonicNote=${song.vocal_tonic_note?.toString() ?? '0'}\nTonality=${song.song_tonality?.toString() ?? '0'}\nTuningCents=${song.tuning_offset_cents?.toString() ?? '0'}\nSongRating=${song.rating.toString()}\nDrumKitSFX=${song.drum_bank === 'sfx/kit01_bank.milo' ? '0' : song.drum_bank === 'sfx/kit02_bank.milo' ? '1' : song.drum_bank === 'sfx/kit03_bank.milo' ? '2' : song.drum_bank === 'sfx/kit04_bank.milo' ? '3' : '4'}\nHopoTresholdIndex=${song.hopo_threshold === 90 ? '0' : song.hopo_threshold === 130 ? '1' : song.hopo_threshold === 170 ? '2' : song.hopo_threshold === 250 ? '3' : '2'}\n`)
-    c3File.write(`MuteVol=${song.mute_volume?.toString() ?? '-96'}\nVocalMuteVol=${song.mute_volume_vocals?.toString() ?? '-12'}\nSoloDrums=${drumSolo}\nSoloGuitar=${guitarSolo}\nSoloBass=${bassSolo}\nSoloKeys=${keysSolo}\nSoloVocals=${vocalsSolo}\nSongPreview=${song.preview[0].toString()}\nSongPreviewEnd=${song.preview[1].toString()}\nCheckTempoMap=False\nWiiMode=False\nDoDrumMixEvents=False\nPackageDisplay=${formatStringFromDTA(song, this.options.conFilePackageName)}\nPackageDescription=${formatStringFromDTA(song, this.options.conFilePackageDesc)}\n`)
-    c3File.write(`SongAlbumArt=${paths.albumArtPathPNG.path}\nPackageThumb=\n${song.encoding === 'utf8' ? 'EncodeANSI=False\nEncodeUTF8=True' : 'EncodeANSI=True\nEncodeUTF8=False'}\nUseNumericID=True\nUniqueNumericID=${song.song_id.toString()}\nUniqueNumericID2X=\n\nTO DO List Begin\nToDo1=Verify the accuracy of all metadata,False,False\nToDo2=Grab official *.png_xbox art file if applicable,False,False\nToDo3=Chart reductions in all instruments,False,False\nToDo4=Add drum fills,False,False\nToDo5=Add overdrive for all instruments,False,False\nToDo6=Add overdrive for vocals,False,False\nToDo7=Create practice sessions [EVENTS],False,False\nToDo8=Draw sing-along notes in VENUE,False,False\nToDo9=Record dry vocals for lipsync,False,False\nToDo10=Render audio with RB limiter and count-in,False,False\nToDo12=Click to add new item...,False,False\nToDo13=Click to add new item...,False,False\nToDo14=Click to add new item...,False,False\nToDo15=Click to add new item...,False,False\nTO DO List End\n`)
+    if (song.rank_real_bass && song.real_bass_tuning) rokFile.write(`ProBassDiff=1\nProBassTuning4=(real_bass_tuning (${song.real_bass_tuning.join(' ')}))\n`)
+    if (song.rank_real_guitar && song.real_guitar_tuning) rokFile.write(`ProGuitarDiff=1\nProBassTuning4=(real_guitar_tuning (${song.real_guitar_tuning.join(' ')}))\n`)
 
-    return [rbprojFile.toString(), c3File.toBuffer().toString()]
+    rokFile.write(`DisableProKeys=${keys.enabled ? 'True' : 'False'}\n`)
+    rokFile.write(`TonicNote=${song.vocal_tonic_note?.toString() ?? '0'}\n`)
+    rokFile.write(`Tonality=${song.song_tonality?.toString() ?? '0'}\n`)
+    rokFile.write(`TuningCents=${song.tuning_offset_cents?.toString() ?? '0'}\n`)
+    rokFile.write(`SongRating=${song.rating.toString()}\n`)
+    let drumKitSFX: string, hopoThreshold: string, bandFailCueSFX: string
+
+    switch (song.drum_bank) {
+      case 'sfx/kit01_bank.milo':
+      default:
+        drumKitSFX = '0'
+        break
+      case 'sfx/kit02_bank.milo':
+        drumKitSFX = '1'
+        break
+      case 'sfx/kit03_bank.milo':
+        drumKitSFX = '2'
+        break
+      case 'sfx/kit04_bank.milo':
+        drumKitSFX = '3'
+        break
+      case 'sfx/kit05_bank.milo':
+        drumKitSFX = '4'
+        break
+    }
+
+    switch (song.hopo_threshold) {
+      case 90:
+        hopoThreshold = '0'
+        break
+      case 130:
+        hopoThreshold = '1'
+        break
+      case 170:
+      default:
+        hopoThreshold = '2'
+        break
+      case 250:
+        hopoThreshold = '3'
+        break
+    }
+
+    switch (song.band_fail_cue) {
+      case 'band_fail_electro.cue':
+      default:
+        bandFailCueSFX = '0'
+        break
+      case 'band_fail_electro_keys.cue':
+        bandFailCueSFX = '1'
+        break
+      case 'band_fail_heavy.cue':
+        bandFailCueSFX = '2'
+        break
+      case 'band_fail_heavy_keys.cue':
+        bandFailCueSFX = '3'
+        break
+      case 'band_fail_rock.cue':
+        bandFailCueSFX = '4'
+        break
+      case 'band_fail_rock_keys.cue':
+        bandFailCueSFX = '5'
+        break
+      case 'band_fail_vintage.cue':
+        bandFailCueSFX = '6'
+        break
+      case 'band_fail_vintage_keys.cue':
+        bandFailCueSFX = '7'
+        break
+    }
+    rokFile.write(`DrumKitSFX=${drumKitSFX}\n`)
+    rokFile.write(`HopoTresholdIndex=${hopoThreshold}\n`)
+    rokFile.write(`MuteVol=${song.mute_volume?.toString() ?? '-96'}\n`)
+    rokFile.write(`VocalMuteVol=${song.mute_volume_vocals?.toString() ?? '-96'}\n`)
+    rokFile.write(`SoloDrums=${drumSolo}\n`)
+    rokFile.write(`SoloGuitar=${guitarSolo}\n`)
+    rokFile.write(`SoloBass=${bassSolo}\n`)
+    rokFile.write(`SoloKeys=${keysSolo}\n`)
+    rokFile.write(`SoloVocals=${vocalsSolo}\n`)
+    rokFile.write(`SongPreview=${song.preview[0].toString()}\n`)
+    rokFile.write(`SongPreviewEnd=${song.preview[1].toString()}\n`)
+    rokFile.write(`CheckTempoMap=False\nWiiMode=False\nDoDrumMixEvents=False\n`)
+    rokFile.write(`PackageDisplay=${formatStringFromDTA(song, this.options.conFilePackageName)}\n`)
+    rokFile.write(`PackageDescription=${formatStringFromDTA(song, this.options.conFilePackageDesc)}\n`)
+    rokFile.write(`SongAlbumArt=${paths.albumArtPathPNG.path}\n`)
+    rokFile.write(`PackageThumb=\n`)
+
+    switch (song.encoding) {
+      case 'utf8':
+        rokFile.write('EncodeANSI=False\nEncodeUTF8=True')
+        break
+      case 'latin1':
+      default:
+        rokFile.write('EncodeANSI=True\nEncodeUTF8=False')
+        break
+    }
+
+    rokFile.write(`UseNumericID=True\nUniqueNumericID=${song.song_id.toString()}\nUniqueNumericID2X=\n`)
+    rokFile.write(`DIYStems=${song.multitrack === 'diy_stems' ? 'True' : 'False'}\n`)
+    rokFile.write(`drumsDifficulty=${song.rank_drum?.toString() ?? '0'}\n`)
+    rokFile.write(`bassDifficulty=${song.rank_bass?.toString() ?? '0'}\n`)
+    rokFile.write(`proBassDifficulty=${song.rank_real_bass?.toString() ?? '0'}\n`)
+    rokFile.write(`guitarDifficulty=${song.rank_guitar?.toString() ?? '0'}\n`)
+    rokFile.write(`proGuitarDifficulty=${song.rank_real_guitar?.toString() ?? '0'}\n`)
+    rokFile.write(`keysDifficulty=${song.rank_keys?.toString() ?? '0'}\n`)
+    rokFile.write(`proKeysDifficulty=${song.rank_real_keys?.toString() ?? '0'}\n`)
+    rokFile.write(`vocalsDifficulty=${song.rank_vocals?.toString() ?? '0'}\n`)
+    rokFile.write(`bandDifficulty=${song.rank_band.toString()}\n`)
+    rokFile.write(`BandFailCueSFX=${bandFailCueSFX}\n`)
+
+    rokFile.write('\nTO DO List Begin\nToDo1=Verify the accuracy of all metadata,False,False\nToDo2=Grab official *.png_xbox art file if applicable,False,False\nToDo3=Chart reductions in all instruments,False,False\nToDo4=Add drum fills,False,False\nToDo5=Add overdrive for all instruments,False,False\nToDo6=Add overdrive for vocals,False,False\nToDo7=Create practice sessions [EVENTS],False,False\nToDo8=Draw sing-along notes in VENUE,False,False\nToDo9=Record dry vocals for lipsync,False,False\nToDo10=Render audio with RB limiter and count-in,False,False\nToDo12=Click to add new item...,False,False\nToDo13=Click to add new item...,False,False\nToDo14=Click to add new item...,False,False\nToDo15=Click to add new item...,False,False\nTO DO List End\n')
+    return [rbprojFile.toString(), rokFile.toBuffer().toString()]
   }
 
   saveMAGMAC3FileContentsSync(): [FilePath, FilePath] {

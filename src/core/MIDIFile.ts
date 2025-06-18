@@ -21,6 +21,9 @@ export interface EDATEncryptionOptions {
   destPath?: FilePathLikeTypes
 }
 
+/**
+ * `MIDIFile` is a class that represents a MIDI file.
+ */
 export class MIDIFile {
   // #region Constructor
 
@@ -32,7 +35,7 @@ export class MIDIFile {
   /**
    * `MIDIFile` is a class that represents a MIDI file.
    * - - - -
-   * @param {FilePathLikeTypes} midiFilePath The path of the MIDI file.
+   * @param {FilePathLikeTypes} midiFilePath The path to the MIDI file.
    */
   constructor(midiFilePath: FilePathLikeTypes) {
     this.path = pathLikeToFilePath(midiFilePath)
@@ -44,14 +47,14 @@ export class MIDIFile {
    * @returns {Promise<string>}
    * @throws {Error} When it identifies file signature of a MIDI file or any unknown file format.
    */
-  private async checkFileIntegrity(): Promise<string> {
+  async checkFileIntegrity(): Promise<string> {
     if (!this.path.exists) throw new Error(`Provided MIDI file path "${this.path.path}" does not exists`)
-    const magic = await BinaryReader.fromBuffer(await this.path.readOffset(0, 4)).readUInt32LE()
+    const magic = await BinaryReader.fromBuffer(await this.path.readOffset(0, 4)).readUInt32BE()
 
     // MThd
-    if (magic === 0x6468544d) return HexVal.processHex(0x6468544d)
+    if (magic === 0x4d546864) return HexVal.processHex(magic)
     // NPD
-    else if (magic === 0x44504e) throw new Error(`Provided MIDI file "${this.path.path}" is an encrypted EDAT file.`)
+    else if (magic === 0x4e5044) throw new Error(`Provided MIDI file "${this.path.path}" is an encrypted EDAT file.`)
     throw new Error(`Provided EDAT file "${this.path.path}" is not a valid EDAT or decrypted MIDI file with no HMX EDAT header.`)
   }
 

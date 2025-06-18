@@ -52,17 +52,12 @@ export const dta = {
   bandFailCue: {
     'band_fail_electro.cue': 'Electro',
     'band_fail_electro_keys.cue': 'Electro (Keys)',
-    'band_fail_electro_mix.cue': 'Electro (Mix)',
-    band_fail_hard_mix: 'Hard (Mix)',
     'band_fail_heavy.cue': 'Heavy',
     'band_fail_heavy_keys.cue': 'Heavy (Keys)',
-    band_fail_keys: 'Keys',
     'band_fail_rock.cue': 'Rock',
     'band_fail_rock_keys.cue': 'Rock (Keys)',
-    'band_fail_rock_mix.cue': 'Rock (Mix)',
     'band_fail_vintage.cue': 'Vintage',
     'band_fail_vintage_keys.cue': 'Vintage (Keys)',
-    band_fail_vintage_mix: 'Vintage (Mix)',
   },
   percussionBank: {
     'sfx/tambourine_bank.milo': 'Tambourine',

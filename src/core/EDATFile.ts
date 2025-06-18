@@ -155,7 +155,7 @@ export interface EDATDecryptionOptions {
    */
   destPath?: FilePathLikeTypes
   /**
-   *
+   * The 16-bytes HEX string used to decrypt the EDAT file.
    */
   devKLicHash: string
 }
@@ -229,14 +229,14 @@ export class EDATFile {
    * @returns {Promise<string>}
    * @throws {Error} When it identifies file signature of a MIDI file or any unknown file format.
    */
-  private async checkFileIntegrity(): Promise<string> {
+  async checkFileIntegrity(): Promise<string> {
     if (!this.path.exists) throw new Error(`Provided EDAT file path "${this.path.path}" does not exists\n`)
-    const magic = await BinaryReader.fromBuffer(await this.path.readOffset(0, 4)).readUInt32LE()
+    const magic = await BinaryReader.fromBuffer(await this.path.readOffset(0, 4)).readUInt32BE()
 
     // NPD
-    if (magic === 0x44504e) return HexVal.processHex(0x44504e)
+    if (magic === 0x4e504400) return HexVal.processHex(magic)
     // MThd
-    else if (magic === 0x6468544d) throw new Error(`Provided EDAT file "${this.path.path}" is a decrypted MIDI file with no HMX EDAT header.`)
+    else if (magic === 0x4d546864) throw new Error(`Provided EDAT file "${this.path.path}" is a decrypted MIDI file with no HMX EDAT header.`)
     throw new Error(`Provided EDAT file "${this.path.path}" is not a valid EDAT or decrypted MIDI file with no HMX EDAT header.`)
   }
 
@@ -245,7 +245,7 @@ export class EDATFile {
    * - - - -
    * @returns {boolean}
    */
-  private isUSRDIRPathValid(): boolean {
+  private _isUSRDIRPathValid(): boolean {
     const usrdir = this.path.gotoDir('../../../')
     const eboot = usrdir.gotoFile('EBOOT.BIN')
     const gen = usrdir.gotoDir('gen')
@@ -308,7 +308,7 @@ export class EDATFile {
 
     await reader.close()
 
-    if (this.isUSRDIRPathValid()) {
+    if (this._isUSRDIRPathValid()) {
       devKLicFolderName = this.path.gotoDir('../../').name
       devKLicHash = EDATFile.genDevKLicHash(devKLicFolderName)
     }

@@ -20,6 +20,10 @@ export * from './lib/imagetex/texToImage'
 
 export * from './lib/path/thisFilePath'
 
+export * from './lib/pkg/calculateAesAlignedOffsetAndSize'
+export * from './lib/pkg/PkgAesCtrCounter'
+export * from './lib/pkg/PkgXorSha1Counter'
+
 export * from './lib/strnum/formatStringFromDTA'
 export * from './lib/strnum/isURL'
 export * from './lib/strnum/textMethods'

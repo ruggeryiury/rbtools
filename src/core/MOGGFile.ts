@@ -44,7 +44,7 @@ export class MOGGFile {
    * @returns {Promise<number>}
    * @throws {Error} When it identifies file signature of a multitrack OGG file with no MOGG header or any unknown file format.
    */
-  private async encryptionVersion(): Promise<number> {
+  private async _encryptionVersion(): Promise<number> {
     return await this.checkFileIntegrity()
   }
 
@@ -55,7 +55,7 @@ export class MOGGFile {
    * @throws {Error} When it identifies file signature of a multitrack OGG file with no MOGG header or any unknown file format.
    */
   async isEncrypted(): Promise<boolean> {
-    return (await this.encryptionVersion()) > 10
+    return (await this._encryptionVersion()) > 10
   }
 
   /**

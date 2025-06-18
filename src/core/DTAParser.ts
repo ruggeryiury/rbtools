@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
+import { createHash, pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
 import { createDTA, depackDTAContents, detectDTABufferEncoding, genNumericSongID, genTracksCountArray, isRB3CompatibleDTA, isURL, parseDTA, patchDTAEncodingFromDTAFileObject, sortDTA, stringifyDTA, type PartialDTAFile, type RB3CompatibleDTAFile, type SongDataCreationObject, type SongDataStringifyOptions, type SongSortingTypes } from '../lib.exports'
 import { RBTools } from './RBTools'
 
@@ -9,6 +9,7 @@ import { RBTools } from './RBTools'
  * This class only works with DTA files of songs and metadata updates, and must not be used to parse any other type of DTA script.
  */
 export class DTAParser {
+  // #region Static
   /**
    * Parses a DTA file buffer.
    * - - - -
@@ -51,6 +52,31 @@ export class DTAParser {
     if (response.status !== 200) throw new Error(`GET method fetching DTA file data on URL "${url}" returned with status ${response.status.toString()}: ${response.statusText}`)
     const buf = response.data
     return DTAParser.fromBuffer(Buffer.from(buf))
+  }
+
+  /**
+   * Returns a SHA256 hash from a DTA file `Buffer`.
+   * - - - -
+   * @param {Buffer} dtaFileBuffer A `Buffer` object from a DTA file.
+   * @returns {string}
+   */
+  static calculateHashFromBuffer(dtaFileBuffer: Buffer): string {
+    const parser = DTAParser.fromBuffer(dtaFileBuffer)
+    parser.sort('ID')
+    const dtaBuffer = Buffer.from(stringifyDTA(parser))
+    return createHash(dtaBuffer)
+  }
+
+  /**
+   * Asynchronously reads and parses a DTA file and returns a SHA256 hash from it.
+   * - - - -
+   * @param {FilePathLikeTypes} dtaFilePath The path to a DTA file.
+   * @returns {Promise<string>}
+   */
+  static async calculateHashFromFile(dtaFilePath: FilePathLikeTypes): Promise<string> {
+    const dtaPath = pathLikeToFilePath(dtaFilePath)
+    const dtaBuffer = await dtaPath.read()
+    return DTAParser.calculateHashFromBuffer(dtaBuffer)
   }
 
   /**
@@ -291,6 +317,18 @@ export class DTAParser {
 
   stringify(options?: SongDataStringifyOptions) {
     return stringifyDTA(this, options)
+  }
+
+  /**
+   * Calculates a SHA256 hash of the songs included on this class instance.
+   * - - - -
+   * @returns {string}
+   */
+  calculateHash(): string {
+    const parser = new DTAParser(this.songs)
+    parser.sort('ID')
+    const dtaBuffer = Buffer.from(stringifyDTA(parser))
+    return createHash(dtaBuffer)
   }
 
   async export(destPath: FilePathLikeTypes, options?: SongDataStringifyOptions) {

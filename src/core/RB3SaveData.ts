@@ -144,24 +144,24 @@ export interface ParsedRB3SaveData {
  * `RB3SaveData` is a class that represents a Rock Band 3 save data.
  */
 export class RB3SaveData {
-  private static dtbXOR(key: number): number {
+  private static _dtbXOR(key: number): number {
     let val = (((key - Math.floor(key / 0x1f31d) * 0x1f31d) * 0x41a7) >>> 0) - ((Math.floor(key / 0x1f31d) * 0xb14) >>> 0)
     if (val <= 0) val = (val - 0x80000000 - 1) >>> 0
     return val
   }
 
-  private static newDTBCrypt(input: Buffer): Buffer {
+  private static _newDTBCrypt(input: Buffer): Buffer {
     let key = input.readUInt32LE(0)
     const outSize = input.length - 4
     const output = Buffer.alloc(outSize)
     for (let i = 0; i < outSize; i++) {
-      key = this.dtbXOR(key)
+      key = this._dtbXOR(key)
       output[i] = (input[i + 4] & 0xff) ^ (key & 0xff)
     }
     return output
   }
 
-  private static getMostPlayedInstrument(scoresList: RB3Scores[]): InstrumentTypes | null {
+  private static _getMostPlayedInstrument(scoresList: RB3Scores[]): InstrumentTypes | null {
     const results: InstrumentTypes[] = []
     if (scoresList.length === 0) return null
     for (const score of scoresList) {
@@ -182,10 +182,10 @@ export class RB3SaveData {
     return mostFrequent
   }
 
-  private static async getScoresListBytesXboxPS3(reader: BinaryReader, blockStart: number): Promise<Buffer[]> {
+  private static async _getScoresListBytesXboxPS3(reader: BinaryReader, blockStart: number): Promise<Buffer[]> {
     reader.seek(blockStart)
     const encScoresBlock = await reader.read(0x15b33c)
-    let decScoresBlock = this.newDTBCrypt(encScoresBlock)
+    let decScoresBlock = this._newDTBCrypt(encScoresBlock)
 
     const xboxPS3UnknownBytes = Buffer.alloc(0x84)
     decScoresBlock.copy(xboxPS3UnknownBytes, 0, 0x15b2b4, 0x15b2b4 + 0x84)
@@ -207,7 +207,7 @@ export class RB3SaveData {
     return scores
   }
 
-  private static async getScoresListBytesWii(reader: BinaryReader, blockStart: number): Promise<Buffer[]> {
+  private static async _getScoresListBytesWii(reader: BinaryReader, blockStart: number): Promise<Buffer[]> {
     const wiiScoreBlockLength = 0x1d6 * 1000
     reader.seek(blockStart)
     const scoresBlock = await reader.read(wiiScoreBlockLength)
@@ -223,7 +223,7 @@ export class RB3SaveData {
     return scores
   }
 
-  private static removeDupeID0x04(input: Buffer): Buffer {
+  private static _removeDupeID0x04(input: Buffer): Buffer {
     // Get the first 4 bytes
     const first = input.subarray(0, 4)
 
@@ -236,12 +236,12 @@ export class RB3SaveData {
     return output
   }
 
-  private static bytesToScore(input: Buffer, isWiiScore: boolean): RB3Scores {
+  private static _bytesToScore(input: Buffer, isWiiScore: boolean): RB3Scores {
     const score = new Map()
     score.set('song_id', input.readUInt32LE(0x00))
     if (!isWiiScore) {
       score.set('song_id', input.readUInt32LE(0x04))
-      input = this.removeDupeID0x04(input)
+      input = this._removeDupeID0x04(input)
     }
     score.set('lighterRating', input[0x06])
     score.set('playCount', input.readInt32LE(0x0b))
@@ -403,7 +403,7 @@ export class RB3SaveData {
     return Object.fromEntries(score) as RB3Scores
   }
 
-  private static async getProfileName(reader: BinaryReader, profileIndex: number): Promise<string> {
+  private static async _getProfileName(reader: BinaryReader, profileIndex: number): Promise<string> {
     let output = ''
     for (let i = 0; i < 0x2e; i++) {
       const start = 0x7c + profileIndex * 0x3b + i
@@ -415,7 +415,7 @@ export class RB3SaveData {
     return output
   }
 
-  private static async getXboxPS3BandName(reader: BinaryReader, platform: RB3SaveDataPlatformTypes): Promise<string> {
+  private static async _getXboxPS3BandName(reader: BinaryReader, platform: RB3SaveDataPlatformTypes): Promise<string> {
     const startOffset = platform === 'ps3' ? 0x43a7e7 : 0x43a773
     let output = ''
     for (let i = 0; i < 0x2e; i++) {
@@ -471,47 +471,47 @@ export class RB3SaveData {
     }
 
     if (platform !== 'wii') {
-      const scoresBytes = await this.getScoresListBytesXboxPS3(reader, blockStart)
+      const scoresBytes = await this._getScoresListBytesXboxPS3(reader, blockStart)
       const scoresList: RB3Scores[] = []
       if (scoresBytes.length > 0) {
         let isWiiScore = false
         if (scoresBytes[0].length === 0x1d6) isWiiScore = true
         for (const scoreBytes of scoresBytes) {
-          const score = this.bytesToScore(scoreBytes, isWiiScore)
+          const score = this._bytesToScore(scoreBytes, isWiiScore)
           scoresList.push(score)
         }
       }
 
-      const profileName = await this.getXboxPS3BandName(reader, platform)
+      const profileName = await this._getXboxPS3BandName(reader, platform)
 
       await reader.close()
 
       return {
         platform,
-        mostPlayedInstrument: scoresList.length > 0 ? this.getMostPlayedInstrument(scoresList) : 'band',
+        mostPlayedInstrument: scoresList.length > 0 ? this._getMostPlayedInstrument(scoresList) : 'band',
         profileName,
         scores: scoresList,
       }
     }
 
-    const scoresBytes = await this.getScoresListBytesWii(reader, blockStart)
+    const scoresBytes = await this._getScoresListBytesWii(reader, blockStart)
     const scoresList: RB3Scores[] = []
     if (scoresBytes.length > 0) {
       let isWiiScore = false
       if (scoresBytes[0].length === 0x1d6) isWiiScore = true
       for (const scoreBytes of scoresBytes) {
-        const score = this.bytesToScore(scoreBytes, isWiiScore)
+        const score = this._bytesToScore(scoreBytes, isWiiScore)
         scoresList.push(score)
       }
     }
 
-    const profileName = await this.getProfileName(reader, wiiProfile)
+    const profileName = await this._getProfileName(reader, wiiProfile)
 
     await reader.close()
 
     return {
       platform,
-      mostPlayedInstrument: scoresList.length > 0 ? this.getMostPlayedInstrument(scoresList) : 'band',
+      mostPlayedInstrument: scoresList.length > 0 ? this._getMostPlayedInstrument(scoresList) : 'band',
       profileName,
       scores: scoresList,
       profileIndex: wiiProfile,

@@ -5,37 +5,39 @@ import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter
 
 export interface SongDataStringifyOptions {
   /**
-   * Default is `false`.
+   * `SONGS ONLY` If `true`, songs with fake value as `true` won't be renderer. Default is `false`.
    */
   ignoreFakeSongs?: boolean
   /**
-   * Default is `null`.
+   * `SONGS ONLY` Changes the songname path to use on Wii console. Default is `null` (Will use XBox/PS3 default songname path).
    */
   wiiMode?: `SZ${string}E/${number}` | null
   /**
-   * Default is `true`.
+   * `SONGS ONLY` Adds generated MAGMA values that is accepted on Nautillus, MAGMA Rok On Edition, and Onyx. Default is `true`.
    */
-  addMAGMAComments?: boolean
+  addMAGMAValues?: boolean
   /**
    * Changes the sorting of the songs. This property has no influence if you want to stringify a single song. Default is `null`.
    */
   sortBy?: SongSortingTypes
   /**
-   * Default if `true`.
+   * `SONGS ONLY` Omit values considered to be default. Default is `true`.
    */
   omitUnusedValues?: boolean
   /**
-   * Defaults to RB3-style DTA format options.
+   * An object that changes the behavior of the DTA rendering process.
+   *
+   * RB3 and MAGMA formatting options are available as static property on `DTAIO.formatOptions`.
    */
   formatOptions?: DTAIOFormattingOptions
 }
 
 export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptions) => {
-  const { ignoreFakeSongs, wiiMode, addMAGMAComments, sortBy, omitUnusedValues, formatOptions } = setDefaultOptions(
+  const { ignoreFakeSongs, wiiMode, addMAGMAValues, sortBy, omitUnusedValues, formatOptions } = setDefaultOptions(
     {
       ignoreFakeSongs: false,
       wiiMode: null,
-      addMAGMAComments: true,
+      addMAGMAValues: true,
       sortBy: null,
       omitUnusedValues: true,
       formatOptions: DTAIO.formatOptions.defaultRB3,
@@ -45,7 +47,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
   const io = new DTAIO(formatOptions)
 
   if (parser.songs.length === 0 && parser.updates.length === 0) throw new Error('No songs or updates to be stringified.')
-  else if (parser.updates.length > 0) {
+  if (parser.updates.length > 0) {
     // Song metadata updates
     parser.updates = sortDTA(parser.updates, 'ID')
     io.options = { ...io.options, object: { ...io.options.object, closeParenthesisInline: true } }
@@ -159,13 +161,6 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         if (mute_volume !== undefined) songMap.set('mute_volume', mute_volume)
         if (mute_volume_vocals !== undefined) songMap.set('mute_volume_vocals', mute_volume_vocals)
         if (hopo_threshold !== undefined) songMap.set('hopo_threshold', hopo_threshold)
-
-        if (omitUnusedValues) {
-          if (songMap.get('mute_volume') === -96) songMap.delete('mute_volume')
-          if (songMap.get('mute_volume_vocals') === -12) songMap.delete('mute_volume_vocals')
-          if (songMap.get('hopo_threshold') === 170) songMap.delete('hopo_threshold')
-        }
-
         map.set('song', Object.fromEntries(songMap.entries()))
       }
 
@@ -222,14 +217,15 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
 
       io.addValue(id, Object.fromEntries(map.entries()))
     }
-  } else if (parser.songs.length > 0) {
+  }
+  if (parser.songs.length > 0) {
     // Songs only
     if (sortBy) parser.sort(sortBy)
     for (const song of parser.songs) {
       const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, convert, cores, customsource, doubleKick, emh, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, languages, loading_phrase, multitrack, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, rhythmOn, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, unpitchedVocals, upgrade_version, version, vocal_tonic_note, vols, year_recorded, original_id } = song as PartialDTAFile
       const map = new Map<LiteralUnion<keyof PartialDTAFile, string>, unknown>()
 
-      if (ignoreFakeSongs && fake) continue
+      if (fake && ignoreFakeSongs) continue
 
       const allValuesKeys = Object.keys(song) as DTAFileKeys[]
       const tracks = tracks_count ? genTracksCountArray(tracks_count) : undefined
@@ -422,9 +418,9 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
 
       if (!rating) map.set('rating', 4)
 
-      if (addMAGMAComments) {
+      if (addMAGMAValues) {
         let content = ''
-        content += '{n};DO NOT EDIT THE FOLLOWING LINES MANUALLY{n};Created using Magma: Rok On Edition v4.0.2{n}'
+        content += '{n};DO NOT EDIT THE FOLLOWING LINES MANUALLY{n};Created using Magma: Rok On Edition v4.0.3{n}'
         content += `;Song authored by ${author ?? 'Unknown Charter'}{n}`
         content += `;Song=${name ?? ''}{n}`
         if (!languages || languages.length === 0) content += `;Language(s)=English,{n}`

@@ -96,7 +96,7 @@ export class ImageFile {
    * @returns {boolean}
    * @throws {Error} If the instance image file path does not exists.
    */
-  private checkExistence(): boolean {
+  private _checkExistence(): boolean {
     if (!this.path.exists) throw new Error(`Provided image file path "${this.path.path}" does not exists`)
     return true
   }
@@ -107,7 +107,7 @@ export class ImageFile {
    * @returns {Promise<ImageFileStatPythonObject>}
    */
   async stat(): Promise<ImageFileStatPythonObject> {
-    this.checkExistence()
+    this._checkExistence()
     return await PythonAPI.imageFileStat(this.path)
   }
 
@@ -171,7 +171,7 @@ export class ImageFile {
    * @returns {Promise<string>}
    */
   async toDataURL(): Promise<string> {
-    this.checkExistence()
+    this._checkExistence()
     const imgBuf = await this.path.read()
     const fileType = await fileTypeFromBuffer(imgBuf)
     if (!fileType) throw new Error(`Unknown image file format for provided file "${this.path.path}"`)
@@ -186,7 +186,7 @@ export class ImageFile {
    * @returns {Promise<string>}
    */
   async toWEBPDataURL(): Promise<string> {
-    this.checkExistence()
+    this._checkExistence()
     const newBuf = await PythonAPI.imageBufferProcessor(this.path, 'webp', { height: 256, interpolation: 'lanczos', quality: 100, width: 256 })
     const dataURL = `data:image/webp;base64,${newBuf.toString('base64')}`
     return dataURL

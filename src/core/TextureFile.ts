@@ -34,7 +34,7 @@ export class TextureFile {
    * @returns {boolean}
    * @throws {Error} If the instance image file path does not exists.
    */
-  private async checkFileIntegrity(): Promise<boolean> {
+  async checkFileIntegrity(): Promise<boolean> {
     if (!this.path.exists) throw new Error(`Provided image file path "${this.path.path}" does not exists`)
     const magic = BinaryReader.fromBuffer(await this.path.readOffset(0, 2))
     const firstByte = await magic.readUInt8()

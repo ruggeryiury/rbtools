@@ -100,7 +100,7 @@ export class U8Archive {
    * @returns {Promise<U8AppFileHeader>}
    * @throws {Error} When it identifies file signature of any unknown file format.
    */
-  private async parseU8ArchiveHeader(): Promise<U8AppFileHeader> {
+  private async _parseU8ArchiveHeader(): Promise<U8AppFileHeader> {
     await this.checkFileIntegrity()
     const reader = await BinaryReader.fromFile(this.path)
     const magic = await reader.readHex(4)
@@ -171,7 +171,7 @@ export class U8Archive {
    */
   async extract(destPath: DirPathLikeTypes): Promise<void> {
     const dest = pathLikeToDirPath(destPath)
-    const header = await this.parseU8ArchiveHeader()
+    const header = await this._parseU8ArchiveHeader()
     const reader = await BinaryReader.fromFile(this.path)
     const entries: { path: FilePath | DirPath; nodeType: 'file' | 'dir'; data?: Buffer }[] = [
       {

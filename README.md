@@ -19,7 +19,7 @@
 
 # About
 
-**_RBTools_** is a highly-typed NodeJS module with methods to manipulate several Rock Band game files, joining several functions that might help you processing these files. **_RBTools_** also uses _Python scripts_ to manipulate many kinds of files, like image and texture files. The main exports of this package consists on classes that represents a file type to be processed. All secondary methods used on these classes is also available to import from `rbtools/lib`.
+**_RBTools_** is a NodeJS module with classes to manipulate several Rock Band-related files on all available systems. **_RBTools_** also uses _Python_ to manipulate many kinds of files, like image and texture files. The main exports of this package consists on classes that represents a file type to be processed. All secondary methods used on these classes is also available to import from `rbtools/lib`.
 
 # Installation
 
@@ -56,10 +56,8 @@ _Make sure that the `packages` folder are in the project's root folder to instal
 
 - Config your environment file (OPTIONAL): Create a `env` file in the root of where you downloaded/cloned this repository and put these values:
 
-  - `RBTOOLS_USESOURCE`: Setting this variable to `1` changes the root path of the package to use `src` rather than the `dist` folder. This value is only need in development when doing new scripts to avoid building and copying the scripts to the `dist` folder.
-  - `RBTOOLS_BIN_PATH`: Changes the path used as the `bin` directory path for the module. Default is the module `dist/bin` (or `src/bin` if `RBTOOLS_USESOURCE` is set to 1) folder.
+  - `RBTOOLS_BIN_PATH`: Changes the path used as the `bin` directory path for the module. Default is the module `dist/bin`.
   - `MAGMA_PATH`: The path where you extracted MAGMA. This variable can be used by `MAGMAProject` class.
-  - `SONGS_PROJECT_ROOT_PATH`: The path where you can find the project files for all your customs. This variable can be used by `MAGMAProject` class.
 
 # Package resources
 
@@ -80,8 +78,8 @@ Also, **_RBTools_** uses modified Python scripts from:
 
 At last, **_RBTools_** comes with a few special Node packages made by myself, such as:
 
-- [Path-JS](https://github.com/ruggeryiury/path-js): A path utility suite that gathers several functions related to a specific path.
-- [Set Default Options](https://github.com/ruggeryiury/set-default-options): Utility function to merge default options with user-defined ones.
+- [node-lib](https://github.com/ruggeryiury/node-lib): A path utility suite that gathers several functions related to a specific path.
+- [set-default-options](https://github.com/ruggeryiury/set-default-options): Utility function to merge default options with user-defined ones.
 
 # Special thanks
 

@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, type FilePathLikeTypes } from 'node-lib'
+import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes, type DirPath, pathLikeToDirPath } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { ImageFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes } from '../core.exports'
 import type { TPLHeaderParserObject } from '../lib.exports'
@@ -70,6 +70,19 @@ export interface MIDIFileStatPythonObject {
   ticksPerBeat: number
   tracksCount: number
   tracksName: string[]
+}
+
+export interface STFSFileStatRawObject {
+  /** The name of the package. */
+  name: string
+  /** The description of the package. */
+  desc: string
+  /** An array with all files included on the CON file. */
+  files: string[]
+  /** The contents of the package's DTA file. */
+  dta?: string
+  /** The contents of the package's upgrades DTA file. */
+  upgrades?: string
 }
 
 // #region Main Class
@@ -168,7 +181,7 @@ export class PythonAPI {
   }
 
   /**
-   *  Returns an object with stats of an audio file.
+   * Returns an object with stats of an audio file.
    * - - - -
    * @param {FilePathLikeTypes} audioFilePath The path to the image file.
    * @returns {Promise<AudioFileStatPythonObject>}
@@ -196,7 +209,7 @@ export class PythonAPI {
   }
 
   /**
-   *  Returns an object with stats of a MOGG file.
+   * Returns an object with stats of a MOGG file.
    * - - - -
    * @param {FilePathLikeTypes} moggFilePath The path to the MOGG file.
    * @returns {Promise<MOGGFileStatPythonObject>}
@@ -211,7 +224,7 @@ export class PythonAPI {
   }
 
   /**
-   *  Returns an object with stats of a MIDI file.
+   * Returns an object with stats of a MIDI file.
    * - - - -
    * @param {FilePathLikeTypes} midiFilePath The path to the MOGG file.
    * @returns {Promise<MIDIFileStatPythonObject>}
@@ -225,6 +238,13 @@ export class PythonAPI {
     return returnValue
   }
 
+  /**
+   * Converts a PNG_WII file Buffer to a WEBP Base64-encoded string.
+   * - - - -
+   * @param {FilePathLikeTypes} texWiiPath The path to the `.png_wii` file.
+   * @param {TPLHeaderParserObject} texHeader The header of the PNG_WII file.
+   * @returns {Promise<string>}
+   */
   static async texWiiToBase64Buffer(texWiiPath: FilePathLikeTypes, texHeader: TPLHeaderParserObject): Promise<string> {
     const tex = pathLikeToFilePath(texWiiPath)
     const base64Header = texHeader.data.toString('base64')
@@ -234,5 +254,40 @@ export class PythonAPI {
     if (stderr) throw new Error(stderr)
     const [dataURL] = stdout.split('\r\n')
     return dataURL
+  }
+
+  /**
+   * Returns an object with stats of a STFS file.
+   * - - - -
+   * @param {FilePathLikeTypes} stfsFilePath The path of the CON file.
+   * @returns {Promise<STFSFileStatRawObject>}
+   */
+  static async stfsFileStat(stfsFilePath: FilePathLikeTypes): Promise<STFSFileStatRawObject> {
+    const stfs = pathLikeToFilePath(stfsFilePath)
+    const pythonScript = 'stfs_file_stat.py'
+    const command = `python "${pythonScript}" "${stfs.path}" -p`
+    const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    if (stderr) throw new Error(stderr)
+    const returnValue = JSON.parse(stdout) as STFSFileStatRawObject
+    return returnValue
+  }
+
+  /**
+   * Extracts the CON file contents and returns the folder path where all contents were extracted.
+   * - - - -
+   * @param {FilePathLikeTypes} stfsFilePath The path of the CON file.
+   * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
+   * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire STFS file system recursively. Default is `false`.
+   * @returns {Promise<DirPath>}
+   */
+  static async stfsExtract(stfsFilePath: FilePathLikeTypes, destPath: DirPathLikeTypes, extractOnRoot = false) {
+    const stfs = pathLikeToFilePath(stfsFilePath)
+    const dest = pathLikeToDirPath(destPath)
+    const pythonScript = 'stfs_extract.py'
+    let command = `python "${pythonScript}" "${stfs.path}" "${dest.path}"`
+    if (extractOnRoot) command += ' --extract-on-root'
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    if (stderr) throw new Error(stderr)
+    return dest
   }
 }
