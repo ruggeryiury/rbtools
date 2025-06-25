@@ -10,63 +10,21 @@
 </div>
 
 - [About](#about)
-- [Installation](#installation)
-  - [Requirements](#requirements)
-  - [Installation steps](#installation-steps)
-- [Package resources](#package-resources)
-- [Special thanks](#special-thanks)
-- [More Rock Band related projects](#more-rock-band-related-projects)
+- [Package Resources](#package-resources)
+- [Special Thanks](#special-thanks)
+- [More Rock Band-Related Projects](#more-rock-band-related-projects)
 
 # About
 
 **_RBTools_** is a NodeJS module with classes to manipulate several Rock Band-related files on all available systems. **_RBTools_** also uses _Python_ to manipulate many kinds of files, like image and texture files. The main exports of this package consists on classes that represents a file type to be processed. All secondary methods used on these classes is also available to import from `rbtools/lib`.
 
-# Installation
-
-## Requirements
-
-- [NodeJS](https://nodejs.org/en/download)
-- [Python v3 & PIP](https://www.python.org/downloads/): **_RBTools_** uses _Python scripts_ to manipulate many kinds of files, like image and texture files.
-
-## Installation steps
-
-Follow the steps below to install and set up the project on your local machine:
-
-- Install Python v3 with PIP.
-
-- Execute the `scripts/install_python_packages.py` script to install necessary Python packages:
-
-```bash
-python scripts/install_python_packages.py
-```
-
-- Clone the repository: If you have `git` installed, se the following command to clone the repository to your local machine:
-
-```bash
-git clone https://github.com/ruggeryiury/rbtools.git
-```
-
-- Install project dependencies: Navigate to the project directory and install the necessary packages by running:
-
-```bash
-npm install
-```
-
-_Make sure that the `packages` folder are in the project's root folder to install all packages correctly. The reason for this is because there are some packages that is made by me and they're not uploaded to the NPM server, existing only locally._
-
-- Config your environment file (OPTIONAL): Create a `env` file in the root of where you downloaded/cloned this repository and put these values:
-
-  - `RBTOOLS_BIN_PATH`: Changes the path used as the `bin` directory path for the module. Default is the module `dist/bin`.
-  - `MAGMA_PATH`: The path where you extracted MAGMA. This variable can be used by `MAGMAProject` class.
-
-# Package resources
+# Package Resources
 
 **_RBTools_** comes with a few binary executables, such as:
 
 - [NVIDIA Texture Tool](https://docs.nvidia.com/texture-tools/index.html)
 - [Wiimms Image Tool](https://szs.wiimm.de/wimgt/)
 - [MakeMogg](https://github.com/maxton/makemogg)
-- EDATTool
 
 Also, **_RBTools_** uses modified Python scripts from:
 
@@ -81,7 +39,7 @@ At last, **_RBTools_** comes with a few special Node packages made by myself, su
 - [node-lib](https://github.com/ruggeryiury/node-lib): A path utility suite that gathers several functions related to a specific path.
 - [set-default-options](https://github.com/ruggeryiury/set-default-options): Utility function to merge default options with user-defined ones.
 
-# Special thanks
+# Special Thanks
 
 - [raphaelgoulart](https://github.com/raphaelgoulart): Close friend and always helping me in some sort.
 - [Onyxite](https://github.com/mtolly): General helping and for the creation of [Onyx Toolkit](https://github.com/mtolly/onyx)!
@@ -89,7 +47,7 @@ At last, **_RBTools_** comes with a few special Node packages made by myself, su
 - [LocalH](https://github.com/LocalH): General helping and providing me the [moggulator](https://github.com/LocalH/moggulator/tree/master) python script.
 - [Emma](https://github.com/InvoxiPlayGames): General helping!
 
-# More Rock Band related projects
+# More Rock Band-Related Projects
 
 - [My Customs Projects](https://github.com/ruggeryiury/ruggy-customs-projects): All my customs projects.
 - [PRO Guitar/Bass Guide](https://ruggeryiury.github.io/proguitarbass-guide/): My famous PRO Guitar/Bass guide.

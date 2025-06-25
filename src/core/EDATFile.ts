@@ -1,4 +1,4 @@
-import { BinaryReader, createHash, FilePath, getReadableBytesSize, HexVal, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, createHash, FilePath, getReadableBytesSize, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { BinaryAPI, MIDIFile } from '../core.exports'
 
@@ -234,7 +234,7 @@ export class EDATFile {
     const magic = await BinaryReader.fromBuffer(await this.path.readOffset(0, 4)).readUInt32BE()
 
     // NPD
-    if (magic === 0x4e504400) return HexVal.processHex(magic)
+    if (magic === 0x4e504400) return 'NPD'
     // MThd
     else if (magic === 0x4d546864) throw new Error(`Provided EDAT file "${this.path.path}" is a decrypted MIDI file with no HMX EDAT header.`)
     throw new Error(`Provided EDAT file "${this.path.path}" is not a valid EDAT or decrypted MIDI file with no HMX EDAT header.`)

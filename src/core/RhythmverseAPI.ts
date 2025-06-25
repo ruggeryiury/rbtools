@@ -442,7 +442,13 @@ export class RhythmverseAPI {
     }
   }
 
-  static processData(data: RawRhythmverseResponse): ProcessRhythmverseObject {
+  /**
+   * Transforms raw Rhythmverse data from the API, gathering the most important data.
+   * - - - -
+   * @param {RawRhythmverseResponse} data A raw Rhythmverse API response.
+   * @returns {ProcessRhythmverseObject}
+   */
+  static processRawData(data: RawRhythmverseResponse): ProcessRhythmverseObject {
     const { pagination, records, songs } = data.data
 
     const allSongs: ProcessedRhythmverseSongData[] = []

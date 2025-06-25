@@ -316,6 +316,7 @@ export const dta = {
     artist_set: 'Artist, Year Released, Album Name, Album Track Number',
     id: 'ID',
     song_id: 'Song ID',
+    songname: 'Shortname',
   },
 } as const
 

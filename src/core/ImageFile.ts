@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { fileTypeFromBuffer } from 'file-type'
 import { type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
-// import type { FilePath } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { temporaryFile } from 'tempy'
 import { PythonAPI, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'
@@ -119,11 +118,10 @@ export class ImageFile {
    * @returns {Promise<ImageFileJSONRepresentation>}
    */
   async toJSON(): Promise<ImageFileJSONRepresentation> {
-    const returnValue = {
+    return {
       ...this.path.toJSON(),
       ...(await this.stat()),
-    } as ImageFileJSONRepresentation
-    return returnValue
+    }
   }
 
   /**

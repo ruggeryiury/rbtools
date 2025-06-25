@@ -16,6 +16,7 @@ import hashlib
 from io import BufferedReader, BytesIO as StringIO
 from typing import Dict, List
 
+
 class STFSHashInfo(object):
     """Whether the block represented by the BlockHashRecord is used, free, old or current."""
 
@@ -26,6 +27,7 @@ class STFSHashInfo(object):
         "Allocated In Use Old",
         "Allocated In Use Current",
     ]
+
 
 class ContentTypes:
     """STFS Content Types mapping."""
@@ -64,6 +66,7 @@ class ContentTypes:
         0xE0000: "XNA",
     }
 
+
 class BlockHashRecord(object):
     """Object containing the SHA1 hash of a block as well as its free/used information and next block."""
 
@@ -90,6 +93,7 @@ class BlockHashRecord(object):
         self.nextblock: int = struct.unpack(">I", bytes([0x00]) + data[0x15:0x18])[0]
         assert self.info in STFSHashInfo.types, "BlockHashRecord type is unknown"
 
+
 class FileListing(object):
     """Object containing the information about a file in the STFS container
     Data includes size, name, path and firstblock and atime and utime
@@ -102,10 +106,14 @@ class FileListing(object):
         self.filename = data[:0x28].strip(bytes([0x00]))
         assert self.filename != "", "FileListing has empty filename"
         self.isdirectory = 0x80 & (data[0x28]) == 0x80
-        self.numblocks: int = struct.unpack("<I", data[0x29 : 0x29 + 3] + bytes([0x00]))[
+        self.numblocks: int = struct.unpack(
+            "<I", data[0x29 : 0x29 + 3] + bytes([0x00])
+        )[
             0
         ]  # More little endian madness!
-        self.firstblock: int = struct.unpack("<I", data[0x2F : 0x2F + 3] + bytes([0x00]))[
+        self.firstblock: int = struct.unpack(
+            "<I", data[0x2F : 0x2F + 3] + bytes([0x00])
+        )[
             0
         ]  # And again!
         self.pathindex: int = struct.unpack(">h", data[0x32:0x34])[
@@ -116,6 +124,7 @@ class FileListing(object):
         self.utime: int = struct.unpack(">H", data[0x3A:0x3C])[0]
         self.adate: int = struct.unpack(">H", data[0x3C:0x3E])[0]
         self.atime: int = struct.unpack(">H", data[0x3E:0x40])[0]
+
 
 class STFS(object):
     """Object representing the STFS container. allfiles dict contains a path to filelisting map"""
@@ -320,7 +329,9 @@ class STFS(object):
 
         self.volume_descriptor_size = data[0x379:0x37A]
         self.block_seperation = data[0x37B]
-        self.filetable_blockcount: int = struct.unpack("<H", data[0x37A + 2 : 0x37A + 4])[
+        self.filetable_blockcount: int = struct.unpack(
+            "<H", data[0x37A + 2 : 0x37A + 4]
+        )[
             0
         ]  # Little Endian. Why?
         self.filetable_blocknumber: int = struct.unpack(

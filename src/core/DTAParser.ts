@@ -132,12 +132,12 @@ export class DTAParser {
   /**
    * Adds song entries to the `songs` array and returns the updated length of the `songs` array.
    * - - - -
-   * @param {RB3CompatibleDTAFile | RB3CompatibleDTAFile[]} songs The song's data that you want to add.
+   * @param {RB3CompatibleDTAFile | RB3CompatibleDTAFile[]} songs The song's data that you want to add. Can be a single `RB3CompatibleDTAFile` object, or an array of multiple `RB3CompatibleDTAFile` objects.
    * @returns {number}
    * @throws {Error} When a provided entry is not compatible with Rock Band 3.
    */
   addSongs(songs: RB3CompatibleDTAFile | RB3CompatibleDTAFile[]): number {
-    if (Array.isArray(songs)) {
+    if (Array.isArray(songs) && songs.length > 0) {
       for (const song of songs) {
         if (!isRB3CompatibleDTA(song)) throw new Error('Only RB3 compatible song metadata is allowed to insert as songs.')
         this.songs.push(song)
@@ -147,6 +147,34 @@ export class DTAParser {
       this.songs.push(songs)
     }
     return this.songs.length
+  }
+
+  /**
+   * Removes song entries to the `songs` array and returns an array with the removed songs object.
+   * - - - -
+   * @param {string | string[]} value The song value that you want to add. Can be a single string, or an array of multiple strings.
+   * @param {'id' | 'songname'} [type] `OPTIONAL` The type of the value you want to evaluate. Default is `'id'`.
+   * @returns {RB3CompatibleDTAFile[]}
+   */
+  removeSongs(value: string | string[], type: 'id' | 'songname' = 'id'): RB3CompatibleDTAFile[] {
+    const removedSongs: RB3CompatibleDTAFile[] = []
+    if (Array.isArray(value) && value.length > 0) {
+      for (const val of value) {
+        const i = this.songs.findIndex((v) => {
+          if (type === 'id') return v.id === val
+          else return v.songname === val
+        })
+        if (i > -1) removedSongs.push(...this.songs.splice(i, 1))
+      }
+    } else if (typeof value === 'string' && value) {
+      const i = this.songs.findIndex((v) => {
+        if (type === 'id') return v.id === value
+        else return v.songname === value
+      })
+      if (i > -1) removedSongs.push(...this.songs.splice(i, 1))
+    }
+
+    return removedSongs
   }
 
   /**
@@ -325,7 +353,7 @@ export class DTAParser {
    * @returns {string}
    */
   calculateHash(): string {
-    const parser = new DTAParser(this.songs)
+    const parser = new DTAParser([...this.songs, ...this.updates])
     parser.sort('ID')
     const dtaBuffer = Buffer.from(stringifyDTA(parser))
     return createHash(dtaBuffer)

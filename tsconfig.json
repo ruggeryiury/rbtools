@@ -16,6 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["dev/**/*.ts", "tests/**/*.ts", "src/**/*.ts"],
+  "include": ["dev/**/*.ts", "tests/**/*.ts", "src/**/*.ts", "dev/DXPACK.ts.old"],
   "exclude": ["node_modules"]
 }

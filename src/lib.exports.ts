@@ -15,6 +15,7 @@ export * from './lib/imagetex/ddsHeader'
 export * from './lib/imagetex/getTPLHeader'
 export * from './lib/imagetex/imageHeaders'
 export * from './lib/imagetex/imageToTex'
+export * from './lib/imagetex/swapTextureBytes'
 export * from './lib/imagetex/texStat'
 export * from './lib/imagetex/texToImage'
 
@@ -24,8 +25,15 @@ export * from './lib/pkg/calculateAesAlignedOffsetAndSize'
 export * from './lib/pkg/PkgAesCtrCounter'
 export * from './lib/pkg/PkgXorSha1Counter'
 
+export * from './lib/rb3package/create'
+export * from './lib/rb3package/defaultArtwork'
+export * from './lib/rb3package/mount'
+export * from './lib/rb3package/parse'
+export * from './lib/rb3package/process'
+
 export * from './lib/strnum/formatStringFromDTA'
 export * from './lib/strnum/isURL'
 export * from './lib/strnum/textMethods'
 
+export * from './lib/utils/extractedPackageProcessor'
 export * from './lib/utils/getKeyFromMapValue'

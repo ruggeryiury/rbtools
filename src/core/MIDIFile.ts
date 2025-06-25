@@ -1,4 +1,4 @@
-import { BinaryReader, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, HexVal, pathLikeToFilePath, randomByteFromRanges } from 'node-lib'
+import { BinaryReader, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, pathLikeToFilePath, randomByteFromRanges } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { BinaryAPI, EDATFile, PythonAPI, type MIDIFileStatPythonObject } from '../core.exports'
 
@@ -48,11 +48,11 @@ export class MIDIFile {
    * @throws {Error} When it identifies file signature of a MIDI file or any unknown file format.
    */
   async checkFileIntegrity(): Promise<string> {
-    if (!this.path.exists) throw new Error(`Provided MIDI file path "${this.path.path}" does not exists`)
+    if (!this.path.exists) throw new Error(`Provided MIDI file "${this.path.path}" does not exists`)
     const magic = await BinaryReader.fromBuffer(await this.path.readOffset(0, 4)).readUInt32BE()
 
     // MThd
-    if (magic === 0x4d546864) return HexVal.processHex(magic)
+    if (magic === 0x4d546864) return 'MThd'
     // NPD
     else if (magic === 0x4e5044) throw new Error(`Provided MIDI file "${this.path.path}" is an encrypted EDAT file.`)
     throw new Error(`Provided EDAT file "${this.path.path}" is not a valid EDAT or decrypted MIDI file with no HMX EDAT header.`)

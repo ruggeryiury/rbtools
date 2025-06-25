@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process'
 import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes, type DirPath, pathLikeToDirPath } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
-import { ImageFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes } from '../core.exports'
+import { ImageFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes, type MOGGFileEncryptionVersion } from '../core.exports'
 import type { TPLHeaderParserObject } from '../lib.exports'
 
 // #region Types
@@ -73,15 +73,25 @@ export interface MIDIFileStatPythonObject {
 }
 
 export interface STFSFileStatRawObject {
-  /** The name of the package. */
+  /**
+   * The name of the package.
+   */
   name: string
-  /** The description of the package. */
+  /**
+   * The description of the package.
+   */
   desc: string
-  /** An array with all files included on the CON file. */
+  /**
+   * An array with all files included on the CON file.
+   */
   files: string[]
-  /** The contents of the package's DTA file. */
+  /**
+   * The contents of the package's DTA file.
+   */
   dta?: string
-  /** The contents of the package's upgrades DTA file. */
+  /**
+   * The contents of the package's upgrades DTA file.
+   */
   upgrades?: string
 }
 
@@ -278,16 +288,57 @@ export class PythonAPI {
    * @param {FilePathLikeTypes} stfsFilePath The path of the CON file.
    * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
    * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire STFS file system recursively. Default is `false`.
+   * @param {boolean} [cleanDestDir] `OPTIONAL` Delete the entire destination folder contents before extracting. Default is `false`.
    * @returns {Promise<DirPath>}
    */
-  static async stfsExtract(stfsFilePath: FilePathLikeTypes, destPath: DirPathLikeTypes, extractOnRoot = false) {
+  static async stfsExtract(stfsFilePath: FilePathLikeTypes, destPath: DirPathLikeTypes, extractOnRoot = false, cleanDestDir = false): Promise<DirPath> {
     const stfs = pathLikeToFilePath(stfsFilePath)
     const dest = pathLikeToDirPath(destPath)
     const pythonScript = 'stfs_extract.py'
     let command = `python "${pythonScript}" "${stfs.path}" "${dest.path}"`
     if (extractOnRoot) command += ' --extract-on-root'
+    if (cleanDestDir) command += ' --clean-dest-dir'
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return dest
+  }
+
+  /**
+   * Decrypts a MOGG file.
+   * - - - -
+   * @param {FilePathLikeTypes} encMoggPath The path of the encrypted MOGG file.
+   * @param {FilePathLikeTypes} decMoggPath The path to the decrypted MOGG file.
+   * @returns {Promise<FilePath>}
+   */
+  static async decryptMOGG(encMoggPath: FilePathLikeTypes, decMoggPath: FilePathLikeTypes): Promise<FilePath> {
+    const enc = pathLikeToFilePath(encMoggPath)
+    const dec = pathLikeToFilePath(decMoggPath)
+    const pythonScript = 'decrypt_mogg.py'
+    const command = `python "${pythonScript}" "${enc.path}" "${dec.path}"`
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    if (stderr) throw new Error(stderr)
+    return dec
+  }
+
+  /**
+   * Encrypts a MOGG file.
+   * - - - -
+   * @param {FilePathLikeTypes} decMoggPath The path to the decrypted MOGG file.
+   * @param {FilePathLikeTypes} encMoggPath The path of the encrypted MOGG file.
+   * @param {MOGGFileEncryptionVersion} [encVersion] `OPTIONAL` Default is `11`.
+   * @param {boolean} [useXbox] `OPTIONAL` Default is `true`.
+   * @param {boolean} [useRed] `OPTIONAL` Default is `false`.
+   * @returns {Promise<FilePath>}
+   */
+  static async encryptMOGG(decMoggPath: FilePathLikeTypes, encMoggPath: FilePathLikeTypes, encVersion: MOGGFileEncryptionVersion = 11, useXbox = true, useRed = false): Promise<FilePath> {
+    const dec = pathLikeToFilePath(decMoggPath)
+    const enc = pathLikeToFilePath(encMoggPath)
+    const pythonScript = 'encrypt_mogg.py'
+    let command = `python "${pythonScript}" "${enc.path}" "${dec.path}" -v ${encVersion.toString()}`
+    if (!useXbox) command += ' --use-ps3'
+    if (useRed) command += ' --use-red'
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    if (stderr) throw new Error(stderr)
+    return enc
   }
 }

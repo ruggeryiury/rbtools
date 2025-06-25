@@ -93,7 +93,6 @@ export const sortDTA = <T extends AnyDTATypeArray>(songs: T, sortBy: SongSorting
       return AID.localeCompare(BID)
     }) as DTASelfReturnType<T>
   } else if (sortBy === 'Song ID') {
-    // Sorting by Song ID
     return songs.sort((a, b) => {
       const AID = Number(a.song_id)
       const BID = Number(b.song_id)
@@ -103,6 +102,13 @@ export const sortDTA = <T extends AnyDTATypeArray>(songs: T, sortBy: SongSorting
       if (AID > BID) return 1
       else if (AID < BID) return -1
       else return 0
+    }) as DTASelfReturnType<T>
+  } else {
+    // sortBy === 'Shortname'
+    return songs.sort((a, b) => {
+      const AID = a.songname?.toLocaleLowerCase() ?? ''
+      const BID = b.songname?.toLowerCase() ?? ''
+      return AID.localeCompare(BID)
     }) as DTASelfReturnType<T>
   }
   return songs

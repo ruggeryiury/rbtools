@@ -2,6 +2,7 @@ import { pathLikeToFilePath, type FilePath, type FilePathJSONRepresentation, typ
 import { PythonAPI, type MOGGFileStatPythonObject } from '../core.exports'
 
 export interface MOGGFileJSONRepresentation extends FilePathJSONRepresentation, MOGGFileStatPythonObject {}
+export type MOGGFileEncryptionVersion = 10 | 11 | 12 | 13
 
 /**
  * `MOGGFile` is a class that represents a MOGG file.
@@ -19,7 +20,6 @@ export class MOGGFile {
    */
   constructor(moggFilePath: FilePathLikeTypes) {
     this.path = pathLikeToFilePath(moggFilePath)
-    if (this.path.ext !== '.mogg') throw new Error(`Provided file "${this.path.path} is not a valid MOGG file"`)
   }
 
   /**
@@ -39,23 +39,13 @@ export class MOGGFile {
   }
 
   /**
-   * Returns the MOGG encryption version from the MOGG file header.
-   * - - - -
-   * @returns {Promise<number>}
-   * @throws {Error} When it identifies file signature of a multitrack OGG file with no MOGG header or any unknown file format.
-   */
-  private async _encryptionVersion(): Promise<number> {
-    return await this.checkFileIntegrity()
-  }
-
-  /**
    * Checks if the MOGG file is encrypted.
    * - - - -
    * @returns {Promise<boolean>}
    * @throws {Error} When it identifies file signature of a multitrack OGG file with no MOGG header or any unknown file format.
    */
   async isEncrypted(): Promise<boolean> {
-    return (await this._encryptionVersion()) > 10
+    return (await this.checkFileIntegrity()) > 10
   }
 
   /**

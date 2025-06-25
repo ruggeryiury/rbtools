@@ -25,7 +25,6 @@ export class TextureFile {
    */
   constructor(imgFilePath: FilePathLikeTypes) {
     this.path = pathLikeToFilePath(imgFilePath)
-    if (this.path.ext === '.png' || this.path.ext === '.jpg' || this.path.ext === '.bmp' || this.path.ext === '.gif') throw new Error(`Tired to instance a ${this.path.ext.slice(1).toUpperCase()} file on the TextureFile class, use the ImageFile class instead`)
   }
 
   /**
@@ -35,7 +34,7 @@ export class TextureFile {
    * @throws {Error} If the instance image file path does not exists.
    */
   async checkFileIntegrity(): Promise<boolean> {
-    if (!this.path.exists) throw new Error(`Provided image file path "${this.path.path}" does not exists`)
+    if (!this.path.exists) throw new Error(`Provided image file path "${this.path.path}" does not exists.`)
     const magic = BinaryReader.fromBuffer(await this.path.readOffset(0, 2))
     const firstByte = await magic.readUInt8()
     const secondByte = await magic.readUInt8()
@@ -65,11 +64,10 @@ export class TextureFile {
    * @returns {Promise<TextureFileJSONRepresentation>}
    */
   async toJSON(): Promise<TextureFileJSONRepresentation> {
-    const returnValue = {
+    return {
       ...this.path.toJSON(),
       ...(await this.stat()),
-    } as TextureFileJSONRepresentation
-    return returnValue
+    }
   }
 
   /**
@@ -101,6 +99,10 @@ export class TextureFile {
     return await texXboxPs3ToImage(this.path, dest, toFormat)
   }
 
+  /**
+   * Returns a DataURL string of the texture file, using WEBP encoding.
+   * @returns {Promise<string>}
+   */
   async toDataURL(): Promise<string> {
     if (this.path.ext === '.png_wii') {
       const base64 = await PythonAPI.texWiiToBase64Buffer(this.path, await getTPLHeader(this.path))
