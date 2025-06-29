@@ -3,9 +3,31 @@
 import argparse, json, os, struct, tempfile
 from lib.mogg import decrypt_mogg_bytes
 from pydub.utils import mediainfo
+from typing import TypedDict
 
 
-def mogg_file_stat(mogg_file_path: str) -> dict:
+class MOGGStatObject(TypedDict):
+    size: int
+    version: int
+    isEncrypted: bool
+    worksInPS3: bool
+
+
+class MOGGFileStat(TypedDict):
+    bitRate: int
+    channels: int
+    codec: str
+    codecDesc: str
+    duration: int
+    durationSec: float
+    ext: str
+    extDesc: str
+    sampleRate: int
+    size: int
+    mogg: MOGGStatObject
+
+
+def mogg_file_stat(mogg_file_path: str) -> MOGGFileStat:
     with open(mogg_file_path, "rb") as fin:
         version = struct.unpack("<I", fin.read(4))[0]
         fin.seek(0)

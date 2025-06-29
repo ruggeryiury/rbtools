@@ -319,15 +319,13 @@ export class DTAParser {
       const tracks = genTracksCountArray(song.tracks_count)
       const coresArray = Array<number>(tracks.allTracksCount)
         .fill(-1)
-        .map((core, coreI) => {
+        .map((_, coreI) => {
           if (tracks.guitar?.includes(coreI)) return 1
           return -1
         })
-      if (!(song.cores && JSON.stringify(song.cores) === JSON.stringify(coresArray))) newSongs.push(song)
-      else {
-        patchedSongsID.push(song.id)
-        newSongs.push({ ...song, cores: coresArray })
-      }
+
+      patchedSongsID.push(song.id)
+      newSongs.push({ ...song, cores: coresArray })
     }
 
     this.songs = newSongs

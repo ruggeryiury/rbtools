@@ -1,4 +1,4 @@
-import { FilePath, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
+import { type FilePath, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
 
 export interface SongExtractionPathObject {
   /**
@@ -35,6 +35,26 @@ export const mountRPCS3SongExtractionPaths = async (songFolder: DirPathLikeTypes
   const midi = song.gotoFile(`${songname}.mid.edat`)
   const png = gen.gotoFile(`${songname}_keep.png_ps3`)
   const milo = gen.gotoFile(`${songname}.milo_ps3`)
+
+  return { mogg, midi, png, milo }
+}
+
+/**
+ * Mounts the paths to a song's files for YARG environment. Also works with extracted CON file structure.
+ * - - - -
+ * @param {DirPathLikeTypes} songFolder The folder to the song's files.
+ * @param {string} songname The songname (shortname) of the song.
+ * @returns {Promise<SongExtractionPathObject>}
+ */
+export const mountYARGSongExtractionPaths = async (songFolder: DirPathLikeTypes, songname: string): Promise<SongExtractionPathObject> => {
+  const song = pathLikeToDirPath(songFolder).gotoDir(songname)
+  if (!song.exists) await song.mkDir()
+  const gen = song.gotoDir('gen')
+  if (!gen.exists) await gen.mkDir()
+  const mogg = song.gotoFile(`${songname}.mogg`)
+  const midi = song.gotoFile(`${songname}.mid`)
+  const png = gen.gotoFile(`${songname}_keep.png_xbox`)
+  const milo = gen.gotoFile(`${songname}.milo_xbox`)
 
   return { mogg, midi, png, milo }
 }

@@ -92,6 +92,17 @@ export const formatStringFromDTA = (song: RB3CompatibleDTAFile | null, format: s
     newText = newText.replace(new RegExp(`{{title.emit}}`, 'g'), song.name)
     newText = newText.replace(new RegExp(`{{title.omit}}`, 'g'), omitLeadingArticle(song.name))
     newText = newText.replace(new RegExp(`{{title.trailing}}`, 'g'), leadingArticleToTrailing(song.name))
+
+    newText = newText.replace(
+      new RegExp(`{{id1}}`, 'g'),
+      (() => {
+        const is2x = song.doubleKick ?? false
+        const val = `${Number(song.song_id.toString().slice(1, 5)).toString()}${song.name.replace(' (2x Bass Pedal)', '')}`
+
+        if (is2x) return `${val.slice(0, 48)}2x`
+        return val.slice(0, 50)
+      })()
+    )
   }
   if (normalizeNFD) newText = newText.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   if (azNumOnly) newText = newText.replace(/[^a-zA-Z0-9]/g, '')

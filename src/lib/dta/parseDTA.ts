@@ -29,6 +29,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
     }
   }
   const map = new Map() as DTAMap
+
   const allStrings = songContent
     .split(/"/g)
     .map((val) => val.trim())

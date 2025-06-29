@@ -93,6 +93,10 @@ export interface STFSFileStatRawObject {
    * The contents of the package's upgrades DTA file.
    */
   upgrades?: string
+  /**
+   * The size of the STFS file.
+   */
+  fileSize: number
 }
 
 // #region Main Class

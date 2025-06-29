@@ -20,7 +20,16 @@ export interface ExtractedPackageProcessorOptions {
   milo?: 'milo_xbox' | 'milo_ps3' | 'milo_wii'
 }
 
-export const extractedPackageProcessor = async (extractedPackageFolderPath: DirPathLikeTypes, options?: ExtractedPackageProcessorOptions) => {
+/**
+ * Processes all songs files from a folder of extracted packages and returns the song package folder.
+ * 
+ * Works on extracted CON files, extracted PKG files, and extracted RB3 Package file.
+ * - - - -
+ * @param {DirPathLikeTypes} extractedPackageFolderPath The folder where the extracted package contents are into.
+ * @param {ExtractedPackageProcessorOptions} [options] `OPTIONAL` Changes specific behaviors of the process.
+ * @returns {Promise<FilePath[]>}
+ */
+export const extractedPackageProcessor = async (extractedPackageFolderPath: DirPathLikeTypes, options?: ExtractedPackageProcessorOptions): Promise<FilePath[]> => {
   const folder = pathLikeToDirPath(extractedPackageFolderPath)
   if (!folder.exists) throw new Error(`Provided extract package folder "${folder.path}" does not exists.`)
   const { moggEncrypted, moggXbox, moggRedKeys, png, milo } = setDefaultOptions(

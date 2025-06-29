@@ -48,6 +48,8 @@ export class STFSFile {
     this.path = pathLikeToFilePath(stfsFilePath)
   }
 
+  // #region Methods
+
   /**
    * Checks the integrity of the STFS by reading the file signature (magic).
    * - - - -
@@ -75,6 +77,7 @@ export class STFSFile {
   async stat(): Promise<STFSFileStatObject> {
     await this.checkFileIntegrity()
     const stat = await PythonAPI.stfsFileStat(this.path)
+
     let isPack = false
     const hasUpgrades = stat.files.includes('/songs_upgrades/upgrades.dta')
 

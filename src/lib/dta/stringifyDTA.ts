@@ -70,8 +70,8 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         } else continue
       }
 
-      if (name !== undefined) map.set('name', quoteToSlashQ(name))
-      if (artist !== undefined) map.set('artist', quoteToSlashQ(artist))
+      if (name !== undefined) map.set('name', DTAIO.useString(quoteToSlashQ(name), io.options.string))
+      if (artist !== undefined) map.set('artist', DTAIO.useString(quoteToSlashQ(artist), io.options.string))
       if (fake === true) map.set('fake', fake)
       if (master !== undefined) map.set('master', master)
       if (song_id !== undefined) map.set('song_id', song_id)
@@ -209,11 +209,11 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       if (alternate_path !== undefined) map.set('alternate_path', alternate_path)
       if (base_points !== undefined) map.set('base_points', base_points)
       if (extra_authoring !== undefined && extra_authoring.length > 0) map.set('extra_authoring', DTAIO.useArray(extra_authoring, { ...io.options, array: { ...io.options.array, parenthesisForValues: false } }))
-      if (author !== undefined) map.set('author', quoteToSlashQ(author))
-      if (strings_author !== undefined) map.set('strings_author', quoteToSlashQ(strings_author))
-      if (keys_author !== undefined) map.set('keys_author', quoteToSlashQ(keys_author))
-      if (loading_phrase !== undefined) map.set('loading_phrase', quoteToSlashQ(loading_phrase))
-      if (pack_name !== undefined) map.set('pack_name', quoteToSlashQ(pack_name))
+      if (author !== undefined) map.set('author', DTAIO.useString(quoteToSlashQ(author), io.options.string))
+      if (strings_author !== undefined) map.set('strings_author', DTAIO.useString(quoteToSlashQ(strings_author), io.options.string))
+      if (keys_author !== undefined) map.set('keys_author', DTAIO.useString(quoteToSlashQ(keys_author), io.options.string))
+      if (loading_phrase !== undefined) map.set('loading_phrase', DTAIO.useString(quoteToSlashQ(loading_phrase), io.options.string))
+      if (pack_name !== undefined) map.set('pack_name', DTAIO.useString(quoteToSlashQ(pack_name), io.options.string))
 
       io.addValue(id, Object.fromEntries(map.entries()))
     }
@@ -241,8 +241,8 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         } else continue
       }
 
-      if (name !== undefined) map.set('name', quoteToSlashQ(name))
-      if (artist !== undefined) map.set('artist', quoteToSlashQ(artist))
+      if (name !== undefined) map.set('name', DTAIO.useString(quoteToSlashQ(name), io.options.string))
+      if (artist !== undefined) map.set('artist', DTAIO.useString(quoteToSlashQ(artist), io.options.string))
       if (fake === true) map.set('fake', fake)
       if (master !== undefined) map.set('master', master)
       if (song_id !== undefined) map.set('song_id', song_id)
@@ -406,11 +406,11 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       if (alternate_path !== undefined) map.set('alternate_path', alternate_path)
       if (base_points !== undefined) map.set('base_points', base_points)
       if (extra_authoring !== undefined && extra_authoring.length > 0) map.set('extra_authoring', DTAIO.useArray(extra_authoring, { ...io.options, array: { ...io.options.array, parenthesisForValues: false } }))
-      if (author !== undefined) map.set('author', quoteToSlashQ(author))
-      if (strings_author !== undefined) map.set('strings_author', quoteToSlashQ(strings_author))
-      if (keys_author !== undefined) map.set('keys_author', quoteToSlashQ(keys_author))
-      if (loading_phrase !== undefined) map.set('loading_phrase', quoteToSlashQ(loading_phrase))
-      if (pack_name !== undefined) map.set('pack_name', quoteToSlashQ(pack_name))
+      if (author !== undefined) map.set('author', DTAIO.useString(quoteToSlashQ(author), io.options.string))
+      if (strings_author !== undefined) map.set('strings_author', DTAIO.useString(quoteToSlashQ(strings_author), io.options.string))
+      if (keys_author !== undefined) map.set('keys_author', DTAIO.useString(quoteToSlashQ(keys_author), io.options.string))
+      if (loading_phrase !== undefined) map.set('loading_phrase', DTAIO.useString(quoteToSlashQ(loading_phrase), io.options.string))
+      if (pack_name !== undefined) map.set('pack_name', DTAIO.useString(quoteToSlashQ(pack_name), io.options.string))
 
       // Songs only
       if (rank_vocals && rank_vocals > 0 && (rank_vocals === 0 || vocal_parts === undefined)) map.set('vocal_parts', 1)

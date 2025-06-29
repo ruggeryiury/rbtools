@@ -86,6 +86,10 @@ export interface PKGData {
   header: PKGHeaderData
   entries: PKGItemEntriesData
   sfo: SFOData
+  /**
+   * The size of the PKG file.
+   */
+  fileSize: number
 }
 
 export interface SFODataObject {
@@ -142,11 +146,11 @@ export interface PKGFileStatObject {
    */
   files: string[]
   /**
-   * The contents of the package's DTA file.
+   * The contents of the PKG DTA file.
    */
   dta: DTAParser
   /**
-   * The contents of the package's upgrades DTA file.
+   * The contents of the PKG upgrades DTA file.
    */
   upgrades: DTAParser | undefined
   /**
@@ -157,15 +161,19 @@ export interface PKGFileStatObject {
    * A boolean value that tells if the package has PRO Guitar/Bass upgrades.
    */
   hasUpgrades: boolean
+  /**
+   * The size of the PKG file.
+   */
+  fileSize: number
 }
 
 export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, Omit<PKGFileStatObject, 'dta' | 'upgrades'> {
   /**
-   * The contents of the package's DTA file.
+   * The contents of the PKG DTA file.
    */
   dta?: RB3CompatibleDTAFile[]
   /**
-   * The contents of the package's upgrades DTA file.
+   * The contents of the PKG upgrades DTA file.
    */
   upgrades?: PartialDTAFile[]
 }
@@ -282,7 +290,7 @@ export class PKGFile {
         dataLength = 0
       if (i === data.length - 1) {
         keyLength = dataTableStartOffset - keyOffset
-        dataLength = reader.size - dataOffset
+        dataLength = reader.length - dataOffset
       } else {
         keyLength = data[i + 1].keyOffset - readKeyBytes
         dataLength = data[i + 1].dataOffset - readDataBytes
@@ -693,6 +701,7 @@ export class PKGFile {
       header,
       entries,
       sfo,
+      fileSize: reader.length,
     }
   }
 
@@ -751,6 +760,7 @@ export class PKGFile {
       upgrades,
       isPack,
       hasUpgrades,
+      fileSize: data.fileSize,
     }
   }
 

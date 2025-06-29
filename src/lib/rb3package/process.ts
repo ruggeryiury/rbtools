@@ -1,4 +1,4 @@
-import { BinaryReader, DirPath, FilePath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes } from 'node-lib'
+import { BinaryReader, type DirPath, type FilePath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes } from 'node-lib'
 import { temporaryDirectory } from 'tempy'
 import { STFSFile } from '../../core.exports'
 import { extractedPackageProcessor, sortDTA, type RB3CompatibleDTAFile, type RB3PackageFilesTypes } from '../../lib.exports'

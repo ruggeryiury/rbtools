@@ -31,7 +31,7 @@ export class MOGGFile {
    * @throws {Error} When it identifies file signature of a multitrack OGG file with no MOGG header or any unknown file format.
    */
   async checkFileIntegrity(): Promise<number> {
-    if (!this.path.exists) throw new Error(`Provided MOGG file path "${this.path.path}" does not exists`)
+    if (!this.path.exists) throw new Error(`Provided MOGG file "${this.path.path}" does not exists`)
     const magic = (await this.path.readOffset(0, 4)).readUint32LE()
     if (magic === 1399285583) throw new Error(`Provided MOGG file "${this.path.path}" is a decrypted OGG file with no HMX MOGG header`)
     else if (magic >= 10 && magic <= 17) return magic

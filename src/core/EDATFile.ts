@@ -35,11 +35,6 @@ export interface EDATFileStatObject {
    */
   header: {
     /**
-     * The file signature. Always "NPD\0" (4E 50 44 00)
-     * - - - -
-     */
-    magic: string
-    /**
      * There are 4 PS3 EDAT (and NPD) format major versions:
      *
      * - 1: compatible with SDK 2.1x or older. Supported since at least PS3 System Software version 1.01.
@@ -147,6 +142,10 @@ export interface EDATFileStatObject {
      */
     packagerVersion: string
   }
+  /**
+   * The size of the EDAT file.
+   */
+  fileSize: number
 }
 
 export interface EDATDecryptionOptions {
@@ -245,7 +244,7 @@ export class EDATFile {
    * - - - -
    * @returns {boolean}
    */
-  private _isUSRDIRPathValid(): boolean {
+  isUSRDIRPathValid(): boolean {
     const usrdir = this.path.gotoDir('../../../')
     const eboot = usrdir.gotoFile('EBOOT.BIN')
     const gen = usrdir.gotoDir('gen')
@@ -276,14 +275,15 @@ export class EDATFile {
    * @returns {Promise<EDATFileStatObject>}
    */
   async stat(): Promise<EDATFileStatObject> {
+    await this.checkFileIntegrity()
     let devKLicFolderName: string | null = null
     let devKLicHash: string | null = null
     const isEncrypted = await this.isEncrypted()
     if (!isEncrypted) throw new Error(`Provided EDAT file "${this.path.path}" is a decrypted MIDI file with no HMX EDAT header`)
     const reader = await BinaryReader.fromFile(this.path)
-    const size = reader.size
+    const fileSize = reader.length
 
-    const magic = await reader.readHex(4)
+    reader.seek(4)
     const version = await reader.readUInt32BE()
     const drmType = await reader.readUInt32BE()
     const applicationType = await reader.readUInt32BE()
@@ -302,13 +302,13 @@ export class EDATFile {
     const ecdsaMetadataSignature = await reader.readHex(0x10, false)
     const ecdsaHeaderSignature = await reader.readHex(0x10, false)
 
-    reader.seek(size - 0x10)
+    reader.seek(fileSize - 0x10)
     const footerName = (await reader.readUTF8(6)).slice(0, -1)
     const packagerVersion = await reader.readUTF8(10)
 
     await reader.close()
 
-    if (this._isUSRDIRPathValid()) {
+    if (this.isUSRDIRPathValid()) {
       devKLicFolderName = this.path.gotoDir('../../').name
       devKLicHash = EDATFile.genDevKLicHash(devKLicFolderName)
     }
@@ -317,7 +317,6 @@ export class EDATFile {
       devKLicFolderName,
       devKLicHash,
       header: {
-        magic,
         version,
         drmType,
         applicationType,
@@ -340,6 +339,7 @@ export class EDATFile {
         footerName,
         packagerVersion,
       },
+      fileSize,
     }
   }
 

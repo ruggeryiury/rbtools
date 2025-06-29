@@ -2,12 +2,25 @@
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse, json
 from pydub.utils import mediainfo
+from typing import TypedDict
 
 
-def audio_file_stat(audio_file_path: str) -> dict:
+class AudioFileStat(TypedDict):
+    bitRate: int
+    channels: int
+    codec: str
+    codecDesc: str
+    duration: int
+    durationSec: float
+    ext: str
+    extDesc: str
+    sampleRate: int
+    size: int
+
+
+def audio_file_stat(audio_file_path: str) -> AudioFileStat:
     try:
         audio = mediainfo(audio_file_path)
-        # return audio
         return {
             "bitRate": int(audio["bit_rate"]),
             "channels": int(audio["channels"]),

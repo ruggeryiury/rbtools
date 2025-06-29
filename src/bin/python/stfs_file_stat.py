@@ -1,17 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
-import argparse, json
+import argparse, json, os
 from lib.stfs import STFS
+from typing import TypedDict
 
 
-def stfs_file_stat(file_path: str) -> dict:
+class STFSFileStatRequired(TypedDict):
+    name: str
+    desc: str
+    files: list[str]
+    fileSize: int
+
+
+class STFSFileStatOptional(TypedDict, total=False):
+    dta: str
+    upgrades: str
+
+
+class STFSFileStat(STFSFileStatRequired, STFSFileStatOptional):
+    pass
+
+
+def stfs_file_stat(file_path: str) -> STFSFileStat:
     con = STFS(file_path)
     status = {
         "path": file_path,
-        "name": str(con.display_name_blob.decode('utf-16be')).replace("\x00", ""),
-        "desc": str(con.display_description_blob.decode('utf-16be')).replace("\x00", ""),
+        "name": str(con.display_name_blob.decode("utf-16be")).replace("\x00", ""),
+        "desc": str(con.display_description_blob.decode("utf-16be")).replace(
+            "\x00", ""
+        ),
         "files": [],
         "dta": "",
+        "fileSize": os.path.getsize(file_path),
     }
 
     all_files = con.allfiles.keys()
@@ -41,7 +61,7 @@ def stfs_file_stat(file_path: str) -> dict:
         dta_file_contents_bytes = con.read_file(dta_file)
 
         try:
-            status["dta"] = dta_file_contents_bytes.decode()
+            status["dta"] = dta_file_contents_bytes.decode().replace('\ufeff', '')
         except UnicodeDecodeError:
             status["dta"] = dta_file_contents_bytes.decode("latin-1")
     except AttributeError:
@@ -51,7 +71,7 @@ def stfs_file_stat(file_path: str) -> dict:
         upg_file_contents_bytes = con.read_file(upg_file)
 
         try:
-            status["upgrades"] = upg_file_contents_bytes.decode()
+            status["upgrades"] = upg_file_contents_bytes.decode().replace('\ufeff', '')
         except UnicodeDecodeError:
             status["upgrades"] = upg_file_contents_bytes.decode("latin-1")
     except AttributeError:

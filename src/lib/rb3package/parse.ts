@@ -31,14 +31,17 @@ export interface RB3PackageHeaderObject {
    * The suggested name of the package folder for PS3 console/RPCS3 environment.
    */
   folderName: string
+  dtaPadding: number
   /**
    * The length of the package's DTA file.
    */
   dtaSize: number
+  descPadding: number
   /**
    * The length of the package description.
    */
   descSize: number
+  artworkPadding: number
   /**
    * The length of the package thumbnail.
    */
@@ -74,16 +77,19 @@ export const parseRB3PackageHeader = async (bufferOrReader: BinaryReader | Buffe
   map.set('songsCount', await reader.readUInt16LE())
   map.set('headerSize', await reader.readUInt32LE())
   map.set('songEntriesBlockSize', await reader.readUInt32LE())
-  map.set('name', await reader.readUTF8(80))
-  map.set('folderName', await reader.readUTF8(48))
-  reader.padding(4)
+  reader.padding(3)
+  map.set('dtaPadding', await reader.readUInt8())
   map.set('dtaSize', await reader.readUInt32LE())
-  reader.padding(4)
+  reader.padding(3)
+  map.set('descPadding', await reader.readUInt8())
   map.set('descSize', await reader.readUInt32LE())
-  reader.padding(4)
+  reader.padding(3)
+  map.set('artworkPadding', await reader.readUInt8())
   map.set('artworkSize', await reader.readUInt32LE())
   reader.padding(4)
   map.set('binaryBlockOffset', await reader.readUInt32LE())
+  map.set('name', await reader.readUTF8(80))
+  map.set('folderName', await reader.readUTF8(48))
 
   return Object.fromEntries(map.entries()) as Record<keyof RB3PackageHeaderObject, unknown> as RB3PackageHeaderObject
 }
@@ -101,18 +107,22 @@ export interface RB3SongEntriesObject {
    * The length of the entire song's files block.
    */
   length: number
+  moggPadding: number
   /**
    * The length of the song's MOGG file.
    */
   moggSize: number
+  midiPadding: number
   /**
    * The length of the song's MIDI file.
    */
   midiSize: number
+  pngPadding: number
   /**
    * The length of the song's texture file.
    */
   pngSize: number
+  miloPadding: number
   /**
    * The length of the song's MILO file.
    */
@@ -141,9 +151,13 @@ export const parseRB3PackageEntries = async (header: RB3PackageHeaderObject, buf
     const map = new Map<keyof RB3SongEntriesObject, unknown>()
 
     map.set('songname', await reader.readASCII(50))
-    reader.padding(6)
+    reader.padding(2)
     map.set('offset', await reader.readUInt32LE())
     map.set('length', await reader.readUInt32LE())
+    map.set('moggPadding', await reader.readUInt8())
+    map.set('midiPadding', await reader.readUInt8())
+    map.set('pngPadding', await reader.readUInt8())
+    map.set('miloPadding', await reader.readUInt8())
     map.set('moggSize', await reader.readUInt32LE())
     map.set('midiSize', await reader.readUInt32LE())
     map.set('pngSize', await reader.readUInt32LE())

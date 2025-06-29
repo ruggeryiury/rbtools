@@ -3,9 +3,21 @@
 import argparse, json, os
 from PIL import Image
 import puremagic
+from typing import TypedDict
 
 
-def img_file_stat(img_file_path: str) -> dict:
+class ImgFileStat(TypedDict):
+    dimensions: int
+    ext: str
+    extDesc: str
+    imageMode: str
+    height: int
+    mimeType: str
+    size: int
+    width: int
+
+
+def img_file_stat(img_file_path: str) -> ImgFileStat:
     try:
         magic = None
         with open(img_file_path, "rb") as img:

@@ -55,6 +55,8 @@ export class ImageFile {
     if (this.path.ext === '.png_xbox' || this.path.ext === '.png_ps3' || this.path.ext === '.png_wii') throw new Error(`Tired to instance a ${this.path.ext.slice(1).toUpperCase()} file on the ImageFile class, use the TextureFile class instead`)
   }
 
+  // #region Static Methods
+
   /**
    * Fetches an image from an URL and return it as a Buffer.
    * - - - -
@@ -88,6 +90,33 @@ export class ImageFile {
     await temp.path.rename(dest.path, true)
     return new ImageFile(dest.path)
   }
+
+  /**
+   * Processes an image buffer.
+   * - - - -
+   * @param {Buffer | FilePathLikeTypes} imgPathOrBuffer The path or buffer of an image file.
+   * @param {ImageFormatTypes} toFormat The format of the new converted image.
+   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
+   * @returns {Promise<Buffer>}
+   */
+  static async process(imgPathOrBuffer: Buffer | FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<Buffer> {
+    return await PythonAPI.imageBufferProcessor(imgPathOrBuffer, toFormat, options)
+  }
+
+  /**
+   * Converts an image buffer into a DataURL string.
+   * - - - -
+   * @param {Buffer} imgBuffer The buffer of the image you want to convert.
+   * @returns {Promise<string>}
+   */
+  static async bufferToDataURL(imgBuffer: Buffer): Promise<string> {
+    const imgType = await fileTypeFromBuffer(imgBuffer)
+    if (!imgType) throw new Error('Unsupported image file format to create DataURL object.')
+    const { mime } = imgType
+    return `data:${mime};base64,${imgBuffer.toString('base64')}`
+  }
+
+  // #region Methods
 
   /**
    * Checks if a path resolves to an existing image file.

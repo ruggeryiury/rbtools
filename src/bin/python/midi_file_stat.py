@@ -2,9 +2,18 @@
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse, json, os, struct, tempfile
 from mido import MidiFile
+from typing import TypedDict
 
 
-def midi_file_stat(midi_file_path: str) -> dict:
+class MidiFileStat(TypedDict):
+    chartset: str
+    midiType: int
+    ticksPerBeat: int
+    tracksCount: int
+    tracksName: list[str]
+
+
+def midi_file_stat(midi_file_path: str) -> MidiFileStat:
     try:
         tracks_name: list[str] = []
         midi = MidiFile(midi_file_path)
