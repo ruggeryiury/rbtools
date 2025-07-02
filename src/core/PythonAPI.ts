@@ -195,6 +195,43 @@ export class PythonAPI {
   }
 
   /**
+   * Returns an object with stats of an image file buffer.
+   * - - - -
+   * @param {Buffer} imgBuffer The buffer to an image file.
+   * @returns {Promise<ImageFileStatPythonObject>}
+   */
+  static async imageBufferStat(imgBuffer: Buffer): Promise<ImageFileStatPythonObject> {
+    return new Promise((resolve, reject) => {
+      const pythonScript = 'img_buffer_stat.py'
+      const process = spawn('python', [pythonScript], { cwd: RBTools.pyFolder.path, windowsHide: true })
+      const imgBase64 = imgBuffer.toString('base64')
+
+      let stdout = ''
+      let stderr = ''
+
+      process.stderr.on('data', (data: Buffer) => {
+        stderr += data.toString()
+      })
+      process.stdout.on('data', (data: Buffer) => {
+        stdout += data.toString()
+      })
+
+      process.on('close', (code) => {
+        if (code === 0) {
+          resolve(JSON.parse(stdout) as ImageFileStatPythonObject)
+        } else if (code === null) {
+          reject(new Error(`Python script exited with unknown code: ${stderr}`))
+        } else {
+          reject(new Error(`Python script exited with code ${code.toString()}: ${stderr}`))
+        }
+      })
+
+      process.stdin.write(JSON.stringify({ imgBase64, printResults: true }))
+      process.stdin.end() // Close stdin to signal that the input is complete
+    })
+  }
+
+  /**
    * Returns an object with stats of an audio file.
    * - - - -
    * @param {FilePathLikeTypes} audioFilePath The path to the image file.

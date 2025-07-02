@@ -89,7 +89,7 @@ export class BinaryAPI {
   }
 
   /**
-   * Asynchronously executes the Wiimms Image Tool decoder.
+   * Executes the Wiimms Image Tool decoder.
    * - - - -
    * @param {FilePathLikeTypes} srcTexFile The path to the PNG_WII file to be converted.
    * @param {FilePathLikeTypes} destImageFile The path to the new converted TPL file.

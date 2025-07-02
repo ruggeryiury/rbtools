@@ -198,6 +198,9 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
         } else if (valuesJoin === 'kTempoFast' || Number(valuesJoin) === 64) {
           map.set('anim_tempo', 64)
           continue
+        } else if (!isNaN(Number(valuesJoin))) {
+          map.set('anim_tempo', valuesJoin)
+          continue
         } else throw new Error('DTA Parsing error: Invalid value for anim_tempo entry.')
       }
       // Put crowd channels
