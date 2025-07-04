@@ -61,6 +61,7 @@ export const texXboxPs3ToImage = async (srcFile: FilePathLikeTypes, destPath: Fi
  * @returns {Promise<ImageFile>} A new instantiated `ImgFile` class pointing to the new converted image file.
  */
 export const texWiiToImage = async (srcFile: FilePathLikeTypes, destPath: FilePathLikeTypes, toFormat: ImageFormatTypes): Promise<ImageFile> => {
+  if (process.platform !== 'win32') throw new Error('PNG_WII texture convertion only works on Windows OS.')
   const src = pathLikeToFilePath(srcFile)
   const dest = pathLikeToFilePath(destPath).changeFileExt(toFormat)
   const tpl = pathLikeToFilePath(temporaryFile({ extension: '.tpl' }))

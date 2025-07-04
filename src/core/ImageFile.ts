@@ -32,29 +32,12 @@ export interface ImageConvertingOptions {
   quality?: number
 }
 
-// #region Main Class
-
 /**
  * `ImageFile` is a class that represents an image file.
  *
  * This class can process most of the known image files, such as JPEG, PNG, BMP, WEBP. Other formats were not tested.
  */
 export class ImageFile {
-  /**
-   * The path to the image file.
-   */
-  path: FilePath
-
-  /**
-   * `ImageFile` is a class that represents an image file.
-   * - - - -
-   * @param {FilePathLikeTypes} imgFilePath The path of the image file.
-   */
-  constructor(imgFilePath: FilePathLikeTypes) {
-    this.path = pathLikeToFilePath(imgFilePath)
-    if (this.path.ext === '.png_xbox' || this.path.ext === '.png_ps3' || this.path.ext === '.png_wii') throw new Error(`Tired to instance a ${this.path.ext.slice(1).toUpperCase()} file on the ImageFile class, use the TextureFile class instead`)
-  }
-
   // #region Static Methods
 
   /**
@@ -118,6 +101,23 @@ export class ImageFile {
 
   static async bufferStat(imgBuffer: Buffer): Promise<ImageFileStatPythonObject> {
     return await PythonAPI.imageBufferStat(imgBuffer)
+  }
+
+  // #region Constructor
+
+  /**
+   * The path to the image file.
+   */
+  path: FilePath
+
+  /**
+   * `ImageFile` is a class that represents an image file.
+   * - - - -
+   * @param {FilePathLikeTypes} imgFilePath The path of the image file.
+   */
+  constructor(imgFilePath: FilePathLikeTypes) {
+    this.path = pathLikeToFilePath(imgFilePath)
+    if (this.path.ext === '.png_xbox' || this.path.ext === '.png_ps3' || this.path.ext === '.png_wii') throw new Error(`Tired to instance a ${this.path.ext.slice(1).toUpperCase()} file on the ImageFile class, use the TextureFile class instead`)
   }
 
   // #region Methods

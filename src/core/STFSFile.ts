@@ -2,6 +2,8 @@ import { BinaryReader, type DirPath, pathLikeToDirPath, pathLikeToFilePath, type
 import { DTAParser, PythonAPI, type STFSFileStatRawObject } from '../core.exports'
 import { detectDTABufferEncoding, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
+// #region Types
+
 export type STFSFileStatObject = Omit<STFSFileStatRawObject, 'dta' | 'upgrades'> & {
   /**
    * The contents of the package's DTA file.
@@ -36,6 +38,8 @@ export interface STFSFileJSONRepresentation extends FilePathJSONRepresentation, 
  * `STFSFile` is a class that represents a Xbox 360 CON file.
  */
 export class STFSFile {
+  // #region Constructor
+
   /** The path to the CON file. */
   path: FilePath
 

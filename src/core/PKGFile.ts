@@ -2,6 +2,7 @@ import { BinaryReader, createHash, HexVal, pathLikeToDirPath, pathLikeToFilePath
 import { DTAParser } from '../core.exports'
 import { calculateAesAlignedOffsetAndSize, PkgXorSha1Counter, type CalculatedAesOffsetAndSizeObject, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
+// #region Types
 export interface PKGHeaderData {
   /**
    * The file signature.
@@ -182,6 +183,22 @@ export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, O
  * `PKGFile` is a class that represents a PS3 PKG file.
  */
 export class PKGFile {
+  // #region Constructor
+
+  /** The path to the PKG file. */
+  path: FilePath
+
+  /**
+   * `PKGFile` is a class that represents a PS3 PKG file.
+   * - - - -
+   * @param {FilePathLikeTypes} pkgFilePath The path to the PKG file.
+   */
+  constructor(pkgFilePath: FilePathLikeTypes) {
+    this.path = pathLikeToFilePath(pkgFilePath)
+  }
+
+  // #region Static Methods
+
   /**
    * An array with keys that acts as an IV for AES decryption.
    *
@@ -212,18 +229,6 @@ export class PKGFile {
       derive: true,
     },
   ] as const
-
-  /** The path to the PKG file. */
-  path: FilePath
-
-  /**
-   * `PKGFile` is a class that represents a PS3 PKG file.
-   * - - - -
-   * @param {FilePathLikeTypes} pkgFilePath The path to the PKG file.
-   */
-  constructor(pkgFilePath: FilePathLikeTypes) {
-    this.path = pathLikeToFilePath(pkgFilePath)
-  }
 
   /**
    * Parses the information of a `PARAM.SFO` file buffer.
@@ -715,6 +720,8 @@ export class PKGFile {
     const reader = await BinaryReader.fromFile(pkgFilePath)
     return await this.parseFromBuffer(reader, pkgFilePath)
   }
+
+  // #region Methods
 
   /**
    * Checks the integrity of the PS3 PKG by reading the file signature (magic).

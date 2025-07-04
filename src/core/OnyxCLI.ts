@@ -21,10 +21,19 @@ export class OnyxCLI {
     this.path = path
   }
 
+  /**
+   * Checks the integrity of the Onyx CLI extracted folder path.
+   * - - - -
+   * @returns {void}
+   * @throws {Error} When the main Onyx CLI executable does not exists.
+   */
   checkIntegrity(): void {
     if (!this.path.exists) throw new Error(`No Onyx CLI executable found on provided path "${this.path.path}"\n\nSTFS creation are only available using Onyx CLI.`)
   }
 
+  /**
+   * The structure of the Onyx repack method for creating STFS files.
+   */
   static readonly repackSTFSRB3Object = {
     'base-version': 0,
     licenses: [

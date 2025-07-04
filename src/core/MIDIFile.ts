@@ -41,8 +41,10 @@ export class MIDIFile {
     this.path = pathLikeToFilePath(midiFilePath)
   }
 
+  // #region Methods
+
   /**
-   * Checks the integrity of the EDAT by reading the file signature (magic).
+   * Checks the integrity of the instantiated MIDI file by reading its signature (magic bytes).
    * - - - -
    * @returns {Promise<string>}
    * @throws {Error} When it identifies file signature of a MIDI file or any unknown file format.

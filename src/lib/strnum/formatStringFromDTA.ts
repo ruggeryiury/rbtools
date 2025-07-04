@@ -94,7 +94,7 @@ export const formatStringFromDTA = (song: RB3CompatibleDTAFile | null, format: s
     newText = newText.replace(new RegExp(`{{title.trailing}}`, 'g'), leadingArticleToTrailing(song.name))
 
     newText = newText.replace(
-      new RegExp(`{{id1}}`, 'g'),
+      new RegExp(`{{idPatch1}}`, 'g'),
       (() => {
         const is2x = song.doubleKick ?? false
         const val = `${Number(song.song_id.toString().slice(1, 5)).toString()}${song.name.replace(' (2x Bass Pedal)', '')}`

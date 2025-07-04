@@ -8,11 +8,11 @@ export interface TextureFileJSONRepresentation extends FilePathJSONRepresentatio
 export type TextureFormatTypes = 'png_xbox' | 'png_ps3' | 'png_wii'
 export type TextureSizeTypes = 128 | 256 | 512 | 1024 | 2048
 
-// #region Main Class
 /**
  * `TextureFile` is a class that represents a texture file.
  */
 export class TextureFile {
+  // #region Constructor
   /**
    * The path to the image file.
    */
@@ -26,6 +26,8 @@ export class TextureFile {
   constructor(imgFilePath: FilePathLikeTypes) {
     this.path = pathLikeToFilePath(imgFilePath)
   }
+
+  // #region Methods
 
   /**
    * Checks if a path resolves to an existing image file.

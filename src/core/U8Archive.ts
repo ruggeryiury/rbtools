@@ -58,12 +58,11 @@ export interface U8AppFileHeader {
   entries: U8ArchiveEntries[]
 }
 
-// #region Main Class
-
 /**
  * `U8Archive` is a class that represents a Wii APP file.
  */
 export class U8Archive {
+  // #region Constructor
   /**
    * The path to the Wii APP file.
    */
@@ -78,6 +77,8 @@ export class U8Archive {
     this.path = pathLikeToFilePath(appFilePath)
     if (this.path.ext !== '.app') throw new Error(`Provided file "${this.path.path} is not a valid U8 archive file"`)
   }
+
+  // #region Methods
 
   /**
    * Checks the integrity of the U8 file.

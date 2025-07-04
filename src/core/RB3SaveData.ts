@@ -138,12 +138,12 @@ export interface ParsedRB3SaveData {
   scores: RB3Scores[]
 }
 
-// #region Main Class
-
 /**
  * `RB3SaveData` is a class that represents a Rock Band 3 save data.
  */
 export class RB3SaveData {
+  // #region Static Methods
+
   private static _dtbXOR(key: number): number {
     let val = (((key - Math.floor(key / 0x1f31d) * 0x1f31d) * 0x41a7) >>> 0) - ((Math.floor(key / 0x1f31d) * 0xb14) >>> 0)
     if (val <= 0) val = (val - 0x80000000 - 1) >>> 0

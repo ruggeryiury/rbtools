@@ -162,28 +162,11 @@ export interface EDATDecryptionOptions {
 export interface EDATFileJSONRepresentation extends FilePathJSONRepresentation, EDATFileStatObject {}
 
 /**
- * `EDATFile` is a class that represents a EDAT file.
+ * `EDATFile` is a class that represents an EDAT file.
  * - - - -
  * @see {@link https://www.psdevwiki.com/ps3/NPD|EDAT File Format Specifications}
  */
 export class EDATFile {
-  // #region Constructor
-
-  /**
-   * The path to the EDAT file.
-   */
-  path: FilePath
-
-  /**
-   * `EDATFile` is a class that represents a EDAT file.
-   * - - - -
-   * @param {FilePathLikeTypes} edatFilePath The path of the EDAT file.
-   * @see {@link https://www.psdevwiki.com/ps3/NPD|EDAT File Format Specifications}
-   */
-  constructor(edatFilePath: FilePathLikeTypes) {
-    this.path = pathLikeToFilePath(edatFilePath)
-  }
-
   // #region Static Methods
 
   /**
@@ -220,10 +203,27 @@ export class EDATFile {
     return contentID
   }
 
-  // #region Private Methods
+  // #region Constructor
 
   /**
-   * Checks the integrity of the EDAT by reading the file signature (magic).
+   * The path to the EDAT file.
+   */
+  path: FilePath
+
+  /**
+   * `EDATFile` is a class that represents an EDAT file.
+   * - - - -
+   * @param {FilePathLikeTypes} edatFilePath The path of the EDAT file.
+   * @see {@link https://www.psdevwiki.com/ps3/NPD|EDAT File Format Specifications}
+   */
+  constructor(edatFilePath: FilePathLikeTypes) {
+    this.path = pathLikeToFilePath(edatFilePath)
+  }
+
+  // #region Methods
+
+  /**
+   * Checks the integrity of the instantiated EDAT file by reading its signature (magic bytes).
    * - - - -
    * @returns {Promise<string>}
    * @throws {Error} When it identifies file signature of a MIDI file or any unknown file format.
@@ -251,8 +251,6 @@ export class EDATFile {
     if (usrdir.exists && eboot.exists && gen.exists) return true
     return false
   }
-
-  // #region Main Methods
 
   /**
    * Checks if the EDAT file is encrypted, returns `false` when the EDAT file is a MIDI file with EDAT extension.

@@ -3,6 +3,7 @@ import { parse as parseYAMLBuffer } from 'yaml'
 import { DTAParser, RB3SaveData, type ParsedRB3SaveData } from '../core.exports'
 import type { PartialDTAFile, RB3CompatibleDTAFile } from '../lib.exports'
 
+// #region Types
 export interface RPCS3ConstructorOptions {
   /**
    * The path to RPCS3 `dev_hdd0` folder.
@@ -143,6 +144,7 @@ export interface SongPackagesStats {
 }
 
 export class RPCS3 {
+  // #region Static Methods
   /**
    * Checks whether the provided `dev_hdd0` path contains valid RPCS3 folders and files.
    * - - - -
@@ -178,6 +180,8 @@ export class RPCS3 {
     return true
   }
 
+  // #region Constructor
+
   /**
    * The path to RPCS3 `dev_hdd0` folder.
    */
@@ -204,6 +208,8 @@ export class RPCS3 {
     const gamesYmlPath = this.rpcs3ExePath.gotoFile('config/games.yml')
     if (!gamesYmlPath.exists) throw new Error(`games.yml file not found on RPCS3's config folder. If you're just installed RPCS3, try to initialize it and find a PS3 game on the emulator first.`)
   }
+
+  // #region Methods
 
   /**
    * Returns a JSON representation of this `RPCS3` class instance.

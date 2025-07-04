@@ -1,6 +1,8 @@
 import { pathLikeToFilePath, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { PythonAPI, type MOGGFileStatPythonObject } from '../core.exports'
 
+// #region Types
+
 export interface MOGGFileJSONRepresentation extends FilePathJSONRepresentation, MOGGFileStatPythonObject {}
 export type MOGGFileEncryptionVersion = 10 | 11 | 12 | 13
 
@@ -8,6 +10,8 @@ export type MOGGFileEncryptionVersion = 10 | 11 | 12 | 13
  * `MOGGFile` is a class that represents a MOGG file.
  */
 export class MOGGFile {
+  // #region Constructor
+
   /**
    * The path to the MOGG file.
    */
@@ -22,8 +26,10 @@ export class MOGGFile {
     this.path = pathLikeToFilePath(moggFilePath)
   }
 
+  // #region Methods
+
   /**
-   * Checks the integrity of the MOGG by reading the file signature (magic).
+   * Checks the integrity of the instantiated MOGG file by reading its signature (magic bytes).
    *
    * This function returns the encryption version of the MOGG file, if the MOGG file is valid.
    * - - - -
