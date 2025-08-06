@@ -1,4 +1,4 @@
-import { BinaryReader, createHash, FilePath, getReadableBytesSize, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, createHashFromBuffer, FilePath, getReadableBytesSize, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { BinaryAPI, MIDIFile } from '../core.exports'
 
@@ -176,7 +176,7 @@ export class EDATFile {
    * @returns {string}
    */
   static genDevKLicHash(folderName: string): string {
-    return createHash(`Ih38rtW1ng3r${folderName}10025250`, 'md5').toUpperCase()
+    return createHashFromBuffer(Buffer.from(`Ih38rtW1ng3r${folderName}10025250`), 'md5').toUpperCase()
   }
 
   /**

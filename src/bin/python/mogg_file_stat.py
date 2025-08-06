@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
-import argparse, json, os, struct, tempfile
-from lib.mogg import decrypt_mogg_bytes
+import argparse, json, struct, tempfile
+from os import PathLike, path, unlink
+from typing import TypedDict, Union
 from pydub.utils import mediainfo
-from typing import TypedDict
+from lib.mogg import decrypt_mogg_bytes
 
 
 class MOGGStatObject(TypedDict):
@@ -27,7 +28,17 @@ class MOGGFileStat(TypedDict):
     mogg: MOGGStatObject
 
 
-def mogg_file_stat(mogg_file_path: str) -> MOGGFileStat:
+def mogg_file_stat(mogg_file_path: Union[str, PathLike[str]]) -> MOGGFileStat:
+    """
+    Returns a dict with stats of a MOGG file.
+
+    Args:
+        mogg_file_path (Union[str, PathLike[str]]): The path to the MOGG file to read.
+
+    Returns:
+        MOGGFileStat: A dict with stats of the MOGG file.
+    """
+
     with open(mogg_file_path, "rb") as fin:
         version = struct.unpack("<I", fin.read(4))[0]
         fin.seek(0)
@@ -50,7 +61,7 @@ def mogg_file_stat(mogg_file_path: str) -> MOGGFileStat:
                 "sampleRate": int(audio["sample_rate"]),
                 "size": int(audio["size"]),
                 "mogg": {
-                    "size": os.path.getsize(mogg_file_path),
+                    "size": path.getsize(mogg_file_path),
                     "version": version,
                     "isEncrypted": version != 10,
                     "worksInPS3": version == 11,
@@ -58,11 +69,11 @@ def mogg_file_stat(mogg_file_path: str) -> MOGGFileStat:
             }
         except Exception as e:
             temp_ogg.close()
-            os.unlink(temp_ogg.name)
+            unlink(temp_ogg.name)
             raise e
         finally:
             temp_ogg.close()
-            os.unlink(temp_ogg.name)
+            unlink(temp_ogg.name)
 
 
 if __name__ == "__main__":

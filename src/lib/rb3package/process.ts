@@ -1,4 +1,4 @@
-import { type DirPath, type DirPathLikeTypes, FilePath, isFile, pathLikeToDirPath, pathLikeToFilePath } from 'node-lib'
+import { type DirPath, type DirPathLikeTypes, type FilePath, isFile, pathLikeToDirPath, pathLikeToFilePath } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { temporaryDirectory, temporaryFile } from 'tempy'
 import { MOGGFile, PythonAPI, STFSFile, TextureFile, type TextureFormatTypes, type TextureSizeTypes } from '../../core.exports'

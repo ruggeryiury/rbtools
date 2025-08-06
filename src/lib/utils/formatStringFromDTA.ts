@@ -96,7 +96,24 @@ export const formatStringFromDTA = (song: RB3CompatibleDTAFile | null, format: s
     newText = newText.replace(
       new RegExp(`{{idPatch1}}`, 'g'),
       (() => {
-        const is2x = song.doubleKick ?? false
+        options = {
+          azNumOnly: true,
+          forceCase: 'lower',
+          normalizeNFD: true,
+          removeSpaces: true,
+          trim: true,
+        }
+        const is2x = song.doubleKick ?? song.name.includes(' (2x Bass Pedal)')
+        const val = song.name.replace(' (2x Bass Pedal)', '')
+
+        if (is2x) return `${val.slice(0, 48)}2x`
+        return val.slice(0, 50)
+      })()
+    )
+    newText = newText.replace(
+      new RegExp(`{{idPatch2}}`, 'g'),
+      (() => {
+        const is2x = song.doubleKick ?? song.name.includes(' (2x Bass Pedal)')
         const val = `${Number(song.song_id.toString().slice(1, 5)).toString()}${song.name.replace(' (2x Bass Pedal)', '')}`
 
         if (is2x) return `${val.slice(0, 48)}2x`

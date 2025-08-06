@@ -164,7 +164,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         map.set('song', Object.fromEntries(songMap.entries()))
       }
 
-      if (bank !== undefined) map.set('bank', bank)
+      if (bank) map.set('bank', bank)
       if (drum_bank !== undefined) map.set('drum_bank', drum_bank)
       if (anim_tempo !== undefined) map.set('anim_tempo', anim_tempo)
       if (band_fail_cue !== undefined) map.set('band_fail_cue', band_fail_cue)
@@ -174,15 +174,15 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
 
       if (hasAnyRank) {
         const rankMap = new Map<string, unknown>()
-        if (rank_drum !== undefined) rankMap.set('drum', rank_drum)
-        if (rank_guitar !== undefined) rankMap.set('guitar', rank_guitar)
-        if (rank_bass !== undefined) rankMap.set('bass', rank_bass)
-        if (rank_vocals !== undefined) rankMap.set('vocals', rank_vocals)
-        if (rank_keys !== undefined) rankMap.set('keys', rank_keys)
-        if (rank_real_keys !== undefined) rankMap.set('real_keys', rank_real_keys)
-        if (rank_real_guitar !== undefined) rankMap.set('real_guitar', rank_real_guitar)
-        if (rank_real_bass !== undefined) rankMap.set('real_bass', rank_real_bass)
-        if (rank_band !== undefined) rankMap.set('band', rank_band)
+        if (rank_drum) rankMap.set('drum', rank_drum)
+        if (rank_guitar) rankMap.set('guitar', rank_guitar)
+        if (rank_bass) rankMap.set('bass', rank_bass)
+        if (rank_vocals) rankMap.set('vocals', rank_vocals)
+        if (rank_keys) rankMap.set('keys', rank_keys)
+        if (rank_real_keys) rankMap.set('real_keys', rank_real_keys)
+        if (rank_real_guitar) rankMap.set('real_guitar', rank_real_guitar)
+        if (rank_real_bass) rankMap.set('real_bass', rank_real_bass)
+        if (rank_band) rankMap.set('band', rank_band)
         map.set('rank', Object.fromEntries(rankMap.entries()))
       }
       if (solo !== undefined && solo.length > 0) map.set('solo', DTAIO.useArray(solo, io.options))
@@ -371,15 +371,15 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
 
       if (hasAnyRank) {
         const rankMap = new Map<string, unknown>()
-        if (rank_drum !== undefined) rankMap.set('drum', rank_drum)
-        if (rank_guitar !== undefined) rankMap.set('guitar', rank_guitar)
-        if (rank_bass !== undefined) rankMap.set('bass', rank_bass)
-        if (rank_vocals !== undefined) rankMap.set('vocals', rank_vocals)
-        if (rank_keys !== undefined) rankMap.set('keys', rank_keys)
-        if (rank_real_keys !== undefined) rankMap.set('real_keys', rank_real_keys)
-        if (rank_real_guitar !== undefined) rankMap.set('real_guitar', rank_real_guitar)
-        if (rank_real_bass !== undefined) rankMap.set('real_bass', rank_real_bass)
-        if (rank_band !== undefined) rankMap.set('band', rank_band)
+        if (rank_drum) rankMap.set('drum', rank_drum)
+        if (rank_guitar) rankMap.set('guitar', rank_guitar)
+        if (rank_bass) rankMap.set('bass', rank_bass)
+        if (rank_vocals) rankMap.set('vocals', rank_vocals)
+        if (rank_keys) rankMap.set('keys', rank_keys)
+        if (rank_real_keys) rankMap.set('real_keys', rank_real_keys)
+        if (rank_real_guitar) rankMap.set('real_guitar', rank_real_guitar)
+        if (rank_real_bass) rankMap.set('real_bass', rank_real_bass)
+        if (rank_band) rankMap.set('band', rank_band)
         map.set('rank', Object.fromEntries(rankMap.entries()))
       }
       if (solo !== undefined && solo.length > 0) map.set('solo', DTAIO.useArray(solo, io.options))

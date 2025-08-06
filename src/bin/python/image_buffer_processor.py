@@ -2,6 +2,7 @@
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import sys, json, base64
 from io import BytesIO
+from typing import Literal
 from PIL import Image
 
 
@@ -10,9 +11,25 @@ def image_buffer_processor(
     format: str,
     width: int = 256,
     height: int = 256,
-    interpolation: str = "LANCZOS",
+    interpolation: Literal[
+        "NEAREST", "BOX", "BILINEAR", "HAMMING", "BICUBIC", "LANCZOS"
+    ] = "LANCZOS",
     quality: int = 100,
 ) -> str:
+    """
+    Process a Base64-encoded image "buffer".
+
+    Args:
+        img_base64 (str): An image "buffer" encoded as Base64 string.
+        format (str): The image format where the processed "buffer" will be encoded.
+        width (int): The output width of the image "buffer". Default is `256`.
+        height (int): The output height of the image "buffer". Default is `256`.
+        interpolation (Literal["NEAREST", "BOX", "BILINEAR", "HAMMING", "BICUBIC", "LANCZOS"]): The interpolation method that will be used if the image should be resized. Default is `"LANCZOS"`.
+        quality (int): The output quality of the image "buffer", used with lossy image formats. Default is `100` (highest quality possible).
+
+    Returns:
+        str: A processed image "buffer" encoded as a Base64 string.
+    """
     image_data = BytesIO(base64.b64decode(img_base64))
     try:
         with Image.open(image_data) as img:

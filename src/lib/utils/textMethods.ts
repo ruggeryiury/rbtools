@@ -9,7 +9,24 @@ export const normalizeString = (str: string): string => {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
-const articles = ['a', 'an', 'the'] as const
+const articles = [
+  // English
+  'a',
+  'an',
+  'the',
+
+  // Spanish
+  'lo',
+  'la',
+  'los',
+  'las',
+  'el',
+
+  // Portuguese
+  'o',
+  'os',
+  'as',
+] as const
 
 /**
  * Removes the leading article from a string, if any.

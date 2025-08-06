@@ -1,6 +1,6 @@
 import { DirPath, FilePath, isFile, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
 import { parse as parseYAMLBuffer } from 'yaml'
-import { DTAParser, RB3SaveData, type ParsedRB3SaveData } from '../core.exports'
+import { DTAParser, RB3SaveData, RBTools, type ParsedRB3SaveData } from '../core.exports'
 import type { PartialDTAFile, RB3CompatibleDTAFile } from '../lib.exports'
 
 // #region Types
@@ -196,20 +196,25 @@ export class RPCS3 {
    */
   constructor(options: DirPathLikeTypes | RPCS3ConstructorOptions) {
     if ((typeof options === 'object' && 'path' in options) || options instanceof DirPath || typeof options === 'string') {
+      // Is any type from DirPathLikeTypes
       this.devhdd0Path = pathLikeToDirPath(options)
       this.rpcs3ExePath = this.devhdd0Path.gotoFile('../rpcs3.exe')
     } else {
+      // Is RPCS3ConstructorOptions
       this.devhdd0Path = pathLikeToDirPath(options.devhdd0Path)
       this.rpcs3ExePath = pathLikeToFilePath(pathLikeToString(options.rpcs3ExePath ?? this.devhdd0Path.gotoFile('../rpcs3.exe')))
     }
+  }
 
+  // #region Methods
+
+  checkIntegrity(): boolean {
     if (!RPCS3.isDevHDD0PathValid(this.devhdd0Path)) throw new Error(`Provided path ${this.devhdd0Path.path} is not a valid RPCS3 dev_hdd0 folder.`)
     if (!RPCS3.isRPCS3ExePathValid(this.rpcs3ExePath)) throw new Error(`Provided path ${this.rpcs3ExePath.path} is not a valid RPCS3 executable path.`)
     const gamesYmlPath = this.rpcs3ExePath.gotoFile('config/games.yml')
     if (!gamesYmlPath.exists) throw new Error(`games.yml file not found on RPCS3's config folder. If you're just installed RPCS3, try to initialize it and find a PS3 game on the emulator first.`)
+    return true
   }
-
-  // #region Methods
 
   /**
    * Returns a JSON representation of this `RPCS3` class instance.
@@ -217,6 +222,7 @@ export class RPCS3 {
    * @returns {RPCS3ClassJSONRepresentation}
    */
   getRPCS3Stats(): RPCS3ClassJSONRepresentation {
+    this.checkIntegrity()
     return {
       devhdd0Path: this.devhdd0Path.path,
       rpcs3ExePath: this.rpcs3ExePath.path,
@@ -229,6 +235,7 @@ export class RPCS3 {
    * @returns {Promise<RPCS3GamesStats>}
    */
   async getRockBandGamesStats(): Promise<RPCS3GamesStats> {
+    this.checkIntegrity()
     const map = new Map<keyof RPCS3GamesStats, unknown>()
     const games = parseYAMLBuffer(await this.rpcs3ExePath.gotoFile('config/games.yml').read('utf8')) as Record<SupportedRBGamesIDs, string>
 
@@ -316,6 +323,7 @@ export class RPCS3 {
    * @returns {Promise<SongPackagesStats>}
    */
   async getSongPackages(): Promise<SongPackagesStats> {
+    this.checkIntegrity()
     const packs: InstalledSongPackagesStats[] = []
     let rb3PacksCount = 0,
       rb3SongsCount = 0,
@@ -382,11 +390,59 @@ export class RPCS3 {
   }
 
   /**
+   *
+   * @returns {Promise<string[]>}
+   */
+  async getAllSongIDs(): Promise<string[]> {
+    this.checkIntegrity()
+    const songnames = new Set()
+    const allSongnames = (await RBTools.binFolder.gotoFile('db/songnames.json').readJSON()) as RB3CompatibleDTAFile[]
+    for (const song of allSongnames) songnames.add(song)
+    const usrdir = this.devhdd0Path.gotoDir('game/BLUS30463/USRDIR')
+    const usrdirPreRB3 = this.devhdd0Path.gotoDir('game/BLUS30050/USRDIR')
+
+    if (usrdir.exists) {
+      const allPacks = (await usrdir.readDir(true))
+        .map((entry) => (isFile(entry) ? FilePath.of(entry) : DirPath.of(entry)))
+        .filter((entry) => entry instanceof DirPath && entry.name !== 'gen')
+        .map((entry) => entry.gotoFile('songs/songs.dta'))
+
+      for (const pack of allPacks) {
+        if (pack.exists) {
+          const parsedData = await DTAParser.fromFile(pack)
+          const allSongs = parsedData.songs.map((song) => song.id)
+          for (const song of allSongs) songnames.add(song)
+        }
+      }
+    }
+
+    if (usrdirPreRB3.exists) {
+      const allPacks = (await usrdirPreRB3.readDir(true))
+        .map((entry) => (isFile(entry) ? FilePath.of(entry) : DirPath.of(entry)))
+        .filter((entry) => entry instanceof DirPath && entry.name !== 'gen')
+        .map((entry) => entry.gotoFile('songs/songs.dta'))
+
+      for (const pack of allPacks) {
+        if (pack.exists) {
+          const parsedData = await DTAParser.fromFile(pack)
+          await parsedData.applyDXUpdatesOnSongs(true)
+          const allSongs = parsedData.songs.map((song) => song.id)
+          const allUpdates = parsedData.updates.map((song) => song.id)
+          for (const song of allSongs) songnames.add(song)
+          for (const upd of allUpdates) songnames.add(upd)
+        }
+      }
+    }
+    return (Array.from(songnames.values()) as string[]).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+  }
+
+  /**
    * Returns the parsed Rock Band 3 save data with profile name and all your scores. If no save data file is found, it will return `undefined`.
    * - - - -
    * @returns {Promise<ParsedRB3SaveData | undefined>}
    */
   async getRB3SaveData(): Promise<ParsedRB3SaveData | undefined> {
+    this.checkIntegrity()
     const saveDataPath = this.devhdd0Path.gotoFile('home/00000001/savedata/BLUS30463-AUTOSAVE/SAVE.DAT')
     if (saveDataPath.exists) return await RB3SaveData.parseFromFile(saveDataPath)
   }
@@ -397,6 +453,7 @@ export class RPCS3 {
    * @returns {Promise<string[]>}
    */
   async getAllRB3InstalledPackNames(): Promise<string[]> {
+    this.checkIntegrity()
     const allPacks: string[] = []
     const usrdir = this.devhdd0Path.gotoDir('game/BLUS30463/USRDIR')
     if (usrdir.exists) {
@@ -411,13 +468,27 @@ export class RPCS3 {
   }
 
   /**
-   * Checks if the a pack folder name is available to use on the Rock Band 3 installed DLC folder.
+   * Checks if the provided package folder name is available to use on the Rock Band 3 installed DLC folder.
    * - - - -
    * @param {string} packName The pack folder name to be checked.
    * @returns {Promise<boolean>}
    */
   async isPackFolderNameAvailable(packName: string): Promise<boolean> {
+    this.checkIntegrity()
     const allPacksName = (await this.getAllRB3InstalledPackNames()).map((entry) => entry.toLowerCase())
     return !allPacksName.includes(packName.toLowerCase())
+  }
+
+  /**
+   * Checks if the a song shortname (songname) is available to use on the Rock Band 3. The songname will iterate through all official
+   * songs and custom songs already installed by the user.
+   * - - - -
+   * @param {string} songname The shortname (songname) to be checked.
+   * @returns {Promise<boolean>}
+   */
+  async isSongnameAvailable(songname: string): Promise<boolean> {
+    this.checkIntegrity()
+    const allSongnames = (await this.getAllSongIDs()).map((entry) => entry.toLowerCase())
+    return !allSongnames.includes(songname.toLowerCase())
   }
 }

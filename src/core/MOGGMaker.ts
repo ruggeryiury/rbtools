@@ -1,6 +1,5 @@
 import { type FilePath, pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
-import { temporaryFile } from 'tempy'
-import { BinaryAPI, MOGGFile, PythonAPI } from '../core.exports'
+import { type MOGGFile, PythonAPI } from '../core.exports'
 
 /**
  * A class that can create multitrack OGG files to use on Rock Band games.
@@ -41,42 +40,52 @@ export class MOGGMaker {
   /**
    * Appends an audio file to the MOGG file audio array.
    * - - - -
-   * @param {FilePathLikeTypes} audioFilePath The path to the audio file.
+   * @param {FilePathLikeTypes} audioFilePath A path to an audio file or an array with audio file paths to be added.
    */
-  async addTrack(audioFilePath: FilePathLikeTypes): Promise<void> {
-    const audioPath = pathLikeToFilePath(audioFilePath)
-    const { channels, duration, sampleRate } = await PythonAPI.audioFileStat(audioFilePath)
+  async addTracks(audioFilePath: FilePathLikeTypes | FilePathLikeTypes[]): Promise<void> {
+    if (Array.isArray(audioFilePath)) {
+      for (const audioFile of audioFilePath) {
+        const audioPath = pathLikeToFilePath(audioFile)
+        const { channels, duration, sampleRate } = await PythonAPI.audioFileStat(audioPath)
 
-    if (!channels || !duration || !sampleRate) throw new Error(`Provided file "${audioPath.path}" is not a compatible audio file.`)
+        if (!channels || !duration || !sampleRate) throw new Error(`Provided file "${audioPath.path}" is not a compatible audio file.`)
 
-    if (this.audioDuration === 0) this.audioDuration = duration
-    if (this.audioDuration !== duration) throw new Error(`Provided file "${audioPath.path}" doesn't have the same duration from the first audio file added to this class\n\nClass audio duration: ${this.audioDuration.toString()}\nProvided file duration: ${duration.toString()}`)
+        if (this.audioDuration === 0) this.audioDuration = duration
+        else if (this.audioDuration !== duration) throw new Error(`Provided file "${audioPath.path}" doesn't have the same duration from the first audio file added to this class\n\nClass audio duration: ${this.audioDuration.toString()}\nProvided file duration: ${duration.toString()}`)
 
-    if (this.audioSampleRate === 0) this.audioSampleRate = sampleRate
-    if (this.audioSampleRate !== sampleRate) throw new Error(`Provided file "${audioPath.path}" doesn't have the same sample rate from the first audio file added to this class\n\nClass sample rate: ${this.audioSampleRate.toString()}\nProvided file sample rate: ${sampleRate.toString()}`)
+        if (this.audioSampleRate === 0) this.audioSampleRate = sampleRate
+        else if (this.audioSampleRate !== sampleRate) throw new Error(`Provided file "${audioPath.path}" doesn't have the same sample rate from the first audio file added to this class\n\nClass sample rate: ${this.audioSampleRate.toString()}\nProvided file sample rate: ${sampleRate.toString()}`)
 
-    this.channelsCount += channels
-    this.tracks.push(audioPath)
+        this.channelsCount += channels
+        this.tracks.push(audioPath)
+      }
+    } else {
+      const audioPath = pathLikeToFilePath(audioFilePath)
+      const { channels, duration, sampleRate } = await PythonAPI.audioFileStat(audioFilePath)
+
+      if (!channels || !duration || !sampleRate) throw new Error(`Provided file "${audioPath.path}" is not a compatible audio file.`)
+
+      if (this.audioDuration === 0) this.audioDuration = duration
+      else if (this.audioDuration !== duration) throw new Error(`Provided file "${audioPath.path}" doesn't have the same duration from the first audio file added to this class\n\nClass audio duration: ${this.audioDuration.toString()}\nProvided file duration: ${duration.toString()}`)
+
+      if (this.audioSampleRate === 0) this.audioSampleRate = sampleRate
+      else if (this.audioSampleRate !== sampleRate) throw new Error(`Provided file "${audioPath.path}" doesn't have the same sample rate from the first audio file added to this class\n\nClass sample rate: ${this.audioSampleRate.toString()}\nProvided file sample rate: ${sampleRate.toString()}`)
+
+      this.channelsCount += channels
+      this.tracks.push(audioPath)
+    }
   }
 
   /**
    * Creates a multitrack OGG file and adds the MOGG header, returning a `MOGGFile` class pointing to the new MOGG file.
    * - - - -
    * @param {FilePathLikeTypes} destPath The destination path to the new MOGG file.
-   * @param {boolean} [encrypt] `OPTIONAL` Encrypts the MOGG file. The encryption works on all systems. Default is `false`.
+   * @param {boolean} [encrypt] `OPTIONAL` Encrypts the MOGG file using `0B` encryption. The encryption works on all systems. Default is `false`.
    * @returns {Promise<MOGGFile>}
    */
   async create(destPath: FilePathLikeTypes, encrypt = false): Promise<MOGGFile> {
-    if (this.channelsCount === 6) throw new Error('Tried to create a MOGG file with six channels, which is known to cause glitches on the audio, possible due to surround.')
-    const dest = pathLikeToFilePath(destPath).changeFileExt('mogg')
-    const tempOggFile = await PythonAPI.multitrackOGGCreator(this.tracks, temporaryFile({ extension: '.ogg' }))
-    try {
-      await BinaryAPI.makeMoog(tempOggFile, dest, encrypt)
-      await tempOggFile.delete()
-      return new MOGGFile(dest)
-    } catch (error) {
-      await tempOggFile.delete()
-      throw error
-    }
+    if (this.channelsCount === 6) throw new Error('Tried to create a MOGG file with six channels, which is known to cause glitches on the audio due to surround processing for OGG files.')
+    const dest = pathLikeToFilePath(destPath).changeFileExt('.mogg')
+    return await PythonAPI.moggCreator(this.tracks, dest, encrypt)
   }
 }

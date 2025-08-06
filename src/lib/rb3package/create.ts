@@ -1,7 +1,7 @@
-import { BinaryWriter, FilePath, pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
+import { BinaryWriter, type FilePath, pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { temporaryFile } from 'tempy'
-import { DTAParser, ImageFile, PythonAPI, STFSFile, TextureFile } from '../../core.exports'
+import { DTAParser, ImageFile, PythonAPI, type STFSFile, TextureFile } from '../../core.exports'
 import { addPaddingToBuffer, defaultArtwork256x256, extractPackagesForRB3Package, getSongContentsStatsByShortname, isURL, paddingToMultipleOf16, type PaddedBufferObject } from '../../lib.exports'
 
 // #region Types
@@ -130,8 +130,8 @@ export const createRB3PackageBuffer = async (options: RB3PackageCreationOptions)
   if (opts.name === '') throw new Error("RB3 Package name can't be blank.")
   if (opts.defaultFolderName === '') throw new Error("RB3 Package default folder name can't be blank.")
 
-  if (opts.name.length > 0x50) throw new Error(`RB3 Package name can't have more than 80 characters.`)
-  if (opts.defaultFolderName.length > 0x30) throw new Error(`RB3 Package folder name can't have more than 48 characters.`)
+  if (opts.name.length > 256) throw new Error(`RB3 Package name can't have more than 80 characters.`)
+  if (opts.defaultFolderName.length > 48) throw new Error(`RB3 Package folder name can't have more than 48 characters.`)
 
   const io = new BinaryWriter()
   const dta = new DTAParser()
@@ -175,7 +175,7 @@ export const createRB3PackageBuffer = async (options: RB3PackageCreationOptions)
     io.writeUInt8(opts.version)
     io.writeUInt16LE(dta.songs.length)
 
-    const headerSize = 176
+    const headerSize = 352
     const songEntriesBlockSize = dta.songs.length * 80
     const binaryBlockStart = headerSize + songEntriesBlockSize + songDTAContents.newBuffer.byteLength + desc.newBuffer.byteLength + art.newBuffer.byteLength
     io.writeUInt32LE(headerSize)
@@ -197,7 +197,7 @@ export const createRB3PackageBuffer = async (options: RB3PackageCreationOptions)
     io.writeUInt8(0)
     io.writeUInt32LE(binaryBlockStart)
 
-    io.writeUTF8(opts.name, 80)
+    io.writeUTF8(opts.name, 256)
     io.writeUTF8(opts.defaultFolderName, 48)
 
     const operators: RB3PackageSongOperatorObject[] = []

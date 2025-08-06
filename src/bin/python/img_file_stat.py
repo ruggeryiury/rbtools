@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
-import argparse, json, os
+import argparse, json
+from os import PathLike, path
 from PIL import Image
 import puremagic
-from typing import TypedDict
+from typing import TypedDict, Union
 
 
 class ImgFileStat(TypedDict):
@@ -17,7 +18,16 @@ class ImgFileStat(TypedDict):
     width: int
 
 
-def img_file_stat(img_file_path: str) -> ImgFileStat:
+def img_file_stat(img_file_path: Union[str, PathLike[str]]) -> ImgFileStat:
+    """
+    Returns a dict with stats of an image file.
+
+    Args:
+        img_file_path (Union[str, PathLike[str]]): The path to the image file to read.
+
+    Returns:
+        ImgFileStat: A dict with stats of the image file.
+    """
     try:
         magic = None
         with open(img_file_path, "rb") as img:
@@ -30,7 +40,7 @@ def img_file_stat(img_file_path: str) -> ImgFileStat:
                 "imageMode": image.mode,
                 "height": image.height,
                 "mimeType": magic.mime_type,
-                "size": os.path.getsize(img_file_path),
+                "size": path.getsize(img_file_path),
                 "width": image.width,
             }
     except Exception as e:

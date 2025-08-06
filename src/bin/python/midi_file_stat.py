@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
-import argparse, json, os, struct, tempfile
+import argparse, json
 from mido import MidiFile
-from typing import TypedDict
+from os import PathLike
+from typing import TypedDict, Union, List
 
 
 class MidiFileStat(TypedDict):
@@ -10,12 +11,21 @@ class MidiFileStat(TypedDict):
     midiType: int
     ticksPerBeat: int
     tracksCount: int
-    tracksName: list[str]
+    tracksName: List[str]
 
 
-def midi_file_stat(midi_file_path: str) -> MidiFileStat:
+def midi_file_stat(midi_file_path: Union[str, PathLike[str]]) -> MidiFileStat:
+    """
+    Returns a dict with stats of a MIDI file.
+
+    Args:
+        midi_file_path (Union[str, PathLike[str]]): The path to the MIDI file to read.
+
+    Returns:
+        MidiFileStat: A dict with stats of the MIDI file.
+    """
     try:
-        tracks_name: list[str] = []
+        tracks_name: List[str] = []
         midi = MidiFile(midi_file_path)
         for track in midi.tracks[1:]:
             tracks_name.append(track.name)

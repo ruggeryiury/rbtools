@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse, json
+from pathlib import Path
 from pydub.utils import mediainfo
-from typing import TypedDict
+from typing import TypedDict, Union
+from os import PathLike
 
 
 class AudioFileStat(TypedDict):
@@ -18,7 +20,29 @@ class AudioFileStat(TypedDict):
     size: int
 
 
-def audio_file_stat(audio_file_path: str) -> AudioFileStat:
+def audio_file_stat(audio_file_path: Union[str, PathLike[str]]) -> AudioFileStat:
+    """
+    Returns a dict with stats of an audio file.
+
+    Args:
+        audio_file_path (Union[str, PathLike[str]]): The path to the audio file to read.
+
+    Returns:
+        AudioFileStat: A dict with stats of an audio file.
+    """
+
+    audio_file_path = Path(audio_file_path)
+
+    if not audio_file_path.exists():
+        raise FileNotFoundError(
+            f'Provided audio file path "{str(audio_file_path)}" does not exists.'
+        )
+
+    if not audio_file_path.is_file():
+        raise TypeError(
+            f'Provided path "{str(audio_file_path)}" is not a valid file path.'
+        )
+
     try:
         audio = mediainfo(audio_file_path)
         return {

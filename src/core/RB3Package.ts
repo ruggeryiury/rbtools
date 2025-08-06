@@ -1,5 +1,5 @@
-import { BinaryReader, DirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
-import { DTAParser, ImageFile } from '../core.exports'
+import { BinaryReader, type DirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { DTAParser, ImageFile, type RPCS3 } from '../core.exports'
 import { createRB3PackageBuffer, extractRB3PackageRPCS3, parseRB3PackageEntries, parseRB3PackageHeader, removePaddingToBuffer, type RB3CompatibleDTAFile, type RB3PackageCreationOptions, type RB3PackageExtractionOptions, type RB3PackageHeaderObject, type RB3SongEntriesObject } from '../lib.exports'
 
 // #region Types
@@ -148,11 +148,11 @@ export class RB3Package {
   /**
    * Extracts songs from a RB3 Package file, formatted to RPCS3 use, and returns the new extracted package folder path.
    * - - - -
-   * @param {DirPathLikeTypes} extractionFolderPath The destination of the extracted package (in this case, must be the Rock Band 3's USRDIR folder).
+   * @param {RPCS3 | DirPathLikeTypes} rpcs3DevHDD0Folder A valid `dev_hdd0` folder destination to the package extraction.
    * @param {RB3PackageExtractionOptions} [options] `OPTIONAL` An object with values that changes the behavior of the extracting process.
    * @returns {Promise<DirPath>}
    */
-  async extractForRPCS3(extractionFolderPath: DirPathLikeTypes, options?: RB3PackageExtractionOptions): Promise<DirPath> {
-    return await extractRB3PackageRPCS3(this, extractionFolderPath, options)
+  async extractForRPCS3(rpcs3DevHDD0Folder: RPCS3 | DirPathLikeTypes, options?: RB3PackageExtractionOptions): Promise<DirPath> {
+    return await extractRB3PackageRPCS3(this, rpcs3DevHDD0Folder, options)
   }
 }

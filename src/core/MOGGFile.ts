@@ -1,5 +1,6 @@
-import { pathLikeToFilePath, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { type DirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { PythonAPI, type MOGGFileStatPythonObject } from '../core.exports'
+import type { RB3CompatibleDTAFile } from '../lib.exports'
 
 // #region Types
 
@@ -77,5 +78,41 @@ export class MOGGFile {
       ...stat,
       ...this.path.toJSON(),
     }
+  }
+
+  /**
+   * Decrypts this MOGG file and returns an instantiated `MOGGFile` class pointing to the new decrypted MOGG file. Returns this
+   * instantiated `MOGGFile` class if the MOGG file is already decrypted.
+   * - - - -
+   * @param {FilePathLikeTypes} decMoggPath The path to the decrypted MOGG file.
+   * @returns {Promise<MOGGFile>}
+   */
+  async decrypt(decMoggPath: FilePathLikeTypes): Promise<MOGGFile> {
+    if (await this.isEncrypted()) return await PythonAPI.decryptMOGG(this.path, decMoggPath)
+    return this
+  }
+
+  /**
+   * Encrypts a MOGG file and returns an instantiated `MOGGFile` class pointing to the new encrypted MOGG file. Returns this
+   * instantiated `MOGGFile` class if the MOGG file is already encrypted using the same encryption version.
+   * - - - -
+   * @param {FilePathLikeTypes} encMoggPath The path of the encrypted MOGG file.
+   * @param {MOGGFileEncryptionVersion} [encVersion] `OPTIONAL` The type of the encryption. Default is `11`.
+   * @param {boolean} [usePS3] `OPTIONAL` Use PS3 keys for encryption, used only on certain encryption versions. Default is `false`.
+   * @param {boolean} [useRed] `OPTIONAL` Use red keys for encryption, used only on certain encryption versions. Default is `false`.
+   * @returns {Promise<MOGGFile>}
+   */
+  async encrypt(encMoggPath: FilePathLikeTypes, encVersion: MOGGFileEncryptionVersion = 11, usePS3 = false, useRed = false) {
+    const thisEncVersion = await this.checkFileIntegrity()
+    if (thisEncVersion === encVersion) return this
+    return await PythonAPI.encryptMOGG(this.path, encMoggPath, encVersion, usePS3, useRed)
+  }
+
+  async extractTracks(songdata: RB3CompatibleDTAFile, destFolderPath: DirPathLikeTypes): Promise<DirPath> {
+    return await PythonAPI.moggTrackExtractor(this.path, songdata, destFolderPath)
+  }
+
+  async createPreview(songdata: RB3CompatibleDTAFile, destPath: FilePathLikeTypes, format?: 'wav' | 'flac' | 'ogg' | 'mp3', mixCrowd?: boolean): Promise<FilePath> {
+    return await PythonAPI.moggPreviewCreator(this.path, songdata, destPath, format, mixCrowd)
   }
 }

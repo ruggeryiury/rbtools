@@ -96,7 +96,7 @@ export const parseRB3PackageHeader = async (bufferOrReader: BinaryReader | Buffe
   map.set('artworkSize', await reader.readUInt32LE())
   reader.padding(4)
   map.set('binaryBlockOffset', await reader.readUInt32LE())
-  map.set('name', await reader.readUTF8(80))
+  map.set('name', await reader.readUTF8(256))
   map.set('defaultFolderName', await reader.readUTF8(48))
 
   return Object.fromEntries(map.entries()) as Record<keyof RB3PackageHeaderObject, unknown> as RB3PackageHeaderObject

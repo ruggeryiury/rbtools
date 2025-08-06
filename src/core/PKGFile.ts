@@ -1,4 +1,4 @@
-import { BinaryReader, createHash, HexVal, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, createHashFromBuffer, HexVal, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { DTAParser } from '../core.exports'
 import { calculateAesAlignedOffsetAndSize, PkgXorSha1Counter, type CalculatedAesOffsetAndSizeObject, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
@@ -602,7 +602,7 @@ export class PKGFile {
       await decryptedNameReader.close()
     }
 
-    const sha256 = createHash(decryptedData)
+    const sha256 = createHashFromBuffer(decryptedData)
     const fileOffset = header.dataOffset + offset
     const fileOffsetEnd = fileOffset + size
 

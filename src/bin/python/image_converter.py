@@ -1,17 +1,49 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse
+from os import PathLike
+from pathlib import Path
 from PIL import Image
+from typing import Literal, Union
 
 
 def image_converter(
-    src_path: str,
-    dest_path: str,
+    src_path: Union[str, PathLike[str]],
+    dest_path: Union[str, PathLike[str]],
     width: int = 256,
     height: int = 256,
-    interpolation: str = "LANCZOS",
+    interpolation: Literal[
+        "NEAREST", "BOX", "BILINEAR", "HAMMING", "BICUBIC", "LANCZOS"
+    ] = "LANCZOS",
     quality: int = 100,
-) -> str:
+) -> Path:
+    """
+    Process/converts an image file.
+
+    Args:
+        src_path (Union[str, PathLike[str]]): The source file path to be converted.
+        dest_path (Union[str, PathLike[str]]): The destination file path of the converted file.
+        format (str): The image format where the processed "buffer" will be encoded.
+        width (int): The output width of the image "buffer". Default is `256`.
+        height (int): The output height of the image "buffer". Default is `256`.
+        interpolation (Literal["NEAREST", "BOX", "BILINEAR", "HAMMING", "BICUBIC", "LANCZOS"]): The interpolation method that will be used if the image should be resized. Default is `"LANCZOS"`.
+        quality (int): The output quality of the image "buffer", used with lossy image formats. Default is `100` (highest quality possible).
+
+    Returns:
+        Path: The destination file path of the converted file.
+    """
+
+    src_path = Path(src_path)
+    dest_path = Path(dest_path)
+
+    if not src_path.exists():
+        raise FileNotFoundError(
+            f'Provided image path "{str(src_path)}" does not exists.'
+        )
+
+    if not src_path.is_file():
+        raise TypeError(f'Provided path "{str(src_path)}" is not a valid file path.')
+
     try:
         with Image.open(src_path) as img:
             if img.mode != "RGB":
@@ -40,15 +72,15 @@ if __name__ == "__main__":
         description="RBTools: Image Converter", epilog="By Ruggery Iury Corrêa."
     )
     parser.add_argument(
-        "src_path", help="The source file path to be converted", type=str
+        "src_path", help="The source file path to be converted.", type=str
     )
     parser.add_argument(
-        "dest_path", help="The destination file path of the converted file", type=str
+        "dest_path", help="The destination file path of the converted file.", type=str
     )
     parser.add_argument(
         "-x",
         "--width",
-        help="The width of the image",
+        help="The width of the image.",
         type=int,
         default=256,
         required=False,
@@ -56,7 +88,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-y",
         "--height",
-        help="The height of the image",
+        help="The height of the image.",
         type=int,
         default=256,
         required=False,
@@ -64,7 +96,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-i",
         "--interpolation",
-        help="The interpolation method used when resizing the image",
+        help="The interpolation method used when resizing the image.",
         default="BILINEAR",
         type=str,
         required=False,
@@ -72,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-q",
         "--quality",
-        help="The quality value of the output image. Only used on lossy format, such as JPEG and WEBP",
+        help="The quality value of the output image. Only used on lossy format, such as JPEG and WEBP.",
         default=100,
         type=int,
         required=False,

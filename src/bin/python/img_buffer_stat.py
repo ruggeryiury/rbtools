@@ -18,6 +18,15 @@ class ImgFileStat(TypedDict):
 
 
 def img_buffer_stat(img_base64: str) -> ImgFileStat:
+    """
+    Returns a dict with stats of an image file "buffer".
+
+    Args:
+        img_base64 (str): An image "buffer" encoded as Base64 string.
+
+    Returns:
+        ImgFileStat: A dict with stats of the image file "buffer".
+    """
     image_data = BytesIO(base64.b64decode(img_base64))
     try:
         magic = puremagic.magic_string(image_data.read(64))[0]

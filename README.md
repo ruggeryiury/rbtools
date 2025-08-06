@@ -46,6 +46,7 @@ At last, **_RBTools_** comes with a few special Node packages made by myself, su
 - [TrojanNemo](https://github.com/trojannemo): General helping and for the creation of [Nautilus](https://github.com/trojannemo/Nautilus)!
 - [LocalH](https://github.com/LocalH): General helping and providing me the [moggulator](https://github.com/LocalH/moggulator/tree/master) python script.
 - [Emma](https://github.com/InvoxiPlayGames): General helping!
+- Jnack and all the fellow contributors of MiloHax!
 
 # More Rock Band-Related Projects
 
