@@ -360,7 +360,7 @@ export class DTAParser {
     const parser = new DTAParser([...this.songs, ...this.updates])
     parser.sort('ID')
     const dtaFileBuffer = Buffer.from(stringifyDTA(parser))
-    return DTAParser.calculateHashFromBuffer(dtaFileBuffer, algorithm, outputEncoding)
+    return createHashFromBuffer(dtaFileBuffer, algorithm, outputEncoding)
   }
 
   async export(destPath: FilePathLikeTypes, options?: SongDataStringifyOptions) {
