@@ -130,7 +130,7 @@ export class DTAParser {
    * @returns {RB3CompatibleDTAFile | undefined}
    */
   getSongByID(id: string): RB3CompatibleDTAFile | undefined {
-    return this.songs.find((song) => String(song.id) === String(id))
+    return this.songs.find((song) => String(song.id as string | number) === String(id as string | number))
   }
 
   /**

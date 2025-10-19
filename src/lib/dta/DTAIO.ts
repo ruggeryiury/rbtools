@@ -528,11 +528,11 @@ export class DTAIO {
   /**
    * Transforms a `variable` type value to `ObjectValueObject`.
    * - - - -
-   * @param {Record<string, any>} value The value you want to transform.
+   * @param {Record<string, unknown>} value The value you want to transform.
    * @param {DTAIOFormattingOptions} [formatOptions] `OPTIONAL` An object with values that manipulates the rendering of this value in specific.
    * @returns {ObjectValueObject}
    */
-  static useObject = (value: Record<string, any>, formatOptions?: DTAIOFormattingOptions): ObjectValueObject => ({
+  static useObject = (value: Record<string, unknown>, formatOptions?: DTAIOFormattingOptions): ObjectValueObject => ({
     __type: 'object',
     __value: value,
     __options: setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
@@ -607,9 +607,9 @@ export class DTAIO {
   /**
    * Returns an object with all values added to the DTA file contents.
    * - - - -
-   * @returns {Record<string, any>}
+   * @returns {Record<string, unknown>}
    */
-  toJSON(): Record<string, any> {
+  toJSON(): Record<string, unknown> {
     return this.content
   }
 
