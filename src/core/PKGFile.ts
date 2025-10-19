@@ -1,4 +1,4 @@
-import { BinaryReader, createHashFromBuffer, HexVal, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, createHashFromBuffer, type DirPath, HexVal, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { DTAParser } from '../core.exports'
 import { calculateAesAlignedOffsetAndSize, PkgXorSha1Counter, type CalculatedAesOffsetAndSizeObject, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
@@ -206,25 +206,25 @@ export class PKGFile {
    */
   static readonly pkgContentKeys = [
     {
-      key: Buffer.from('Lntx18nJoU6jIh8YiCi4+A==', 'base64'),
+      key: Buffer.from('Lntx18nJoU6jIh8YiCi4+A==', 'base64') as Buffer,
       desc: 'PS3',
     },
     {
-      key: Buffer.from('B/LGgpC1DSwzgY1wm2DmKw==', 'base64'),
+      key: Buffer.from('B/LGgpC1DSwzgY1wm2DmKw==', 'base64') as Buffer,
       desc: 'PSX/PSP',
     },
     {
-      key: Buffer.from('4xpwyc4d1yvzwGIpY/Lsyw==', 'base64'),
+      key: Buffer.from('4xpwyc4d1yvzwGIpY/Lsyw==', 'base64') as Buffer,
       desc: 'PSV',
       derive: true,
     },
     {
-      key: Buffer.from('QjrKOivVZJ+Whqutb9iAHw==', 'base64'),
+      key: Buffer.from('QjrKOivVZJ+Whqutb9iAHw==', 'base64') as Buffer,
       desc: 'PSV Livearea',
       derive: true,
     },
     {
-      key: Buffer.from('rwf9WWUlJ7rxM4lmixfZ6g==', 'base64'),
+      key: Buffer.from('rwf9WWUlJ7rxM4lmixfZ6g==', 'base64') as Buffer,
       desc: 'PSM',
       derive: true,
     },
@@ -787,7 +787,7 @@ export class PKGFile {
     }
   }
 
-  async extract(destPath: DirPathLikeTypes, extractOnRoot = false, cleanDestDir = false) {
+  async extract(destPath: DirPathLikeTypes, extractOnRoot = false, cleanDestDir = false): Promise<DirPath> {
     await this.checkFileIntegrity()
     const dest = pathLikeToDirPath(destPath)
     if (!dest.exists) await dest.mkDir()

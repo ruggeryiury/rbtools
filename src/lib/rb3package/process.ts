@@ -69,7 +69,7 @@ export interface SongContentsStatsObject {
 
 // #region Functions
 
-export const extractedPackageProcessor = async (extractedPackageFolderPath: DirPathLikeTypes, options?: ExtractedPackageProcessorOptions) => {
+export const extractedPackageProcessor = async (extractedPackageFolderPath: DirPathLikeTypes, options?: ExtractedPackageProcessorOptions): Promise<void> => {
   const folder = pathLikeToDirPath(extractedPackageFolderPath)
   if (!folder.exists) throw new Error(`Provided extract package folder "${folder.path}" does not exists.`)
   const { moggEncrypted, textureFormat, miloFormat } = setDefaultOptions(

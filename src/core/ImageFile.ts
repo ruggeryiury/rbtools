@@ -3,7 +3,7 @@ import { fileTypeFromBuffer } from 'file-type'
 import { type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { setDefaultOptions } from 'set-default-options'
 import { temporaryFile } from 'tempy'
-import { PythonAPI, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'
+import { PythonAPI, type TextureFile, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'
 import { imageToTexWii, imageToTexXboxPs3, isURL } from '../lib.exports'
 
 // #region Types
@@ -188,7 +188,7 @@ export class ImageFile {
     return await PythonAPI.imageConverter(this.path, dest, toFormat, opts)
   }
 
-  async convertToTexture(destPath: FilePathLikeTypes, toFormat: TextureFormatTypes, size: TextureSizeTypes = 256) {
+  async convertToTexture(destPath: FilePathLikeTypes, toFormat: TextureFormatTypes, size: TextureSizeTypes = 256): Promise<TextureFile> {
     const dest = pathLikeToFilePath(destPath)
     await dest.delete()
 

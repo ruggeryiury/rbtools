@@ -102,7 +102,7 @@ export class MOGGFile {
    * @param {boolean} [useRed] `OPTIONAL` Use red keys for encryption, used only on certain encryption versions. Default is `false`.
    * @returns {Promise<MOGGFile>}
    */
-  async encrypt(encMoggPath: FilePathLikeTypes, encVersion: MOGGFileEncryptionVersion = 11, usePS3 = false, useRed = false) {
+  async encrypt(encMoggPath: FilePathLikeTypes, encVersion: MOGGFileEncryptionVersion = 11, usePS3 = false, useRed = false): Promise<MOGGFile> {
     const thisEncVersion = await this.checkFileIntegrity()
     if (thisEncVersion === encVersion) return this
     return await PythonAPI.encryptMOGG(this.path, encMoggPath, encVersion, usePS3, useRed)

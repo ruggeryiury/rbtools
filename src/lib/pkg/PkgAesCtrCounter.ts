@@ -1,4 +1,4 @@
-import { createDecipheriv, type Decipher } from 'node:crypto'
+import { createDecipheriv, type Decipheriv } from 'node:crypto'
 
 /**
  * Represents an AES-CTR counter object that supports seeking and decryption.
@@ -9,7 +9,7 @@ export class PkgAesCtrCounter {
   private iv: bigint
   private blockOffset = -1
   private blockSize = 16
-  private aes?: Decipher
+  private aes?: Decipheriv
 
   /**
    * Create a new AES CTR counter stream.
@@ -58,6 +58,7 @@ export class PkgAesCtrCounter {
     if (!this.aes) throw new Error('AES stream not initialized')
     return this.aes.update(Buffer.from(data))
   }
+
   toString(): string {
     return this.key.toString('hex')
   }

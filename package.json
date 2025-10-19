@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "author": "Ruggery Iury Corrêa <ruggeryiury@gmail.com>",
   "license": "MIT",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.18.3",
   "keywords": [
     "tool",
     "rock-band",

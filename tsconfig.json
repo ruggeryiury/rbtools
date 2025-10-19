@@ -3,18 +3,18 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "target": "ES2021",
-    "allowJs": true,
+    "target": "ESNext",
+    "module": "ESNext",
     "resolveJsonModule": true,
     "noImplicitOverride": true,
     "moduleResolution": "bundler",
-    "module": "ESNext",
     "outDir": "dist",
     "declaration": true,
     "sourceMap": true,
-    "lib": ["ES2021"],
+    "lib": ["ESNext"],
     "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "isolatedDeclarations": true
   },
   "include": ["dev/**/*.ts", "tests/**/*.ts", "src/**/*.ts", "dev/DXPACK.ts.old"],
   "exclude": ["node_modules"]

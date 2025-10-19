@@ -1,6 +1,6 @@
 import type { BinaryToTextEncoding } from 'node:crypto'
 import axios from 'axios'
-import { createHashFromBuffer, pathLikeToFilePath, type AllHashAlgorithms, type FilePathLikeTypes } from 'node-lib'
+import { createHashFromBuffer, type FilePath, pathLikeToFilePath, type AllHashAlgorithms, type FilePathLikeTypes } from 'node-lib'
 import { createDTA, depackDTAContents, detectDTABufferEncoding, genNumericSongID, genTracksCountArray, isRB3CompatibleDTA, isURL, parseDTA, patchDTAEncodingFromDTAFileObject, sortDTA, stringifyDTA, type PartialDTAFile, type RB3CompatibleDTAFile, type SongDataCreationObject, type SongDataStringifyOptions, type SongSortingTypes } from '../lib.exports'
 import { RBTools } from './RBTools'
 
@@ -244,7 +244,7 @@ export class DTAParser {
    * @param {boolean} [deleteNonAppliedUpdates] `OPTIONAL` Cleans the `updates` array when finished. Default is `true`.
    * @returns {string[]}
    */
-  applyUpdatesToExistingSongs(deleteNonAppliedUpdates = true) {
+  applyUpdatesToExistingSongs(deleteNonAppliedUpdates = true): string[] {
     if (this.updates.length === 0) return [] as string[]
     const appliedUpdSongsIDs: string[] = []
     const unusedUpdates: PartialDTAFile[] = []
@@ -345,7 +345,7 @@ export class DTAParser {
     this.songs = sortDTA(this.songs, sortBy)
   }
 
-  stringify(options?: SongDataStringifyOptions) {
+  stringify(options?: SongDataStringifyOptions): string {
     return stringifyDTA(this, options)
   }
 
@@ -363,7 +363,7 @@ export class DTAParser {
     return createHashFromBuffer(dtaFileBuffer, algorithm, outputEncoding)
   }
 
-  async export(destPath: FilePathLikeTypes, options?: SongDataStringifyOptions) {
+  async export(destPath: FilePathLikeTypes, options?: SongDataStringifyOptions): Promise<FilePath> {
     const dest = pathLikeToFilePath(destPath)
     return await dest.write(this.stringify(options), 'utf8')
   }

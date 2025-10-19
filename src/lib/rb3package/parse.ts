@@ -67,7 +67,7 @@ export type RB3SongEntriesObject = Omit<RB3PackageSongOperatorObject, 'moggPath'
 
 // #region Functions
 
-export const parseRB3PackageHeader = async (bufferOrReader: BinaryReader | Buffer, filePath?: FilePathLikeTypes) => {
+export const parseRB3PackageHeader = async (bufferOrReader: BinaryReader | Buffer, filePath?: FilePathLikeTypes): Promise<RB3PackageHeaderObject> => {
   let reader: BinaryReader
   if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
   else if (filePath && bufferOrReader instanceof BinaryReader) reader = bufferOrReader
@@ -102,7 +102,7 @@ export const parseRB3PackageHeader = async (bufferOrReader: BinaryReader | Buffe
   return Object.fromEntries(map.entries()) as Record<keyof RB3PackageHeaderObject, unknown> as RB3PackageHeaderObject
 }
 
-export const parseRB3PackageEntries = async (header: RB3PackageHeaderObject, bufferOrReader: BinaryReader | Buffer, filePath?: FilePathLikeTypes) => {
+export const parseRB3PackageEntries = async (header: RB3PackageHeaderObject, bufferOrReader: BinaryReader | Buffer, filePath?: FilePathLikeTypes): Promise<RB3SongEntriesObject[]> => {
   let reader: BinaryReader
   if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
   else if (filePath && bufferOrReader instanceof BinaryReader) reader = bufferOrReader

@@ -4,7 +4,7 @@
  * @param {string} dtaFileContents The `.dta` file contents.
  * @returns {string[]} An array with each song content separated to be parsed individually.
  */
-export const depackDTAContents = (dtaFileContents: string) => {
+export const depackDTAContents = (dtaFileContents: string): string[] => {
   const allLines = dtaFileContents
     .split('\n')
     .map((line) => {

@@ -352,7 +352,7 @@ export class DTAIO {
       dta: {
         useSpaces: 3,
       },
-    } satisfies RequiredDeep<DTAIOFormattingOptions>,
+    } as RequiredDeep<DTAIOFormattingOptions>,
     defaultRB3: {
       string: {
         apostropheOnKey: false,
@@ -387,7 +387,7 @@ export class DTAIO {
       dta: {
         useSpaces: false,
       },
-    } satisfies RequiredDeep<DTAIOFormattingOptions>,
+    } as RequiredDeep<DTAIOFormattingOptions>,
   }
 
   // #region Constructor

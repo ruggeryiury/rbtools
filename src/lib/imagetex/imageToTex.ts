@@ -4,7 +4,7 @@ import { temporaryFile } from 'tempy'
 import { BinaryAPI, PythonAPI, TextureFile, type TextureFormatTypes, type TextureSizeTypes } from '../../core.exports'
 import { imageHeaders } from '../../lib.exports'
 
-export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: FilePathLikeTypes, toFormat: TextureFormatTypes, size: TextureSizeTypes = 256) => {
+export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: FilePathLikeTypes, toFormat: TextureFormatTypes, size: TextureSizeTypes = 256): Promise<TextureFile> => {
   const src = pathLikeToFilePath(srcFile)
   const dest = pathLikeToFilePath(destPath).changeFileExt(toFormat)
 
@@ -52,7 +52,7 @@ export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: Fi
   return new TextureFile(dest)
 }
 
-export const imageToTexWii = async (srcFile: FilePathLikeTypes, destPath: FilePathLikeTypes) => {
+export const imageToTexWii = async (srcFile: FilePathLikeTypes, destPath: FilePathLikeTypes): Promise<TextureFile> => {
   const src = pathLikeToFilePath(srcFile)
   const dest = pathLikeToFilePath(destPath).changeFileExt('.png_wii')
 

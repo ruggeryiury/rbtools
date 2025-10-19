@@ -32,7 +32,7 @@ export interface SongDataStringifyOptions {
   formatOptions?: DTAIOFormattingOptions
 }
 
-export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptions) => {
+export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptions): string => {
   const { ignoreFakeSongs, wiiMode, addMAGMAValues, sortBy, omitUnusedValues, formatOptions } = setDefaultOptions(
     {
       ignoreFakeSongs: false,
