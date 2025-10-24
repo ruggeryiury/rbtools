@@ -113,7 +113,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       if (key === '"') unfinishedString = false
     }
 
-    // This is where tracks info like channels
+    // This is where tracks count gets counted
     else if (tracksStarted) {
       if (tracksIndex === -1) {
         tracksStarted = false
@@ -207,6 +207,8 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       else if (key === 'crowd_channels') {
         if (tracksCount.length === 7) tracksCount[6] = 2
         else tracksCount.push(2)
+
+        if (tracksCount.length > 6 && tracksCount[5] > 2) tracksCount[5] -= 2
       }
       // Parse preview
       else if (key === 'preview') {
