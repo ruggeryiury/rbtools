@@ -1,5 +1,5 @@
 import { BinaryReader, type DirPath, type FilePath, pathLikeToDirPath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { DTAParser, RB3Package, RPCS3 } from '../../core.exports'
 import { DTAIO, formatStringFromDTA, removePaddingToBuffer, swapTextureBytes, type RB3SongEntriesObject } from '../../lib.exports'
 
@@ -132,7 +132,7 @@ export const extractRB3PackageRPCS3 = async (rb3PackageFilePath: RB3Package | Fi
   const rpcs3 = rpcs3DevHDD0Folder instanceof RPCS3 ? rpcs3DevHDD0Folder : new RPCS3(rpcs3DevHDD0Folder)
 
   const reader = await BinaryReader.fromFile(packageFile.path)
-  const opts = setDefaultOptions(
+  const opts = useDefaultOptions(
     {
       selectSongs: [],
       packageFolderName: null,

@@ -3,7 +3,7 @@ import { type Readable, Writable } from 'node:stream'
 import { finished } from 'node:stream/promises'
 import axios, { AxiosError } from 'axios'
 import { type FilePath, getReadableBytesSize, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { isURL, normalizeString, type PartialDTAFile } from '../lib.exports'
 
 // #region Types
@@ -358,7 +358,7 @@ export class RhythmverseAPI {
    * @returns {Promise<RawRhythmverseResponse>}
    */
   static async searchText(text: string, options?: RhythmverseFetchingOptions): Promise<RawRhythmverseResponse> {
-    const opts = setDefaultOptions<RhythmverseFetchingOptions>(
+    const opts = useDefaultOptions<RhythmverseFetchingOptions>(
       {
         source: 'rb3xbox',
         sortBy: 'updateDate',
@@ -411,7 +411,7 @@ export class RhythmverseAPI {
    * @returns {Promise<RawRhythmverseResponse>}
    */
   static async searchArtist(artist: string, options?: RhythmverseFetchingOptions): Promise<RawRhythmverseResponse> {
-    const opts = setDefaultOptions<RhythmverseFetchingOptions>(
+    const opts = useDefaultOptions<RhythmverseFetchingOptions>(
       {
         source: 'rb3xbox',
         sortBy: 'updateDate',
@@ -464,7 +464,7 @@ export class RhythmverseAPI {
    * @returns {Promise<RawRhythmverseResponse>}
    */
   static async searchAuthor(author: string, options?: RhythmverseFetchingOptions): Promise<RawRhythmverseResponse> {
-    const opts = setDefaultOptions<RhythmverseFetchingOptions>(
+    const opts = useDefaultOptions<RhythmverseFetchingOptions>(
       {
         source: 'rb3xbox',
         sortBy: 'updateDate',

@@ -1,5 +1,5 @@
 import { type DirPath, type DirPathLikeTypes, type FilePath, isFile, pathLikeToDirPath, pathLikeToFilePath } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { temporaryDirectory, temporaryFile } from 'tempy'
 import { MOGGFile, PythonAPI, STFSFile, TextureFile, type TextureFormatTypes, type TextureSizeTypes } from '../../core.exports'
 import { sortDTA, type RB3CompatibleDTAFile, type RB3PackageFilesTypes } from '../../lib.exports'
@@ -72,7 +72,7 @@ export interface SongContentsStatsObject {
 export const extractedPackageProcessor = async (extractedPackageFolderPath: DirPathLikeTypes, options?: ExtractedPackageProcessorOptions): Promise<void> => {
   const folder = pathLikeToDirPath(extractedPackageFolderPath)
   if (!folder.exists) throw new Error(`Provided extract package folder "${folder.path}" does not exists.`)
-  const { moggEncrypted, textureFormat, miloFormat } = setDefaultOptions(
+  const { moggEncrypted, textureFormat, miloFormat } = useDefaultOptions(
     {
       moggEncrypted: false,
       textureFormat: 'xbox',

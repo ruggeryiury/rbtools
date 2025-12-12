@@ -1,4 +1,4 @@
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { leadingArticleToTrailing, omitLeadingArticle, type RB3CompatibleDTAFile } from '../../lib.exports'
 
 export interface StringFormatterOptions {
@@ -58,7 +58,7 @@ export const formatStringFromDTA = (song: RB3CompatibleDTAFile | null, format: s
       trim: true,
     }
 
-  const { azNumOnly, forceCase, normalizeNFD, removeSpaces, trim } = setDefaultOptions<StringFormatterOptions>(
+  const { azNumOnly, forceCase, normalizeNFD, removeSpaces, trim } = useDefaultOptions<StringFormatterOptions>(
     {
       azNumOnly: false,
       forceCase: null,

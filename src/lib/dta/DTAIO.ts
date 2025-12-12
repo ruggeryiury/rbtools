@@ -1,5 +1,5 @@
 import { BinaryWriter } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import type { RequiredDeep } from 'type-fest'
 import { dtaRenderArray, dtaRenderBoolean, dtaRenderComment, dtaRenderFloat, dtaRenderIfDef, dtaRenderNumber, dtaRenderObject, dtaRenderString, dtaRenderVariable } from '../../lib.exports'
 
@@ -397,7 +397,7 @@ export class DTAIO {
    */
   constructor(formatOptions?: DTAIOFormattingOptions) {
     this.content = {}
-    this.options = setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>)
+    this.options = useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>)
   }
 
   // #region Static Methods
@@ -413,7 +413,7 @@ export class DTAIO {
   }
 
   static valueToObject(value: DTAIOAddValueTypes, formatOptions?: RequiredDeep<DTAIOFormattingOptions>): ValueObjectsTypes {
-    const options = setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions)
+    const options = useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions)
     if (DTAIO.isValueObject(value)) return value
     else {
       if (typeof value === 'undefined') return DTAIO.useUndefined()
@@ -458,7 +458,7 @@ export class DTAIO {
   static useString = (value: string, formatOptions?: StringFormattingOptions): StringValueObject => ({
     __type: 'string',
     __value: value,
-    __options: setDefaultOptions<Required<StringFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.string, formatOptions),
+    __options: useDefaultOptions<Required<StringFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.string, formatOptions),
   })
 
   /**
@@ -471,7 +471,7 @@ export class DTAIO {
   static useVariable = (value: string, formatOptions?: StringVariableFormattingOptions): StringVariableValueObject => ({
     __type: 'str_var',
     __value: value,
-    __options: setDefaultOptions<Required<StringVariableFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.variable, formatOptions),
+    __options: useDefaultOptions<Required<StringVariableFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.variable, formatOptions),
   })
 
   /**
@@ -484,7 +484,7 @@ export class DTAIO {
   static useNumber = (value: number, formatOptions?: NumberAndFloatFormattingOptions): NumberValueObject => ({
     __type: 'number',
     __value: value,
-    __options: setDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, formatOptions),
+    __options: useDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, formatOptions),
   })
 
   /**
@@ -497,7 +497,7 @@ export class DTAIO {
   static useFloat = (value: number, formatOptions?: NumberAndFloatFormattingOptions): FloatValueObject => ({
     __type: 'float',
     __value: value,
-    __options: setDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, formatOptions),
+    __options: useDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, formatOptions),
   })
 
   /**
@@ -510,7 +510,7 @@ export class DTAIO {
   static useBoolean = (value: boolean, formatOptions?: BooleanFormattingOptions): BooleanValueObject => ({
     __type: 'boolean',
     __value: value,
-    __options: setDefaultOptions<Required<BooleanFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.boolean, formatOptions),
+    __options: useDefaultOptions<Required<BooleanFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.boolean, formatOptions),
   })
 
   /**
@@ -522,7 +522,7 @@ export class DTAIO {
   static useNull = (formatOptions?: StringVariableFormattingOptions): StringVariableValueObject => ({
     __type: 'str_var',
     __value: 'null',
-    __options: setDefaultOptions<Required<StringVariableFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.variable, formatOptions),
+    __options: useDefaultOptions<Required<StringVariableFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.variable, formatOptions),
   })
 
   /**
@@ -535,7 +535,7 @@ export class DTAIO {
   static useObject = (value: Record<string, unknown>, formatOptions?: DTAIOFormattingOptions): ObjectValueObject => ({
     __type: 'object',
     __value: value,
-    __options: setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
+    __options: useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
   })
 
   /**
@@ -548,7 +548,7 @@ export class DTAIO {
   static useArray = (value: DTAIOAddValueTypes[], formatOptions?: DTAIOFormattingOptions): ArrayValueObject => ({
     __type: 'array',
     __value: value,
-    __options: setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
+    __options: useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
   })
 
   /**
@@ -588,7 +588,7 @@ export class DTAIO {
     __condition: condition,
     __valueIfTrue: valueIfTrue,
     __valueIfFalse: valueIfFalse,
-    __options: setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
+    __options: useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, formatOptions as RequiredDeep<DTAIOFormattingOptions>),
   })
 
   // #region Class Methods

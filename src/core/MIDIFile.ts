@@ -1,5 +1,5 @@
 import { BinaryReader, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, pathLikeToFilePath, randomByteFromRanges } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { BinaryAPI, EDATFile, PythonAPI, type MIDIFileStatPythonObject } from '../core.exports'
 
 // #region Types
@@ -91,7 +91,7 @@ export class MIDIFile {
    * @returns {Promise<EDATFile>}
    */
   async encrypt(options: EDATEncryptionOptions): Promise<EDATFile> {
-    const { contentID, destPath, packFolderName } = setDefaultOptions({ contentID: EDATFile.genContentID(`RBTOOLSEDAT${randomByteFromRanges(6, ['numbers']).toString()}`), packFolderName: 'RBTOOLS', destPath: this.path.fullname }, options)
+    const { contentID, destPath, packFolderName } = useDefaultOptions({ contentID: EDATFile.genContentID(`RBTOOLSEDAT${randomByteFromRanges(6, ['numbers']).toString()}`), packFolderName: 'RBTOOLS', destPath: this.path.fullname }, options)
 
     return await BinaryAPI.edatToolEncrypt(this.path, contentID, EDATFile.genDevKLicHash(packFolderName), destPath)
   }

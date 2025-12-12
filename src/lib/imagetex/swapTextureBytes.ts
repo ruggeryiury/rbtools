@@ -15,7 +15,7 @@ export const swapTextureBytes = async (textureBuffer: Buffer): Promise<Buffer> =
   fout.write(await fin.read(32))
 
   // Reverse the bytes until the end of the file
-  for (let i = fin.getOffset; i < size; i += 2) {
+  for (let i = fin.offset; i < size; i += 2) {
     const byte1 = await fin.read(1)
     const byte2 = await fin.read(1)
     fout.write(byte2)

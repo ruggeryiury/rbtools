@@ -1,4 +1,4 @@
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import type { LiteralUnion } from 'type-fest'
 import type { DTAParser } from '../../core.exports'
 import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type SongSortingTypes } from '../../lib.exports'
@@ -33,7 +33,7 @@ export interface SongDataStringifyOptions {
 }
 
 export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptions): string => {
-  const { ignoreFakeSongs, wiiMode, addMAGMAValues, sortBy, omitUnusedValues, formatOptions } = setDefaultOptions(
+  const { ignoreFakeSongs, wiiMode, addMAGMAValues, sortBy, omitUnusedValues, formatOptions } = useDefaultOptions(
     {
       ignoreFakeSongs: false,
       wiiMode: null,

@@ -1,5 +1,7 @@
 import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, resolve, type FilePathLikeTypes } from 'node-lib'
 import { EDATFile, ImageFile, MIDIFile, RBTools } from '../core.exports'
+import { buildOSCommand } from '../lib.exports'
+import { platform } from 'node:os'
 
 /**
  * A class with APIs to use RBTools executables.
@@ -14,7 +16,7 @@ export class BinaryAPI {
    */
   static async makeMoog(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, encrypt = false): Promise<void> {
     const exeName = RBTools.binFolder.gotoFile('makemogg.exe').name
-    const command = `${exeName} "${pathLikeToString(srcPath)}" -${encrypt ? 'e' : ''}m "${pathLikeToString(destPath)}"`
+    const command = buildOSCommand(`${exeName} "${pathLikeToString(srcPath)}" -${encrypt ? 'e' : ''}m "${pathLikeToString(destPath)}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
   }
@@ -35,7 +37,7 @@ export class BinaryAPI {
     if (destPath) dest = pathLikeToFilePath(`${pathLikeToString(destPath)}${pathLikeToString(destPath).toLowerCase().endsWith('.edat') ? '' : '.edat'}`)
     else dest = pathLikeToFilePath(`${midi.root}/${midi.fullname}${midi.fullname.toLowerCase().endsWith('.edat') ? '' : '.edat'}`)
 
-    const command = `${exeName} encrypt -custom:${devKLic} ${contentID.slice(0, 36)} 03 02 00 "${midi.path}" "${dest.path}"`
+    const command = buildOSCommand(`${exeName} encrypt -custom:${devKLic} ${contentID.slice(0, 36)} 03 02 00 "${midi.path}" "${dest.path}"`)
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     if (!stdout.split('\r\n').slice(-2)[0].startsWith('COMPLETE:')) throw new Error(stdout.split('\r\n').slice(-2)[0].slice(7))
@@ -61,7 +63,7 @@ export class BinaryAPI {
     let dest: FilePath
     if (destPath) dest = pathLikeToFilePath(destPath).changeFileExt('mid')
     else dest = pathLikeToFilePath(resolve(edat.root, edat.name))
-    const command = `${exeName} decrypt -custom:${devKLicHash} "${edat.path}" "${dest.path}"`
+    const command = buildOSCommand(`${exeName} decrypt -custom:${devKLicHash} "${edat.path}" "${dest.path}"`)
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     if (!stdout.split('\r\n').slice(-2)[0].startsWith('COMPLETE:')) throw new Error(stdout.split('\r\n').slice(-2)[0].slice(7))
@@ -79,7 +81,7 @@ export class BinaryAPI {
     const exeName = RBTools.binFolder.gotoFile('wimgt.exe').name
     const src = pathLikeToFilePath(srcPngFile)
     const dest = pathLikeToFilePath(destTplFile)
-    const command = `${exeName} -d "${dest.path}" ENC -x TPL.CMPR "${src.path}"`
+    const command = buildOSCommand(`${exeName} -d "${dest.path}" ENC -x TPL.CMPR "${src.path}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) {
       if (stderr.includes("find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer")) return pathLikeToFilePath(dest)
@@ -99,7 +101,7 @@ export class BinaryAPI {
     const exeName = RBTools.binFolder.gotoFile('wimgt.exe').name
     const src = pathLikeToFilePath(srcTexFile)
     const dest = pathLikeToFilePath(destImageFile)
-    const command = `${exeName} -d "${dest.path}" DEC -x TPL.CMPR "${src.path}"`
+    const command = buildOSCommand(`${exeName} -d "${dest.path}" DEC -x TPL.CMPR "${src.path}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) {
       if (stderr.includes("find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer")) return new ImageFile(dest)
@@ -122,7 +124,7 @@ export class BinaryAPI {
     const src = pathLikeToFilePath(srcTgaFile)
     const dest = pathLikeToFilePath(destDdsPath)
 
-    const command = `${exeName} -nocuda -bc3 "${src.path}" "${dest.path}"`
+    const command = buildOSCommand(`${exeName} -nocuda -bc3 "${src.path}" "${dest.path}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     return dest

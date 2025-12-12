@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { fileTypeFromBuffer } from 'file-type'
 import { type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { temporaryFile } from 'tempy'
 import { PythonAPI, type TextureFile, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'
 import { imageToTexWii, imageToTexXboxPs3, isURL } from '../lib.exports'
@@ -169,7 +169,7 @@ export class ImageFile {
    */
   async convertToImage(destPath: FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<ImageFile> {
     const { width: srcWidth, height: srcHeight } = await this.stat()
-    const opts = setDefaultOptions(
+    const opts = useDefaultOptions(
       {
         width: srcWidth,
         height: srcHeight,

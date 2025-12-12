@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter, type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { PythonAPI, type ImageConvertingOptions, type ImageFile, type ImageFormatTypes } from '../core.exports'
 import { getDDSHeader, getTPLHeader, texWiiStat, texWiiToImage, texXboxPs3Stat, texXboxPs3ToImage, type TextureFileStatReturnObject } from '../lib.exports'
 
@@ -84,7 +84,7 @@ export class TextureFile {
    */
   async convertToImage(destPath: FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<ImageFile> {
     const { width: srcWidth, height: srcHeight } = await this.stat()
-    const opts = setDefaultOptions(
+    const opts = useDefaultOptions(
       {
         width: srcWidth,
         height: srcHeight,

@@ -1,5 +1,5 @@
 import { BinaryWriter, FilePath, isAbsolute, resolve } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { DTAIO, formatStringFromDTA, genAudioFileStructure, rankCalculator, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export type MAGMAAutogenOptions = 'Default' | 'AgressiveMetal' | 'ArenaRock' | 'DarkHeavyRock' | 'DustyVintage' | 'EdgyProgRock' | 'FeelGoodPopRock' | 'GaragePunkRock' | 'PsychJamRock' | 'SlowJam' | 'SynthPop'
@@ -116,7 +116,7 @@ export class MAGMAProject {
       ...songMagmaConfig,
       ...options,
     }
-    this.options = setDefaultOptions<Required<MAGMAProjectSongData>>(MAGMAProject.defaultMAGMAProjectOptions, magma)
+    this.options = useDefaultOptions<Required<MAGMAProjectSongData>>(MAGMAProject.defaultMAGMAProjectOptions, magma)
   }
 
   mapAllOptionsPaths(): MAGMAPathMapperReturnObject {

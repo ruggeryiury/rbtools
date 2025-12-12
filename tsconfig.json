@@ -16,6 +16,6 @@
     "verbatimModuleSyntax": true,
     "isolatedDeclarations": true
   },
-  "include": ["dev/**/*.ts", "tests/**/*.ts", "src/**/*.ts", "dev/DXPACK.ts.old"],
+  "include": ["dev/**/*.ts", "src/**/*.ts"],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,5 @@
 import { BinaryWriter, type FilePath, pathLikeToFilePath, type FilePathLikeTypes } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { temporaryFile } from 'tempy'
 import { DTAParser, ImageFile, PythonAPI, type STFSFile, TextureFile } from '../../core.exports'
 import { addPaddingToBuffer, defaultArtwork256x256, extractPackagesForRB3Package, getSongContentsStatsByShortname, isURL, paddingToMultipleOf16, type PaddedBufferObject } from '../../lib.exports'
@@ -114,7 +114,7 @@ export interface RB3PackageSongOperatorObject {
  * @returns {Promise<Buffer>}
  */
 export const createRB3PackageBuffer = async (options: RB3PackageCreationOptions): Promise<Buffer> => {
-  const opts = setDefaultOptions(
+  const opts = useDefaultOptions(
     {
       version: 1,
       name: '',

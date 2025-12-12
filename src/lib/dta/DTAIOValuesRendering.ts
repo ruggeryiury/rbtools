@@ -1,5 +1,5 @@
 import { BinaryWriter } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import type { RequiredDeep } from 'type-fest'
 import { DTAIO, quoteToSlashQ, type ArrayValueObject, type BooleanFormattingOptions, type BooleanValueObject, type DTAIOAddValueTypes, type DTAIOFormattingOptions, type FloatValueObject, type IfDefValueObject, type NumberAndFloatFormattingOptions, type NumberValueObject, type ObjectValueObject, type StringFormattingOptions, type StringValueObject, type StringVariableFormattingOptions, type StringVariableValueObject } from '../../lib.exports'
 
@@ -24,7 +24,7 @@ export const dtaRenderKey = (key: string, apostropheOnKey: boolean): string => {
 export const dtaRenderString = (key: string | null, value: StringValueObject, tabAmount: number, io?: BinaryWriter | null): string | undefined => {
   const internalIO = io !== undefined && io !== null
   io = io ?? new BinaryWriter()
-  const { apostropheOnKey, keyAndValueInline } = setDefaultOptions<Required<StringFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.string, value.__options)
+  const { apostropheOnKey, keyAndValueInline } = useDefaultOptions<Required<StringFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.string, value.__options)
   if (key) {
     if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
     io.write('(')
@@ -51,7 +51,7 @@ export const dtaRenderString = (key: string | null, value: StringValueObject, ta
 export const dtaRenderVariable = (key: string | null, value: StringVariableValueObject, tabAmount: number, io?: BinaryWriter | null): string | undefined => {
   const internalIO = io !== undefined && io !== null
   io = io ?? new BinaryWriter()
-  const { apostropheOnKey, keyAndValueInline, apostropheOnVariable } = setDefaultOptions<Required<StringVariableFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.variable, value.__options)
+  const { apostropheOnKey, keyAndValueInline, apostropheOnVariable } = useDefaultOptions<Required<StringVariableFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.variable, value.__options)
   if (key) {
     if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
     io.write('(')
@@ -78,7 +78,7 @@ export const dtaRenderVariable = (key: string | null, value: StringVariableValue
 export const dtaRenderNumber = (key: string | null, value: NumberValueObject, tabAmount: number, io?: BinaryWriter | null): string | undefined => {
   const internalIO = io !== undefined && io !== null
   io = io ?? new BinaryWriter()
-  const { apostropheOnKey } = setDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, value.__options)
+  const { apostropheOnKey } = useDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, value.__options)
   if (key) {
     if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
     io.write('(')
@@ -94,7 +94,7 @@ export const dtaRenderNumber = (key: string | null, value: NumberValueObject, ta
 export const dtaRenderFloat = (key: string | null, value: FloatValueObject, tabAmount: number, io?: BinaryWriter | null): string | undefined => {
   const internalIO = io !== undefined && io !== null
   io = io ?? new BinaryWriter()
-  const { apostropheOnKey, floatMaxDecimals } = setDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, value.__options)
+  const { apostropheOnKey, floatMaxDecimals } = useDefaultOptions<Required<NumberAndFloatFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.number, value.__options)
   if (key) {
     if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
     io.write('(')
@@ -110,7 +110,7 @@ export const dtaRenderFloat = (key: string | null, value: FloatValueObject, tabA
 export const dtaRenderBoolean = (key: string | null, value: BooleanValueObject, tabAmount: number, io?: BinaryWriter | null): string | undefined => {
   const internalIO = io !== undefined && io !== null
   io = io ?? new BinaryWriter()
-  const { apostropheOnKey, type } = setDefaultOptions<Required<BooleanFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.boolean, value.__options)
+  const { apostropheOnKey, type } = useDefaultOptions<Required<BooleanFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA.boolean, value.__options)
   if (key) {
     if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
     io.write('(')
@@ -128,7 +128,7 @@ export const dtaRenderObject = (key: string | null, value: ObjectValueObject, ta
   io = io ?? new BinaryWriter()
   const objValues = Object.keys(value.__value)
   const isObjectPopulated = objValues.length > 0
-  const options = setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, value.__options)
+  const options = useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, value.__options)
   if (isObjectPopulated) {
     if (key) {
       if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
@@ -191,7 +191,7 @@ export const dtaRenderArray = (key: string | null, value: ArrayValueObject, tabA
   const internalIO = io !== undefined && io !== null
   io = io ?? new BinaryWriter()
   const isArrayPopulated = value.__value.length > 0
-  const options = setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, value.__options)
+  const options = useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, value.__options)
 
   if (key) {
     if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
@@ -292,7 +292,7 @@ export const dtaRenderIfDef = (key: string | null, value: IfDefValueObject, tabA
   const isFalseVarStringWithQuotes = value.__valueIfFalse.startsWith('"') && value.__valueIfFalse.endsWith('"')
   const {
     string: { apostropheOnKey },
-  } = setDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, value.__options)
+  } = useDefaultOptions<RequiredDeep<DTAIOFormattingOptions>>(DTAIO.formatOptions.defaultMAGMA, value.__options)
   if (key) {
     if (tabAmount > 0) io.write('\t'.repeat(tabAmount))
     io.write('(')

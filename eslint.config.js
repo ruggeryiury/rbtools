@@ -18,12 +18,11 @@ export default defineConfig(
       parser: tseslint.parser,
       sourceType: 'module',
       parserOptions: {
-        project: 'tsconfig.json',
         projectService: true,
       },
       globals: {
         ...globals.node,
-        ...globals.es2021,
+        ...globals.es2025,
       },
     },
   },

@@ -37,7 +37,7 @@ Also, **_RBTools_** uses modified Python scripts from:
 At last, **_RBTools_** comes with a few special Node packages made by myself, such as:
 
 - [node-lib](https://github.com/ruggeryiury/node-lib): A path utility suite that gathers several functions related to a specific path.
-- [set-default-options](https://github.com/ruggeryiury/set-default-options): Utility function to merge default options with user-defined ones.
+- [use-default-options](https://github.com/ruggeryiury/use-default-options): Utility function to merge default options with user-defined ones.
 
 # Special Thanks
 

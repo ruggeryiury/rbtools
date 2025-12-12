@@ -1,5 +1,5 @@
 import { BinaryReader, createHashFromBuffer, FilePath, getReadableBytesSize, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { BinaryAPI, MIDIFile } from '../core.exports'
 
 // #region Types
@@ -367,7 +367,7 @@ export class EDATFile {
       const destPath = options.destPath ? pathLikeToFilePath(options.destPath) : FilePath.of(`${stat.root}/${stat.name}`)
       return new MIDIFile(await this.path.copy(destPath))
     }
-    const { destPath, devKLicHash } = setDefaultOptions(
+    const { destPath, devKLicHash } = useDefaultOptions(
       {
         destPath: FilePath.of(`${stat.root}/${stat.name}`),
         devKLicHash: stat.devKLicHash ?? '',

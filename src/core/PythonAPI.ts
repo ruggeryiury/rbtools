@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
 import { execAsync, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes, type DirPath, pathLikeToDirPath, type FilePath } from 'node-lib'
-import { setDefaultOptions } from 'set-default-options'
+import { useDefaultOptions } from 'use-default-options'
 import { ImageFile, MOGGFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes, type MOGGFileEncryptionVersion } from '../core.exports'
 import { genAudioFileStructure, type RB3CompatibleDTAFile, type TPLHeaderParserObject } from '../lib.exports'
 
@@ -134,7 +134,7 @@ export class PythonAPI {
    * @returns {ImageFile}
    */
   static async imageConverter(srcFilePath: FilePathLikeTypes, destFilePath: FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<ImageFile> {
-    const opts = setDefaultOptions(
+    const opts = useDefaultOptions(
       {
         width: 256,
         height: 256,
@@ -161,7 +161,7 @@ export class PythonAPI {
    */
   static async imageBufferProcessor(imgPathOrBuffer: Buffer | FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<Buffer> {
     return new Promise<Buffer>((resolve, reject) => {
-      const opts = setDefaultOptions(
+      const opts = useDefaultOptions(
         {
           width: 256,
           height: 256,
