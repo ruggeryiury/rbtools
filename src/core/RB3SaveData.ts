@@ -1,4 +1,4 @@
-import { BinaryReader, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, MyObject, type FilePathLikeTypes } from 'node-lib'
 import type { InstrumentTypes } from '../lib.exports'
 
 // #region Types
@@ -237,7 +237,7 @@ export class RB3SaveData {
   }
 
   private static _bytesToScore(input: Buffer, isWiiScore: boolean): RB3Scores {
-    const score = new Map()
+    const score = new MyObject<RB3Scores>()
     score.set('song_id', input.readUInt32LE(0x00))
     if (!isWiiScore) {
       score.set('song_id', input.readUInt32LE(0x04))
@@ -247,7 +247,7 @@ export class RB3SaveData {
     score.set('playCount', input.readInt32LE(0x0b))
 
     // Drums
-    const drums = new Map()
+    const drums = new MyObject<RB3InstrumentScores>()
     drums.set('topScore', input.readInt32LE(0x3f))
     drums.set('topScoreDifficulty', input[0x43])
     drums.set('starsEasy', input[0x44])
@@ -258,10 +258,10 @@ export class RB3SaveData {
     drums.set('percentHard', input[0x55])
     drums.set('starsExpert', input[0x5c])
     drums.set('percentExpert', input[0x5d])
-    score.set('drums', Object.fromEntries(drums))
+    score.set('drums', drums.toObject())
 
     // Bass
-    const bass = new Map()
+    const bass = new MyObject<RB3InstrumentScores>()
     bass.set('topScore', input.readInt32LE(0x64))
     bass.set('topScoreDifficulty', input[0x68])
     bass.set('starsEasy', input[0x69])
@@ -272,10 +272,10 @@ export class RB3SaveData {
     bass.set('percentHard', input[0x7a])
     bass.set('starsExpert', input[0x81])
     bass.set('percentExpert', input[0x82])
-    score.set('bass', Object.fromEntries(bass))
+    score.set('bass', bass.toObject())
 
     // Guitar
-    const guitar = new Map()
+    const guitar = new MyObject<RB3InstrumentScores>()
     guitar.set('topScore', input.readInt32LE(0x89))
     guitar.set('topScoreDifficulty', input[0x8d])
     guitar.set('starsEasy', input[0x8e])
@@ -286,10 +286,10 @@ export class RB3SaveData {
     guitar.set('percentHard', input[0x9f])
     guitar.set('starsExpert', input[0xa6])
     guitar.set('percentExpert', input[0xa7])
-    score.set('guitar', Object.fromEntries(guitar))
+    score.set('guitar', guitar.toObject())
 
     // Vocals
-    const vocals = new Map()
+    const vocals = new MyObject<RB3InstrumentScores>()
     vocals.set('topScore', input.readInt32LE(0xae))
     vocals.set('topScoreDifficulty', input[0xb2])
     vocals.set('starsEasy', input[0xb3])
@@ -300,10 +300,10 @@ export class RB3SaveData {
     vocals.set('percentHard', input[0xc4])
     vocals.set('starsExpert', input[0xcb])
     vocals.set('percentExpert', input[0xcc])
-    score.set('vocals', Object.fromEntries(vocals))
+    score.set('vocals', vocals.toObject())
 
     // Harmonies
-    const harmonies = new Map()
+    const harmonies = new MyObject<RB3InstrumentScores>()
     harmonies.set('topScore', input.readInt32LE(0xd3))
     harmonies.set('topScoreDifficulty', input[0xd7])
     harmonies.set('starsEasy', input[0xd8])
@@ -314,10 +314,10 @@ export class RB3SaveData {
     harmonies.set('percentHard', input[0xe9])
     harmonies.set('starsExpert', input[0xf0])
     harmonies.set('percentExpert', input[0xf1])
-    score.set('harmonies', Object.fromEntries(harmonies))
+    score.set('harmonies', harmonies.toObject())
 
     // Keys
-    const keys = new Map()
+    const keys = new MyObject<RB3InstrumentScores>()
     keys.set('topScore', input.readInt32LE(0xf8))
     keys.set('topScoreDifficulty', input[0xfc])
     keys.set('starsEasy', input[0xfd])
@@ -328,10 +328,10 @@ export class RB3SaveData {
     keys.set('percentHard', input[0x10e])
     keys.set('starsExpert', input[0x115])
     keys.set('percentExpert', input[0x116])
-    score.set('keys', Object.fromEntries(keys))
+    score.set('keys', keys.toObject())
 
     // PRO Drums
-    const proDrums = new Map()
+    const proDrums = new MyObject<RB3InstrumentScores>()
     proDrums.set('topScore', input.readInt32LE(0x11d))
     proDrums.set('topScoreDifficulty', input[0x121])
     proDrums.set('starsEasy', input[0x122])
@@ -342,10 +342,10 @@ export class RB3SaveData {
     proDrums.set('percentHard', input[0x133])
     proDrums.set('starsExpert', input[0x13a])
     proDrums.set('percentExpert', input[0x13b])
-    score.set('proDrums', Object.fromEntries(proDrums))
+    score.set('proDrums', proDrums.toObject())
 
     // PRO Guitar
-    const proGuitar = new Map()
+    const proGuitar = new MyObject<RB3InstrumentScores>()
     proGuitar.set('topScore', input.readInt32LE(0x142))
     proGuitar.set('topScoreDifficulty', input[0x146])
     proGuitar.set('starsEasy', input[0x147])
@@ -356,10 +356,10 @@ export class RB3SaveData {
     proGuitar.set('percentHard', input[0x158])
     proGuitar.set('starsExpert', input[0x15f])
     proGuitar.set('percentExpert', input[0x160])
-    score.set('proGuitar', Object.fromEntries(proGuitar))
+    score.set('proGuitar', proGuitar.toObject())
 
     // PRO Bass
-    const proBass = new Map()
+    const proBass = new MyObject<RB3InstrumentScores>()
     proBass.set('topScore', input.readInt32LE(0x167))
     proBass.set('topScoreDifficulty', input[0x16b])
     proBass.set('starsEasy', input[0x16c])
@@ -370,10 +370,10 @@ export class RB3SaveData {
     proBass.set('percentHard', input[0x17d])
     proBass.set('starsExpert', input[0x184])
     proBass.set('percentExpert', input[0x185])
-    score.set('proBass', Object.fromEntries(proBass))
+    score.set('proBass', proBass.toObject())
 
     // PRO Keys
-    const proKeys = new Map()
+    const proKeys = new MyObject<RB3InstrumentScores>()
     proKeys.set('topScore', input.readInt32LE(0x18c))
     proKeys.set('topScoreDifficulty', input[0x190])
     proKeys.set('starsEasy', input[0x191])
@@ -384,10 +384,10 @@ export class RB3SaveData {
     proKeys.set('percentHard', input[0x1a2])
     proKeys.set('starsExpert', input[0x1a9])
     proKeys.set('percentExpert', input[0x1aa])
-    score.set('proKeys', Object.fromEntries(proKeys))
+    score.set('proKeys', proKeys.toObject())
 
     // Band
-    const band = new Map()
+    const band = new MyObject<RB3InstrumentScores>()
     band.set('topScore', input.readInt32LE(0x1b1))
     band.set('topScoreDifficulty', input[0x1b5])
     band.set('starsEasy', input[0x1b6])
@@ -398,9 +398,9 @@ export class RB3SaveData {
     band.set('percentHard', input[0x1c7])
     band.set('starsExpert', input[0x1ce])
     band.set('percentExpert', input[0x1cf])
-    score.set('band', Object.fromEntries(band))
+    score.set('band', band.toObject())
 
-    return Object.fromEntries(score) as RB3Scores
+    return score.toObject()
   }
 
   private static async _getProfileName(reader: BinaryReader, profileIndex: number): Promise<string> {

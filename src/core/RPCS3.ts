@@ -1,4 +1,4 @@
-import { DirPath, FilePath, isFile, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
+import { DirPath, FilePath, isFile, MyObject, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
 import { parse as parseYAMLBuffer } from 'yaml'
 import { DTAParser, RB3SaveData, RBTools, type ParsedRB3SaveData } from '../core.exports'
 import type { PartialDTAFile, RB3CompatibleDTAFile } from '../lib.exports'
@@ -236,11 +236,11 @@ export class RPCS3 {
    */
   async getRockBandGamesStats(): Promise<RPCS3GamesStats> {
     this.checkIntegrity()
-    const map = new Map<keyof RPCS3GamesStats, unknown>()
+    const map = new MyObject<RPCS3GamesStats>()
     const games = parseYAMLBuffer(await this.rpcs3ExePath.gotoFile('config/games.yml').read('utf8')) as Record<SupportedRBGamesIDs, string>
 
     if ('BLUS30463' in games) {
-      const rb3 = new Map<keyof RockBand3SpecificStats, unknown>()
+      const rb3 = new MyObject<RockBand3SpecificStats>()
       const rb3GamePath = pathLikeToDirPath(games.BLUS30463)
       rb3.set('path', rb3GamePath.path)
       rb3.set('name', 'Rock Band 3')
@@ -277,11 +277,11 @@ export class RPCS3 {
       if (rb3GamePath.gotoFile('PS3_GAME/USRDIR/gen/main_ps3_vanilla.hdr').exists && rb3GamePath.gotoFile('PS3_GAME/USRDIR/gen/main_ps3_10.ark').exists) rb3.set('hasTeleportGlitchPatch', true)
       if (gen.gotoFile('../dx_high_memory.dta').exists) rb3.set('hasHighMemoryPatch', true)
 
-      map.set('BLUS30463', Object.fromEntries(rb3.entries()))
+      map.set('BLUS30463', rb3.toObject())
     }
 
     if ('BLUS30147' in games) {
-      const rb2 = new Map<keyof RockBand2SpecificStats, unknown>()
+      const rb2 = new MyObject<RockBand2SpecificStats>()
       const rb2GamePath = pathLikeToDirPath(games.BLUS30147)
       rb2.set('path', rb2GamePath.path)
       rb2.set('name', 'Rock Band 2')
@@ -311,10 +311,10 @@ export class RPCS3 {
         else if (hdrStats.size === 0x5d85) rb2.set('updateType', 'tu2')
       }
 
-      map.set('BLUS30147', Object.fromEntries(rb2.entries()))
+      map.set('BLUS30147', rb2.toObject())
     }
 
-    return Object.fromEntries(map.entries()) as Record<keyof RPCS3GamesStats, unknown> as RPCS3GamesStats
+    return map.toObject()
   }
 
   /**
@@ -343,12 +343,12 @@ export class RPCS3 {
           rb3PacksCount++
           const parsedData = await DTAParser.fromFile(pack)
           rb3SongsCount += parsedData.songs.length
-          const packMap = new Map<keyof InstalledSongPackagesStats, unknown>()
+          const packMap = new MyObject<InstalledSongPackagesStats>()
           packMap.set('path', pack.path)
           packMap.set('name', pack.gotoDir('../').name)
           packMap.set('origin', 'rb3')
           packMap.set('songs', parsedData.songs)
-          packs.push(Object.fromEntries(packMap.entries()) as Record<keyof InstalledSongPackagesStats, unknown> as InstalledSongPackagesStats)
+          packs.push(packMap.toObject())
         }
       }
     }
@@ -367,12 +367,12 @@ export class RPCS3 {
           await parsedData.applyDXUpdatesOnSongs(true)
           preRB3SongsCount += parsedData.songs.length
           preRB3SongsCount += parsedData.updates.length
-          const packMap = new Map<keyof InstalledSongPackagesStats, unknown>()
+          const packMap = new MyObject<InstalledSongPackagesStats>()
           packMap.set('path', pack.path)
           packMap.set('name', pack.gotoDir('../').name)
           packMap.set('origin', 'pre_rb3')
           packMap.set('songs', [...parsedData.updates, ...parsedData.songs])
-          packs.push(Object.fromEntries(packMap.entries()) as Record<keyof InstalledSongPackagesStats, unknown> as InstalledSongPackagesStats)
+          packs.push(packMap.toObject())
         }
       }
     }

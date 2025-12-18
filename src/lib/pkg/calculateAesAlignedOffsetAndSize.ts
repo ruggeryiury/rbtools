@@ -1,3 +1,5 @@
+import { MyObject } from 'node-lib'
+
 export interface CalculatedAesOffsetAndSizeObject {
   offsetDelta: number
   offset: number
@@ -7,7 +9,7 @@ export interface CalculatedAesOffsetAndSizeObject {
 
 export const calculateAesAlignedOffsetAndSize = (offset: number, size: number): CalculatedAesOffsetAndSizeObject => {
   const blockSize = 16 // AES block size in bytes
-  const map = new Map<keyof CalculatedAesOffsetAndSizeObject, unknown>()
+  const map = new MyObject<CalculatedAesOffsetAndSizeObject>()
 
   const offsetDelta = offset & (blockSize - 1)
   map.set('offsetDelta', offsetDelta)
@@ -22,5 +24,5 @@ export const calculateAesAlignedOffsetAndSize = (offset: number, size: number): 
   map.set('sizeDelta', sizeDelta)
   map.set('size', size + sizeDelta)
 
-  return Object.fromEntries(map.entries()) as Record<keyof CalculatedAesOffsetAndSizeObject, unknown> as CalculatedAesOffsetAndSizeObject
+  return map.toObject()
 }

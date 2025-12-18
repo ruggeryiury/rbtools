@@ -1,5 +1,6 @@
 import type { LiteralUnion } from 'type-fest'
 import type { MAGMAProjectSongData } from '../../core.exports'
+import { MyObject } from 'node-lib'
 
 /**
  * An object that holds information of many values used in a DTA file.
@@ -827,8 +828,8 @@ export const getCompleteDTAMissingValues = (song: PartialDTAFile): DTAFileKeys[]
  * @param {DTAMap} song A `Map` class with `DTAFile` keys and values.
  * @returns {DTAMap} A `Map` class with `DTAFile` keys and values.
  */
-export const sortDTAMap = (song: DTAMap): DTAMap => {
-  const sortedDTA = new Map() as DTAMap
+export const sortDTAMap = (song: MyObject<RB3CompatibleDTAFile>): MyObject<RB3CompatibleDTAFile> => {
+  const sortedDTA = new MyObject<RB3CompatibleDTAFile>()
 
   for (const key of dta.allKeys) {
     if (song.has(key)) {
@@ -845,13 +846,13 @@ export const sortDTAMap = (song: DTAMap): DTAMap => {
  * @param {DTAMap} song The unformatted DTA file map.
  * @returns {DTAMap} The DTA file map with only the values that works in vanilla game.
  */
-export const customSourceIfdefDeconstructor = (song: DTAMap): DTAMap => {
+export const customSourceIfdefDeconstructor = (song: MyObject<RB3CompatibleDTAFile>): MyObject<RB3CompatibleDTAFile> => {
   const gameOrigin = song.get('game_origin') as CustomSourceValuesObject['game_origin']
   const genre = song.get('genre') as CustomSourceValuesObject['genre']
   const subGenre = song.get('sub_genre') as CustomSourceValuesObject['sub_genre']
 
   let hasAnyCustomSource = false
-  const customSource = new Map<keyof CustomSourceValuesObject, string>()
+  const customSource = new MyObject<CustomSourceValuesObject>()
 
   if (gameOrigin && gameOrigin.startsWith('#ifdef')) {
     const split = gameOrigin.split(' ')
@@ -872,7 +873,7 @@ export const customSourceIfdefDeconstructor = (song: DTAMap): DTAMap => {
     hasAnyCustomSource = true
   }
 
-  if (hasAnyCustomSource) song.set('customsource', Object.fromEntries(customSource))
+  if (hasAnyCustomSource) song.set('customsource', customSource.toObject())
 
   return song
 }

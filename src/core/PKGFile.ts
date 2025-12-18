@@ -1,4 +1,4 @@
-import { BinaryReader, createHashFromBuffer, type DirPath, HexVal, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, createHashFromBuffer, type DirPath, HexVal, pathLikeToDirPath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, MyObject } from 'node-lib'
 import { DTAParser } from '../core.exports'
 import { calculateAesAlignedOffsetAndSize, PkgXorSha1Counter, type CalculatedAesOffsetAndSizeObject, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
@@ -386,7 +386,7 @@ export class PKGFile {
     const metadata: PKGMetadata[] = []
 
     for (let i = 0; i < metadataCount; i++) {
-      const metadataMap = new Map<keyof PKGMetadata, unknown>()
+      const metadataMap = new MyObject<PKGMetadata>()
       const metadataEntryType = await reader.readUInt32BE()
       const metadataEntrySize = await reader.readInt32BE()
       const tempBytes = await reader.read(metadataEntrySize)
@@ -445,9 +445,9 @@ export class PKGFile {
         if (metadataEntryType === 4) metadataMap.set('pkgSize', value.readBigUint64BE())
       }
 
-      metadataSize = reader.getOffset - metadataOffset
+      metadataSize = reader.offset - metadataOffset
 
-      metadata.push(Object.fromEntries(metadataMap.entries()) as Record<keyof PKGMetadata, unknown> as PKGMetadata)
+      metadata.push(metadataMap.toObject())
     }
 
     // Content keys
@@ -462,7 +462,7 @@ export class PKGFile {
     digestBuf.subarray(0x08, 0x10).copy(debugXorIV, 0x18)
     const xorCtr = new PkgXorSha1Counter(debugXorIV)
 
-    const map = new Map<keyof PKGHeaderData, unknown>()
+    const map = new MyObject<PKGHeaderData>()
     map.set('magic', magic)
     map.set('resivion', resivion)
     map.set('pkgType', pkgType)
@@ -487,7 +487,7 @@ export class PKGFile {
     map.set('metadata', metadata)
     map.set('xorCtr', xorCtr)
 
-    return Object.fromEntries(map.entries()) as Record<keyof PKGHeaderData, unknown> as PKGHeaderData
+    return map.toObject()
   }
 
   /**
@@ -522,7 +522,7 @@ export class PKGFile {
     let itemNameSizeMax = 0
 
     for (let i = 0; i < header.itemCount; i++) {
-      const entryMap = new Map<keyof PKGItemEntriesMap, unknown>()
+      const entryMap = new MyObject<PKGItemEntriesMap>()
       const itemEntryReader = BinaryReader.fromBuffer(decryptedData.subarray(offset2, offset2 + itemEntrySize))
       const itemNameOffset = await itemEntryReader.readUInt32BE()
       const itemNameSize = await itemEntryReader.readUInt32BE()
@@ -558,7 +558,7 @@ export class PKGFile {
       offset2 += itemEntrySize
 
       await itemEntryReader.close()
-      itemEntries.push(Object.fromEntries(entryMap.entries()) as Record<keyof PKGItemEntriesMap, unknown> as PKGItemEntriesMap)
+      itemEntries.push(entryMap.toObject())
     }
 
     if (nameOffsetEnd === null || namesOffset === null) throw new Error('PKG Item Entries Parsing Error: Name offset and its end can remain null after iterating through PKG file entries.')
@@ -606,7 +606,7 @@ export class PKGFile {
     const fileOffset = header.dataOffset + offset
     const fileOffsetEnd = fileOffset + size
 
-    const map = new Map<keyof PKGItemEntriesData, unknown>()
+    const map = new MyObject<PKGItemEntriesData>()
     map.set('offset', offset)
     map.set('size', size)
     map.set('entriesSize', entriesSize)
@@ -618,7 +618,7 @@ export class PKGFile {
     map.set('dlcFolderName', dlcFolderName)
     map.set('items', itemEntries)
 
-    return Object.fromEntries(map.entries()) as Record<keyof PKGItemEntriesData, unknown> as PKGItemEntriesData
+    return map.toObject()
   }
 
   /**

@@ -1,4 +1,4 @@
-import { BinaryReader, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, MyObject, type FilePathLikeTypes } from 'node-lib'
 import type { RB3PackageSongOperatorObject } from '../../lib.exports'
 
 // #region Types
@@ -72,7 +72,7 @@ export const parseRB3PackageHeader = async (bufferOrReader: BinaryReader | Buffe
   if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
   else if (filePath && bufferOrReader instanceof BinaryReader) reader = bufferOrReader
   else throw new Error(`Invalid argument pairs for "bufferOrReader" and "file" provided while trying to read RB3 Package or buffer.`)
-  const map = new Map<keyof RB3PackageHeaderObject, unknown>()
+  const map = new MyObject<RB3PackageHeaderObject>()
 
   if (reader.length < 176) throw new Error('RB3 Package is too small to process, is the file corrupted?')
   reader.seek(0)
@@ -99,7 +99,7 @@ export const parseRB3PackageHeader = async (bufferOrReader: BinaryReader | Buffe
   map.set('name', await reader.readUTF8(256))
   map.set('defaultFolderName', await reader.readUTF8(48))
 
-  return Object.fromEntries(map.entries()) as Record<keyof RB3PackageHeaderObject, unknown> as RB3PackageHeaderObject
+  return map.toObject()
 }
 
 export const parseRB3PackageEntries = async (header: RB3PackageHeaderObject, bufferOrReader: BinaryReader | Buffer, filePath?: FilePathLikeTypes): Promise<RB3SongEntriesObject[]> => {
@@ -112,7 +112,7 @@ export const parseRB3PackageEntries = async (header: RB3PackageHeaderObject, buf
   const entries: RB3SongEntriesObject[] = []
 
   for (let i = 0; i < header.songsCount; i++) {
-    const map = new Map<keyof RB3SongEntriesObject, unknown>()
+    const map = new MyObject<RB3SongEntriesObject>()
 
     map.set('songname', await reader.readASCII(50))
     reader.padding(2)
@@ -127,7 +127,7 @@ export const parseRB3PackageEntries = async (header: RB3PackageHeaderObject, buf
     map.set('pngSize', await reader.readUInt32LE())
     map.set('miloSize', await reader.readUInt32LE())
 
-    entries.push(Object.fromEntries(map.entries()) as Record<keyof RB3SongEntriesObject, unknown> as RB3SongEntriesObject)
+    entries.push(map.toObject())
   }
 
   return entries

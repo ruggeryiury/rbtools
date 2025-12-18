@@ -1,3 +1,4 @@
+import { MyObject } from 'node-lib'
 import { customSourceIfdefDeconstructor, isTracksCountEmpty, slashQToQuote, sortDTAMap, type DTAFileKeys, type DTAMap, type DTARecord, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
 
 /**
@@ -28,7 +29,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
         throw new Error(`DTA Parsing error: Tried to find tracks count index for unknown key "${key}"`)
     }
   }
-  const map = new Map() as DTAMap
+  const map = new MyObject<RB3CompatibleDTAFile>()
 
   const allStrings = songContent
     .split(/"/g)
@@ -233,5 +234,5 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
   if (extraAuthoring.length > 0) map.set('extra_authoring', extraAuthoring)
   if (languages.length > 0) map.set('languages', languages)
 
-  return Object.fromEntries(customSourceIfdefDeconstructor(sortDTAMap(map)).entries()) as DTARecord as RB3CompatibleDTAFile | PartialDTAFile
+  return customSourceIfdefDeconstructor(sortDTAMap(map)).toObject() as RB3CompatibleDTAFile | PartialDTAFile
 }

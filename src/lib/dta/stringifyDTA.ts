@@ -2,6 +2,7 @@ import { useDefaultOptions } from 'use-default-options'
 import type { LiteralUnion } from 'type-fest'
 import type { DTAParser } from '../../core.exports'
 import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type SongSortingTypes } from '../../lib.exports'
+import { MyObject } from 'node-lib'
 
 export interface SongDataStringifyOptions {
   /**
@@ -54,7 +55,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
 
     for (const upd of parser.updates) {
       const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, cores, customsource, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, loading_phrase, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, upgrade_version, version, vocal_tonic_note, vols, year_recorded } = upd
-      const map = new Map<LiteralUnion<keyof PartialDTAFile, string>, unknown>()
+      const map = new MyObject<PartialDTAFile>()
 
       const allValuesKeys = Object.keys(upd) as DTAFileKeys[]
       const tracks = tracks_count ? genTracksCountArray(tracks_count) : undefined
@@ -79,7 +80,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       if (context !== undefined) map.set('context', context)
 
       if (hasSongSpecific) {
-        const songMap = new Map<string, unknown>()
+        const songMap = new MyObject()
         if (songname !== undefined) {
           if (wiiMode) songMap.set('name', DTAIO.useString(`dlc/${wiiMode}/content/${songname}/${songname}`, io.options.string))
           else songMap.set('name', DTAIO.useString(`songs/${songname}/${songname}`, io.options.string))
@@ -161,7 +162,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         if (mute_volume !== undefined) songMap.set('mute_volume', mute_volume)
         if (mute_volume_vocals !== undefined) songMap.set('mute_volume_vocals', mute_volume_vocals)
         if (hopo_threshold !== undefined) songMap.set('hopo_threshold', hopo_threshold)
-        map.set('song', Object.fromEntries(songMap.entries()))
+        map.set('song', songMap.toObject())
       }
 
       if (bank) map.set('bank', bank)
@@ -173,7 +174,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       if (song_length !== undefined) map.set('song_length', song_length)
 
       if (hasAnyRank) {
-        const rankMap = new Map<string, unknown>()
+        const rankMap = new MyObject()
         if (rank_drum) rankMap.set('drum', rank_drum)
         if (rank_guitar) rankMap.set('guitar', rank_guitar)
         if (rank_bass) rankMap.set('bass', rank_bass)
@@ -183,7 +184,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         if (rank_real_guitar) rankMap.set('real_guitar', rank_real_guitar)
         if (rank_real_bass) rankMap.set('real_bass', rank_real_bass)
         if (rank_band) rankMap.set('band', rank_band)
-        map.set('rank', Object.fromEntries(rankMap.entries()))
+        map.set('rank', rankMap.toObject())
       }
       if (solo !== undefined && solo.length > 0) map.set('solo', DTAIO.useArray(solo, io.options))
       if (format !== undefined) map.set('format', format)
@@ -215,7 +216,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       if (loading_phrase !== undefined) map.set('loading_phrase', DTAIO.useString(quoteToSlashQ(loading_phrase), io.options.string))
       if (pack_name !== undefined) map.set('pack_name', DTAIO.useString(quoteToSlashQ(pack_name), io.options.string))
 
-      io.addValue(id, Object.fromEntries(map.entries()))
+      io.addValue(id, map.toObject())
     }
   }
   if (parser.songs.length > 0) {
@@ -223,7 +224,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
     if (sortBy) parser.sort(sortBy)
     for (const song of parser.songs) {
       const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, convert, cores, customsource, doubleKick, emh, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, languages, loading_phrase, multitrack, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, rhythmOn, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, unpitchedVocals, upgrade_version, version, vocal_tonic_note, vols, year_recorded, original_id } = song as PartialDTAFile
-      const map = new Map<LiteralUnion<keyof PartialDTAFile, string>, unknown>()
+      const map = new MyObject<PartialDTAFile>()
 
       if (fake && ignoreFakeSongs) continue
 
@@ -250,7 +251,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       if (context !== undefined) map.set('context', context)
 
       if (hasSongSpecific) {
-        const songMap = new Map<string, unknown>()
+        const songMap = new Map()
         if (songname !== undefined) {
           if (wiiMode) songMap.set('name', DTAIO.useString(`dlc/${wiiMode}/content/${songname}/${songname}`, io.options.string))
           else songMap.set('name', DTAIO.useString(`songs/${songname}/${songname}`, io.options.string))
@@ -370,7 +371,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       if (song_length !== undefined) map.set('song_length', song_length)
 
       if (hasAnyRank) {
-        const rankMap = new Map<string, unknown>()
+        const rankMap = new MyObject()
         if (rank_drum) rankMap.set('drum', rank_drum)
         if (rank_guitar) rankMap.set('guitar', rank_guitar)
         if (rank_bass) rankMap.set('bass', rank_bass)
@@ -380,7 +381,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         if (rank_real_guitar) rankMap.set('real_guitar', rank_real_guitar)
         if (rank_real_bass) rankMap.set('real_bass', rank_real_bass)
         if (rank_band) rankMap.set('band', rank_band)
-        map.set('rank', Object.fromEntries(rankMap.entries()))
+        map.set('rank', rankMap.toObject())
       }
       if (solo !== undefined && solo.length > 0) map.set('solo', DTAIO.useArray(solo, io.options))
       if (format !== undefined) map.set('format', format)
@@ -461,7 +462,7 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
         if (map.get('guide_pitch_volume') && (map.get('guide_pitch_volume') as FloatValueObject).__value === -3) map.delete('guide_pitch_volume')
       }
 
-      io.addValue(id, Object.fromEntries(map.entries()))
+      io.addValue(id, map.toObject())
     }
   }
 
