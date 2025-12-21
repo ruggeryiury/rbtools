@@ -1,7 +1,6 @@
 import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, resolve, type FilePathLikeTypes } from 'node-lib'
-import { EDATFile, ImageFile, MIDIFile, RBTools } from '../core.exports'
+import { EDATFile, ImageFile, MIDIFile, MOGGFile, RBTools } from '../core.exports'
 import { buildOSCommand } from '../lib.exports'
-import { platform } from 'node:os'
 
 /**
  * A class with APIs to use RBTools executables.
@@ -13,12 +12,14 @@ export class BinaryAPI {
    * @param {FilePathLikeTypes} srcPath The path to the multitrack OGG file, without HMX header, to be converted to MOGG file.
    * @param {FilePathLikeTypes} destPath The destination path of the new MOGG file.
    * @param {boolean} [encrypt] `OPTIONAL` Encrypts the MOGG file if `true`. Default is `false`.
+   * @returns {MOGGFile} A `MOGGFile` instance pointing to the new MOGG file path.
    */
-  static async makeMoog(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, encrypt = false): Promise<void> {
+  static async makeMogg(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, encrypt = false): Promise<MOGGFile> {
     const exeName = RBTools.binFolder.gotoFile('makemogg.exe').name
     const command = buildOSCommand(`${exeName} "${pathLikeToString(srcPath)}" -${encrypt ? 'e' : ''}m "${pathLikeToString(destPath)}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
+    return new MOGGFile(destPath)
   }
 
   /**
@@ -77,7 +78,7 @@ export class BinaryAPI {
    * @param {FilePathLikeTypes} destTplFile The path to the new converted TPL file.
    * @returns {Promise<FilePath>}
    */
-  static async WimgtEnc(srcPngFile: FilePathLikeTypes, destTplFile: FilePathLikeTypes): Promise<FilePath> {
+  static async wimgtEnc(srcPngFile: FilePathLikeTypes, destTplFile: FilePathLikeTypes): Promise<FilePath> {
     const exeName = RBTools.binFolder.gotoFile('wimgt.exe').name
     const src = pathLikeToFilePath(srcPngFile)
     const dest = pathLikeToFilePath(destTplFile)
@@ -94,13 +95,13 @@ export class BinaryAPI {
    * Executes the Wiimms Image Tool decoder.
    * - - - -
    * @param {FilePathLikeTypes} srcTexFile The path to the PNG_WII file to be converted.
-   * @param {FilePathLikeTypes} destImageFile The path to the new converted TPL file.
+   * @param {FilePathLikeTypes} destImgFile The path to the new converted TPL file.
    * @returns {Promise<FilePath>}
    */
-  static async WimgtDec(srcTexFile: FilePathLikeTypes, destImageFile: FilePathLikeTypes): Promise<ImageFile> {
+  static async wimgtDec(srcTexFile: FilePathLikeTypes, destImgFile: FilePathLikeTypes): Promise<ImageFile> {
     const exeName = RBTools.binFolder.gotoFile('wimgt.exe').name
     const src = pathLikeToFilePath(srcTexFile)
-    const dest = pathLikeToFilePath(destImageFile)
+    const dest = pathLikeToFilePath(destImgFile)
     const command = buildOSCommand(`${exeName} -d "${dest.path}" DEC -x TPL.CMPR "${src.path}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) {
@@ -119,7 +120,7 @@ export class BinaryAPI {
    * @param {FilePathLikeTypes} destDdsPath The path to the new converted DDS file.
    * @returns {Promise<FilePath>}
    */
-  static async NVCompress(srcTgaFile: FilePathLikeTypes, destDdsPath: FilePathLikeTypes): Promise<FilePath> {
+  static async nvCompress(srcTgaFile: FilePathLikeTypes, destDdsPath: FilePathLikeTypes): Promise<FilePath> {
     const exeName = RBTools.binFolder.gotoFile('nvcompress.exe').name
     const src = pathLikeToFilePath(srcTgaFile)
     const dest = pathLikeToFilePath(destDdsPath)

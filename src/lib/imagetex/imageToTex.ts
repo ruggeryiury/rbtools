@@ -22,7 +22,7 @@ export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: Fi
     quality: 100,
   })
 
-  await BinaryAPI.NVCompress(tga, dds)
+  await BinaryAPI.nvCompress(tga, dds)
   await tga.delete()
 
   const ddsHeaderName = `${size.toString()}pDTX5` as keyof typeof imageHeaders
@@ -65,7 +65,7 @@ export const imageToTexWii = async (srcFile: FilePathLikeTypes, destPath: FilePa
 
   await PythonAPI.imageConverter(src, png, 'png', { height: 256, width: 256 })
 
-  await BinaryAPI.WimgtEnc(png, tpl)
+  await BinaryAPI.wimgtEnc(png, tpl)
 
   await png.delete()
 

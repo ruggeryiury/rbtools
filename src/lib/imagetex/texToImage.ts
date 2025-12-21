@@ -78,7 +78,7 @@ export const texWiiToImage = async (srcFile: FilePathLikeTypes, destPath: FilePa
 
   await once(tplStream, 'finish')
 
-  const image = await BinaryAPI.WimgtDec(tpl, dest)
+  const image = await BinaryAPI.wimgtDec(tpl, dest)
 
   await tpl.delete()
   return image

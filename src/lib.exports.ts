@@ -32,6 +32,8 @@ export * from './lib/rb3package/extract'
 export * from './lib/rb3package/parse'
 export * from './lib/rb3package/process'
 
+export * from './lib/u8/parseU8ArchiveHeader'
+
 export * from './lib/utils/buildOSCommand'
 export * from './lib/utils/formatStringFromDTA'
 export * from './lib/utils/getKeyFromMapValue'
