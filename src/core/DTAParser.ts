@@ -125,13 +125,23 @@ export class DTAParser {
   }
 
   /**
-   * Gets a song entry by it's ID. Returns `undefined` if the song is not found.
+   * Gets a song entry by it's entry ID. Returns `undefined` if the song is not found.
    * - - - -
-   * @param {string} id The ID of the song.
+   * @param {string} id The entry ID of the song.
    * @returns {RB3CompatibleDTAFile | undefined}
    */
-  getSongByID(id: string): RB3CompatibleDTAFile | undefined {
+  getSongByEntryID(id: string): RB3CompatibleDTAFile | undefined {
     return this.songs.find((song) => String(song.id as string | number) === String(id as string | number))
+  }
+
+  /**
+   * Gets a song entry by it's song ID. Returns `undefined` if the song is not found.
+   * - - - -
+   * @param {string | number} songID The song ID of the song.
+   * @returns {RB3CompatibleDTAFile | undefined}
+   */
+  getSongBySongID(songID: string | number): RB3CompatibleDTAFile | undefined {
+    return this.songs.find((song) => String(song.song_id) === String(songID))
   }
 
   /**
