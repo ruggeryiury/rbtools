@@ -22,7 +22,10 @@ export * from './lib/imagetex/texToImage'
 export * from './lib/path/thisFilePath'
 
 export * from './lib/pkg/calculateAesAlignedOffsetAndSize'
+export * from './lib/pkg/parsePKG'
+export * from './lib/pkg/parseSFO'
 export * from './lib/pkg/PkgAesCtrCounter'
+export * from './lib/pkg/pkgContentKeys'
 export * from './lib/pkg/PkgXorSha1Counter'
 
 export * from './lib/rb3package/bufferpad'

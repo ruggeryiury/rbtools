@@ -1,4 +1,4 @@
-import { pathLikeToFilePath } from 'node-lib'
+import { DirPath, pathLikeToFilePath } from 'node-lib'
 import { RBTools } from '../../core.exports'
 
 export type DDSFormatTypes = 'DXT1' | 'DXT3' | 'DXT5' | 'NORMAL' | 'UNKNOWN'
@@ -158,12 +158,13 @@ export const buildDDSHeader = (format: DDSFormatTypes, width: number, height: nu
  */
 export const getDDSHeader = async (fullDDSHeader: Buffer, shortDDSHeader: Buffer): Promise<DDSHeaderParserObject> => {
   let header = buildDDSHeader('DXT1', 256, 256)
-  const headerPaths = await RBTools.headersFolder.readDir(true)
+  const headerPaths = await RBTools.headersFolder.readDir()
   let ddsFormat: DDSFormatTypes = 'UNKNOWN'
   let ddsWidth: ArtworkSizeTypes = 512
   let ddsHeight: ArtworkSizeTypes = 512
 
   for (const headerPath of headerPaths) {
+    if (headerPath instanceof DirPath) continue
     const headerFilePath = pathLikeToFilePath(headerPath)
     const headerName = headerFilePath.name
     const headerBytes = await headerFilePath.read()

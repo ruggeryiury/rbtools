@@ -11,14 +11,13 @@ export class OnyxCLI {
   /**
    * The path to the Onyx CLI executable.
    */
-  path: FilePath
+  readonly path: FilePath
 
   /**
    * @param {FilePathLikeTypes} onyxCLIExePath The path to the Onyx CLI executable.
    */
   constructor(onyxCLIExePath: FilePathLikeTypes) {
-    const path = pathLikeToFilePath(onyxCLIExePath)
-    this.path = path
+    this.path = pathLikeToFilePath(onyxCLIExePath)
   }
 
   /**
@@ -118,13 +117,13 @@ export class OnyxCLI {
    * @param {FilePathLikeTypes} srcFile The path to the file to be encrypted.
    * @param {FilePathLikeTypes} destFile The path to the new `.edat` file.
    * @param {string} contentID The content ID. Must be 36 characters long. Ex.: `UP0002-BLUS30487_00-MYPACKAGELABEL`
-   * @param {string} klic A 16-byte HEX string (32 chars). Ex.: `d7f3f90a1f012d844ca557e08ee42391`
+   * @param {string} devKLic A 16-byte HEX string (32 chars). Ex.: `d7f3f90a1f012d844ca557e08ee42391`
    * @returns {Promise<string>} The printable text from the child process.
    */
-  async edat(srcFile: FilePathLikeTypes, destFile: FilePathLikeTypes, contentID: string, klic: string): Promise<string> {
+  async edat(srcFile: FilePathLikeTypes, destFile: FilePathLikeTypes, contentID: string, devKLic: string): Promise<string> {
     const src = FilePath.of(pathLikeToString(srcFile))
     const dest = FilePath.of(pathLikeToString(destFile)).changeFileExt('edat')
-    const cmd = `"${this.path.path}" edat ${contentID} ${klic} "${src.path}" --to ${dest.path}`
+    const cmd = `"${this.path.path}" edat ${contentID} ${devKLic} "${src.path}" --to ${dest.path}`
     const { stderr, stdout } = await execAsync(cmd, { windowsHide: true })
     if (stderr) throw new Error(stderr)
     return stdout

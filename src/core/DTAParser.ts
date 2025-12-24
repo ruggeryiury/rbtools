@@ -3,6 +3,7 @@ import axios from 'axios'
 import { createHashFromBuffer, type FilePath, pathLikeToFilePath, type AllHashAlgorithms, type FilePathLikeTypes } from 'node-lib'
 import { createDTA, depackDTAContents, detectDTABufferEncoding, genNumericSongID, genTracksCountArray, isRB3CompatibleDTA, isURL, parseDTA, patchDTAEncodingFromDTAFileObject, sortDTA, stringifyDTA, type PartialDTAFile, type RB3CompatibleDTAFile, type SongDataCreationObject, type SongDataStringifyOptions, type SongSortingTypes } from '../lib.exports'
 import { RBTools } from './RBTools'
+import { inspect } from 'node:util'
 
 /**
  * A class with methods related to DTA file parsing.
@@ -220,7 +221,7 @@ export class DTAParser {
       await localUpdates.write(JSON.stringify(dta.updates))
     }
     if (localUpdates.exists) {
-      const json = (await localUpdates.readJSON()) as PartialDTAFile[]
+      const json = await localUpdates.readJSON<PartialDTAFile>()
       this.addUpdates(json)
     }
 
@@ -366,5 +367,9 @@ export class DTAParser {
   async export(destPath: FilePathLikeTypes, options?: SongDataStringifyOptions): Promise<FilePath> {
     const dest = pathLikeToFilePath(destPath)
     return await dest.write(this.stringify(options), 'utf8')
+  }
+
+  [inspect.custom]() {
+    return `DTAParser { ${this.songs.length} Songs, ${this.updates.length} Updates }`
   }
 }

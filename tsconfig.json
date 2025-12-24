@@ -14,7 +14,7 @@
     "lib": ["ESNext"],
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
-    "isolatedDeclarations": true
+    // "isolatedDeclarations": true
   },
   "include": ["dev/**/*.ts", "src/**/*.ts"],
   "exclude": ["node_modules"]

@@ -333,10 +333,7 @@ export class RPCS3 {
     // TO-DO Adding Rock Band 3 On Disc songs
     const usrdir = this.devhdd0Path.gotoDir('game/BLUS30463/USRDIR')
     if (usrdir.exists) {
-      const allPacks = (await usrdir.readDir(true))
-        .map((entry) => (isFile(entry) ? FilePath.of(entry) : DirPath.of(entry)))
-        .filter((entry) => entry instanceof DirPath && entry.name !== 'gen')
-        .map((entry) => entry.gotoFile('songs/songs.dta'))
+      const allPacks = (await usrdir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen').map((entry) => entry.gotoFile('songs/songs.dta'))
 
       for (const pack of allPacks) {
         if (pack.exists) {
@@ -355,10 +352,7 @@ export class RPCS3 {
 
     const usrdirPreRB3 = this.devhdd0Path.gotoDir('game/BLUS30050/USRDIR')
     if (usrdirPreRB3.exists) {
-      const allPacks = (await usrdirPreRB3.readDir(true))
-        .map((entry) => (isFile(entry) ? FilePath.of(entry) : DirPath.of(entry)))
-        .filter((entry) => entry instanceof DirPath && entry.name !== 'gen')
-        .map((entry) => entry.gotoFile('songs/songs.dta'))
+      const allPacks = (await usrdirPreRB3.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen').map((entry) => entry.gotoFile('songs/songs.dta'))
 
       for (const pack of allPacks) {
         if (pack.exists) {
@@ -396,16 +390,13 @@ export class RPCS3 {
   async getAllSongIDs(): Promise<string[]> {
     this.checkIntegrity()
     const songnames = new Set()
-    const allSongnames = (await RBTools.binFolder.gotoFile('db/songnames.json').readJSON()) as RB3CompatibleDTAFile[]
+    const allSongnames = await RBTools.binFolder.gotoFile('db/songnames.json').readJSON<RB3CompatibleDTAFile[]>()
     for (const song of allSongnames) songnames.add(song)
     const usrdir = this.devhdd0Path.gotoDir('game/BLUS30463/USRDIR')
     const usrdirPreRB3 = this.devhdd0Path.gotoDir('game/BLUS30050/USRDIR')
 
     if (usrdir.exists) {
-      const allPacks = (await usrdir.readDir(true))
-        .map((entry) => (isFile(entry) ? FilePath.of(entry) : DirPath.of(entry)))
-        .filter((entry) => entry instanceof DirPath && entry.name !== 'gen')
-        .map((entry) => entry.gotoFile('songs/songs.dta'))
+      const allPacks = (await usrdir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen').map((entry) => entry.gotoFile('songs/songs.dta'))
 
       for (const pack of allPacks) {
         if (pack.exists) {
@@ -417,10 +408,7 @@ export class RPCS3 {
     }
 
     if (usrdirPreRB3.exists) {
-      const allPacks = (await usrdirPreRB3.readDir(true))
-        .map((entry) => (isFile(entry) ? FilePath.of(entry) : DirPath.of(entry)))
-        .filter((entry) => entry instanceof DirPath && entry.name !== 'gen')
-        .map((entry) => entry.gotoFile('songs/songs.dta'))
+      const allPacks = (await usrdirPreRB3.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen').map((entry) => entry.gotoFile('songs/songs.dta'))
 
       for (const pack of allPacks) {
         if (pack.exists) {
@@ -457,10 +445,7 @@ export class RPCS3 {
     const allPacks: string[] = []
     const usrdir = this.devhdd0Path.gotoDir('game/BLUS30463/USRDIR')
     if (usrdir.exists) {
-      const allPacksName = (await usrdir.readDir(true))
-        .map((entry) => (isFile(entry) ? FilePath.of(entry) : DirPath.of(entry)))
-        .filter((entry) => entry instanceof DirPath && entry.name !== 'gen')
-        .map((entry) => entry.name)
+      const allPacksName = (await usrdir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen').map((entry) => entry.name)
       allPacks.push(...allPacksName)
     }
 

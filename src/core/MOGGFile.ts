@@ -108,10 +108,29 @@ export class MOGGFile {
     return await PythonAPI.encryptMOGG(this.path, encMoggPath, encVersion, usePS3, useRed)
   }
 
+  /**
+   * Extracts all tracks from a MOGG file following the audio track structure defined by a Rock Band 3 songdata.
+   *
+   * Providing a directory path and the parsed song data from the song where the MOGG file belongs, the function will extract
+   * the instruments stems from it, saving all files in the provided destination folder path
+   * - - - -
+   * @param {RB3CompatibleDTAFile} songdata The parsed song data of the song where the MOGG belongs.
+   * @param {DirPathLikeTypes} destFolderPath The destination folder path where the tracks audio files will be created.
+   * @returns {Promise<DirPath>}
+   */
   async extractTracks(songdata: RB3CompatibleDTAFile, destFolderPath: DirPathLikeTypes): Promise<DirPath> {
     return await PythonAPI.moggTrackExtractor(this.path, songdata, destFolderPath)
   }
 
+  /**
+   * Creates a preview audio from this MOGG file following the audio track structure defined by a Rock Band 3 songdata.
+   * - - - -
+   * @param {RB3CompatibleDTAFile} songdata The parsed song data of the song where the MOGG belongs.
+   * @param {FilePathLikeTypes} destPath The destination path where the preview audio will be created.
+   * @param {PreviewAudioFormatTypes} [format] `OPTIONAL` The audio format of the preview. Default is `'wav'`.
+   * @param {boolean} [mixCrowd] `OPTIONAL` If true, the crowd track will be mixed into the preview audio.
+   * @returns {Promise<FilePath>}
+   */
   async createPreview(songdata: RB3CompatibleDTAFile, destPath: FilePathLikeTypes, format?: 'wav' | 'flac' | 'ogg' | 'mp3', mixCrowd?: boolean): Promise<FilePath> {
     return await PythonAPI.moggPreviewCreator(this.path, songdata, destPath, format, mixCrowd)
   }

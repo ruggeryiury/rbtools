@@ -69,11 +69,9 @@ def mogg_file_stat(mogg_file_path: Union[str, PathLike[str]]) -> MOGGFileStat:
             }
         except Exception as e:
             temp_ogg.close()
-            unlink(temp_ogg.name)
             raise e
         finally:
             temp_ogg.close()
-            unlink(temp_ogg.name)
 
 
 if __name__ == "__main__":

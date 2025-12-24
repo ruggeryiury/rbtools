@@ -103,6 +103,7 @@ export class TextureFile {
 
   /**
    * Returns a DataURL string of the texture file, using WEBP encoding.
+   * - - - -
    * @returns {Promise<string>}
    */
   async toDataURL(): Promise<string> {
