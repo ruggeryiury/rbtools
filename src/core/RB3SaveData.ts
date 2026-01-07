@@ -50,14 +50,6 @@ export interface RB3InstrumentScores {
 
 export interface RB3Scores {
   /**
-   * The title of the song.
-   */
-  name?: string
-  /**
-   * The artist of the song.
-   */
-  artist?: string
-  /**
    * A numerical, unique number ID of the song.
    */
   song_id: number
