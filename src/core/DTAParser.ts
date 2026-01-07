@@ -313,7 +313,7 @@ export class DTAParser {
       if (!isNaN(Number(song.song_id))) newSongs.push(song)
       else {
         patchedSongsID.push(song.id)
-        newSongs.push({ ...song, song_id: Math.abs(genNumericSongID(song.song_id)), original_id: song.song_id.toString() })
+        newSongs.push({ ...song, song_id: Math.abs(genNumericSongID(song.id)), original_id: song.song_id.toString() })
       }
     }
 
@@ -379,6 +379,6 @@ export class DTAParser {
   }
 
   [inspect.custom]() {
-    return `DTAParser { ${this.songs.length} Songs, ${this.updates.length} Updates }`
+    return `DTAParser { ${this.songs.length} Song${this.songs.length === 1 ? '' : 's'}, ${this.updates.length} Updates }`
   }
 }
