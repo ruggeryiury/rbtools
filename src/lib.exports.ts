@@ -35,6 +35,14 @@ export * from './lib/rb3package/extract'
 export * from './lib/rb3package/parse'
 export * from './lib/rb3package/process'
 
+export * from './lib/rb3savedata/bytesToScore'
+export * from './lib/rb3savedata/dtb'
+export * from './lib/rb3savedata/getMostPlayedInstrument'
+export * from './lib/rb3savedata/getProfileName'
+export * from './lib/rb3savedata/getScoresListBytesWii'
+export * from './lib/rb3savedata/getScoresListBytesXboxPS3'
+export * from './lib/rb3savedata/getXboxPS3BandName'
+
 export * from './lib/u8/parseU8ArchiveHeader'
 
 export * from './lib/utils/buildOSCommand'
