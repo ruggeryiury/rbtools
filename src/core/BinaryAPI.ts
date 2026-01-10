@@ -72,7 +72,7 @@ export class BinaryAPI {
     return new MIDIFile(dest)
   }
   /**
-   * Executes the Wiimms Image Tool encoder.
+   * Executes the Wiimms Image Tool encoder, that converts PNG files into Wii's TPL (Texture Palette Library) image format.
    * - - - -
    * @param {FilePathLikeTypes} srcPngFile The path to the PNG file to be converted.
    * @param {FilePathLikeTypes} destTplFile The path to the new converted TPL file.
@@ -92,17 +92,17 @@ export class BinaryAPI {
   }
 
   /**
-   * Executes the Wiimms Image Tool decoder.
+   * Executes the Wiimms Image Tool decoder, that converts Wii's TPL (Texture Palette Library) image format into PNG image format.
    * - - - -
-   * @param {FilePathLikeTypes} srcTexFile The path to the PNG_WII file to be converted.
-   * @param {FilePathLikeTypes} destImgFile The path to the new converted TPL file.
-   * @returns {Promise<FilePath>}
+   * @param {FilePathLikeTypes} srcTPLFile The path to the TPL file to be converted.
+   * @param {FilePathLikeTypes} destImgFile The path to the new converted PNG file.
+   * @returns {Promise<ImageFile>}
    */
-  static async wimgtDec(srcTexFile: FilePathLikeTypes, destImgFile: FilePathLikeTypes): Promise<ImageFile> {
+  static async wimgtDec(srcTPLFile: FilePathLikeTypes, destImgFile: FilePathLikeTypes): Promise<ImageFile> {
     const exeName = RBTools.binFolder.gotoFile('wimgt.exe').name
-    const src = pathLikeToFilePath(srcTexFile)
+    const tpl = pathLikeToFilePath(srcTPLFile)
     const dest = pathLikeToFilePath(destImgFile)
-    const command = buildOSCommand(`${exeName} -d "${dest.path}" DEC -x TPL.CMPR "${src.path}"`)
+    const command = buildOSCommand(`${exeName} -d "${dest.path}" DEC -x TPL.CMPR "${tpl.path}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) {
       if (stderr.includes("find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer")) return new ImageFile(dest)

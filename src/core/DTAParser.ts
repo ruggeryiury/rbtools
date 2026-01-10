@@ -1,7 +1,7 @@
 import type { BinaryToTextEncoding } from 'node:crypto'
 import axios from 'axios'
 import { createHashFromBuffer, type FilePath, pathLikeToFilePath, type AllHashAlgorithms, type FilePathLikeTypes } from 'node-lib'
-import { createDTA, depackDTAContents, detectDTABufferEncoding, genNumericSongID, genTracksCountArray, isRB3CompatibleDTA, isURL, parseDTA, patchDTAEncodingFromDTAFileObject, sortDTA, stringifyDTA, type PartialDTAFile, type RB3CompatibleDTAFile, type SongDataCreationObject, type SongDataStringifyOptions, type SongSortingTypes } from '../lib.exports'
+import { createDTA, depackDTAContents, detectDTABufferEncoding, genNumericSongID, genTracksCountArray, isRB3CompatibleDTA, isValidURL, parseDTA, patchDTAEncodingFromDTAFileObject, sortDTA, stringifyDTA, type PartialDTAFile, type RB3CompatibleDTAFile, type SongDataCreationObject, type DTAStringifyOptions, type SongSortingTypes } from '../lib.exports'
 import { RBTools } from './RBTools'
 import { inspect } from 'node:util'
 
@@ -11,7 +11,7 @@ import { inspect } from 'node:util'
  * This class only works with DTA files of songs and metadata updates, and must not be used to parse any other type of DTA script.
  */
 export class DTAParser {
-  // #region Static
+  // #region Static Methods
   /**
    * Parses a DTA file buffer.
    * - - - -
@@ -49,7 +49,7 @@ export class DTAParser {
    * @returns {Promise<DTAParser>}
    */
   static async fromURL(url: string): Promise<DTAParser> {
-    if (!isURL(url)) throw new Error(`Provided DTA URL "${url}" is not a valid HTTP/HTTPS URL`)
+    if (!isValidURL(url)) throw new Error(`Provided DTA URL "${url}" is not a valid HTTP/HTTPS URL`)
     const response = await axios.get<ArrayBuffer>(url, { responseType: 'arraybuffer' })
     if (response.status !== 200) throw new Error(`GET method fetching DTA file data on URL "${url}" returned with status ${response.status.toString()}: ${response.statusText}`)
     const buf = response.data
@@ -94,6 +94,8 @@ export class DTAParser {
     return createDTA(songdata)
   }
 
+  //#region Constructor
+
   /**
    * An array with songs with complete information to work properly on Rock Band 3.
    */
@@ -104,6 +106,7 @@ export class DTAParser {
    * Updates are only stringified directly when there's no entries on `this.songs`.
    */
   updates: PartialDTAFile[]
+
   constructor(songs?: RB3CompatibleDTAFile | PartialDTAFile | (RB3CompatibleDTAFile | PartialDTAFile)[]) {
     this.songs = []
     this.updates = []
@@ -120,9 +123,13 @@ export class DTAParser {
     }
   }
 
+  // #region Private Methods
+
   private _cleanUpdates() {
     this.updates = []
   }
+
+  // #region Instance Methods
 
   /**
    * Gets a song entry by it's entry ID. Returns `undefined` if the song is not found.
@@ -355,8 +362,20 @@ export class DTAParser {
     this.songs = sortDTA(this.songs, sortBy)
   }
 
-  stringify(options?: SongDataStringifyOptions): string {
-    return stringifyDTA(this, options)
+  /**
+   * Stringify songs and updates entries back to DTA format.
+   * - - - -
+   * @param {DTAStringifyOptions} [options] `OPTIONAL` An object that changes the behavior of the stringify process.
+   * @returns {string}
+   */
+  stringify(options?: DTAStringifyOptions): string {
+    return stringifyDTA(
+      {
+        songs: this.songs,
+        updates: this.updates,
+      },
+      options
+    )
   }
 
   /**
@@ -373,7 +392,14 @@ export class DTAParser {
     return createHashFromBuffer(dtaFileBuffer, algorithm, outputEncoding)
   }
 
-  async export(destPath: FilePathLikeTypes, options?: SongDataStringifyOptions): Promise<FilePath> {
+  /**
+   * Stringify songs and updates entries back to DTA format and writes the stringified contents into a file.
+   * - - - -
+   * @param destPath The file path where you want to save the DTA contents.
+   * @param {DTAStringifyOptions} [options] `OPTIONAL` An object that changes the behavior of the stringify process.
+   * @returns {Promise<FilePath>}
+   */
+  async export(destPath: FilePathLikeTypes, options?: DTAStringifyOptions): Promise<FilePath> {
     const dest = pathLikeToFilePath(destPath)
     return await dest.write(this.stringify(options), 'utf8')
   }

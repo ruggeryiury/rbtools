@@ -125,6 +125,10 @@ export class STFSFile {
     await this.checkFileIntegrity()
     const dest = pathLikeToDirPath(destPath)
     if (!dest.exists) await dest.mkDir()
+    else {
+      await dest.deleteDir(true)
+      await dest.mkDir()
+    }
     return await PythonAPI.stfsExtract(this.path, destPath, extractOnRoot)
   }
 }

@@ -11,6 +11,8 @@ export * from './lib/dta/parseDTA'
 export * from './lib/dta/sortDTA'
 export * from './lib/dta/stringifyDTA'
 
+export * from './lib/edat/edatStat'
+
 export * from './lib/imagetex/ddsHeader'
 export * from './lib/imagetex/getTPLHeader'
 export * from './lib/imagetex/imageHeaders'
@@ -19,6 +21,7 @@ export * from './lib/imagetex/swapTextureBytes'
 export * from './lib/imagetex/texStat'
 export * from './lib/imagetex/texToImage'
 
+export * from './lib/path/buildOSCommand'
 export * from './lib/path/thisFilePath'
 
 export * from './lib/pkg/calculateAesAlignedOffsetAndSize'
@@ -28,13 +31,6 @@ export * from './lib/pkg/PkgAesCtrCounter'
 export * from './lib/pkg/pkgContentKeys'
 export * from './lib/pkg/PkgXorSha1Counter'
 
-export * from './lib/rb3package/bufferpad'
-export * from './lib/rb3package/create'
-export * from './lib/rb3package/defaults'
-export * from './lib/rb3package/extract'
-export * from './lib/rb3package/parse'
-export * from './lib/rb3package/process'
-
 export * from './lib/rb3savedata/bytesToScore'
 export * from './lib/rb3savedata/dtb'
 export * from './lib/rb3savedata/getMostPlayedInstrument'
@@ -43,10 +39,14 @@ export * from './lib/rb3savedata/getScoresListBytesWii'
 export * from './lib/rb3savedata/getScoresListBytesXboxPS3'
 export * from './lib/rb3savedata/getXboxPS3BandName'
 
+export * from './lib/rpcs3/getRPCS3SongStats'
+export * from './lib/rpcs3/getRPCS3Stats'
+export * from './lib/rpcs3/isDevHDD0PathValid'
+export * from './lib/rpcs3/isRPCS3ExePathValid'
+
 export * from './lib/u8/parseU8ArchiveHeader'
 
-export * from './lib/utils/buildOSCommand'
 export * from './lib/utils/formatStringFromDTA'
 export * from './lib/utils/getKeyFromMapValue'
-export * from './lib/utils/isURL'
+export * from './lib/utils/isValidURL'
 export * from './lib/utils/textMethods'

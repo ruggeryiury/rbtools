@@ -1,10 +1,22 @@
 import { useDefaultOptions } from 'use-default-options'
-import type { LiteralUnion } from 'type-fest'
 import type { DTAParser } from '../../core.exports'
-import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type SongSortingTypes } from '../../lib.exports'
+import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
 import { MyObject } from 'node-lib'
 
-export interface SongDataStringifyOptions {
+export interface SongsAndUpdatesObject {
+  /**
+   * An array with songs with complete information to work properly on Rock Band 3.
+   */
+  songs: RB3CompatibleDTAFile[]
+  /**
+   * An array with updates that will be applied to its respective songs, if the song is found on `this.songs`.
+   *
+   * Updates are only stringified directly when there's no entries on `this.songs`.
+   */
+  updates: PartialDTAFile[]
+}
+
+export interface DTAStringifyOptions {
   /**
    * `SONGS ONLY` If `true`, songs with fake value as `true` won't be renderer. Default is `false`.
    */
@@ -33,7 +45,15 @@ export interface SongDataStringifyOptions {
   formatOptions?: DTAIOFormattingOptions
 }
 
-export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptions): string => {
+/**
+ * Stringify songs and updates entries back to DTA format.
+ * - - - -
+ * @param {SongsAndUpdatesObject} songsAndUpdates
+ * @param {DTAStringifyOptions} [options] `OPTIONAL` An object that changes the behavior of the stringify process.
+ * @returns {string}
+ */
+export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: DTAStringifyOptions): string => {
+  let { songs, updates } = songsAndUpdates
   const { ignoreFakeSongs, wiiMode, addMAGMAValues, sortBy, omitUnusedValues, formatOptions } = useDefaultOptions(
     {
       ignoreFakeSongs: false,
@@ -47,13 +67,13 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
   )
   const io = new DTAIO(formatOptions)
 
-  if (parser.songs.length === 0 && parser.updates.length === 0) throw new Error('No songs or updates to be stringified.')
-  if (parser.updates.length > 0) {
+  if (songs.length === 0 && updates.length === 0) throw new Error('No songs or updates to be stringified.')
+  if (updates.length > 0) {
     // Song metadata updates
-    parser.updates = sortDTA(parser.updates, 'ID')
+    updates = sortDTA(updates, 'ID')
     io.options = { ...io.options, object: { ...io.options.object, closeParenthesisInline: true } }
 
-    for (const upd of parser.updates) {
+    for (const upd of updates) {
       const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, cores, customsource, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, loading_phrase, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, upgrade_version, version, vocal_tonic_note, vols, year_recorded } = upd
       const map = new MyObject<PartialDTAFile>()
 
@@ -219,10 +239,10 @@ export const stringifyDTA = (parser: DTAParser, options?: SongDataStringifyOptio
       io.addValue(id, map.toObject())
     }
   }
-  if (parser.songs.length > 0) {
+  if (songs.length > 0) {
     // Songs only
-    if (sortBy) parser.sort(sortBy)
-    for (const song of parser.songs) {
+    if (sortBy) songs = sortDTA(songs, sortBy)
+    for (const song of songs) {
       const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, convert, cores, customsource, doubleKick, emh, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, languages, loading_phrase, multitrack, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, rhythmOn, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, unpitchedVocals, upgrade_version, version, vocal_tonic_note, vols, year_recorded, original_id } = song as PartialDTAFile
       const map = new MyObject<PartialDTAFile>()
 

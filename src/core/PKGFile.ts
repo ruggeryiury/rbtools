@@ -136,11 +136,18 @@ export class PKGFile {
     }
   }
 
-  async extract(destPath: DirPathLikeTypes, extractOnRoot = false, cleanDestDir = false): Promise<DirPath> {
+  /**
+   * Extracts the PKG file contents and returns the folder path where all contents were extracted.
+   * - - - -
+   * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
+   * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire PKG file system recursively. Default is `false`.
+   * @returns {Promise<DirPath>}
+   */
+  async extract(destPath: DirPathLikeTypes, extractOnRoot = false): Promise<DirPath> {
     await this.checkFileIntegrity()
     const dest = pathLikeToDirPath(destPath)
     if (!dest.exists) await dest.mkDir()
-    else if (cleanDestDir) {
+    else {
       await dest.deleteDir(true)
       await dest.mkDir()
     }
