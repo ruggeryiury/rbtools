@@ -145,7 +145,7 @@ export class RPCS3 {
     const saveDataPath = this.devhdd0Path.gotoFile('home/00000001/savedata/BLUS30463-AUTOSAVE/SAVE.DAT')
     if (saveDataPath.exists) {
       const saveData = await RB3SaveData.parseFromFile(saveDataPath)
-      return RB3SaveData.getDetailedScoreData(saveData, instrument)
+      return RB3SaveData.getDetailedScoreData(saveData, instrument, difficulty)
     }
   }
 

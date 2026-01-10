@@ -450,7 +450,7 @@ export interface AudioFileTracksStructureDocument {
  * @returns {AudioFileTracksStructureDocument} An object with all panning and volume informations.
  */
 export const genAudioFileStructure = (song: RB3CompatibleDTAFile): AudioFileTracksStructureDocument => {
-  const { tracks_count, pans: dtaPans, vols: dtaVols, cores: dtaCores, solo } = song
+  const { tracks_count, pans: dtaPans, vols: dtaVols, solo } = song
   const [allDrum, bass, guitar, vocals, keys, backing, crowd] = tracks_count
   const { backing: backingArray, bass: bassArray, crowd: crowdArray, drum: drumsArray, guitar: guitarArray, keys: keysArray, vocals: vocalsArray, defaultPans, defaultVols, defaultCores } = genTracksCountArray(tracks_count)
   const drumkick = allDrum >= 3 ? (allDrum === 6 ? 2 : 1) : 0
@@ -461,8 +461,6 @@ export const genAudioFileStructure = (song: RB3CompatibleDTAFile): AudioFileTrac
 
   const pans = dtaPans ?? defaultPans
   const vols = dtaVols ?? defaultVols
-
-  // const cores = dtaCores ?? defaultCores
 
   return {
     allTracksCount,

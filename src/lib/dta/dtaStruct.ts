@@ -736,12 +736,6 @@ export const isRB3CompatibleDTA = (song: unknown): song is RB3CompatibleDTAFile 
 }
 
 /**
- * A `Map` class with `DTAFile` keys and values.
- */
-export type DTAMap = Map<DTAFileKeys, unknown>
-export type DTARecord = Record<DTAFileKeys, unknown>
-
-/**
  * Gets all the missing values of a partial parsed song object and returns them as array.
  * - - - -
  * @param {PartialDTAFile} song A parsed song object.

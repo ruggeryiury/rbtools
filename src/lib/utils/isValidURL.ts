@@ -8,7 +8,9 @@ export const isValidURL = (url: string): boolean => {
   try {
     new URL(url)
     return true
-  } catch (err) {
+
+    /* eslint-disable-next-line no-unused-vars */
+  } catch (error) {
     return false
   }
 }

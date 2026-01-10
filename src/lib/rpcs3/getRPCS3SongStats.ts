@@ -89,7 +89,7 @@ export interface GamePackagesStats {
  * @returns {Promise<GamePackagesStats>}
  */
 export const getRPCS3SongStats = async (options: RPCS3Options): Promise<GamePackagesStats> => {
-  const { devhdd0Path, rpcs3ExePath } = RPCS3.getParsedRPCS3Options(options)
+  const { devhdd0Path } = RPCS3.getParsedRPCS3Options(options)
 
   const packs: InstalledSongPackagesStats[] = []
   let rb3PacksCount = 0,

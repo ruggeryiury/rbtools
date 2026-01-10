@@ -1,7 +1,5 @@
-import { MyObject, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
+import { MyObject, pathLikeToDirPath } from 'node-lib'
 import { parse as parseYAMLBuffer } from 'yaml'
-import { isRPCS3ExePathValid } from './isRPCS3ExePathValid'
-import { isDevHDD0PathValid } from './isDevHDD0PathValid'
 import { RPCS3, type RPCS3Options } from '../../core.exports'
 
 export interface RockBand3SpecificStats {

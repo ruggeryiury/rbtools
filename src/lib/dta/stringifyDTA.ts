@@ -1,5 +1,4 @@
 import { useDefaultOptions } from 'use-default-options'
-import type { DTAParser } from '../../core.exports'
 import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
 import { MyObject } from 'node-lib'
 
