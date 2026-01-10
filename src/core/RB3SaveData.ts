@@ -251,7 +251,7 @@ export class RB3SaveData {
   }
 
   /**
-   * Retrieves detailed information of saved scores specific for an instrument and difficulty.
+   * Returns  detailed information of saved scores specific for an instrument and difficulty.
    * - - - -
    * @param {ParsedRB3SaveData} saveData A parsed save data object.
    * @param {DetailedScoreDataInstrumentTypes} instrument The instrument you want to retrieve score data about.

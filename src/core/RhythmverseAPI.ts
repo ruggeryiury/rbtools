@@ -4,7 +4,7 @@ import { finished } from 'node:stream/promises'
 import axios, { AxiosError } from 'axios'
 import { type FilePath, getReadableBytesSize, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
-import { isURL, normalizeString, type PartialDTAFile } from '../lib.exports'
+import { isValidURL, normalizeString, type PartialDTAFile } from '../lib.exports'
 
 // #region Types
 
@@ -599,7 +599,7 @@ export class RhythmverseAPI {
     const operators = results.songs.map((val) => ({ filename: val.file_name, url: val.file_download_url }))
 
     for (const op of operators) {
-      if (op.filename && isURL(op.url) && op.url.startsWith('https://rhythmverse.co/download_file')) {
+      if (op.filename && isValidURL(op.url) && op.url.startsWith('https://rhythmverse.co/download_file')) {
         const songPath = dest.gotoFile(op.filename.endsWith('_rb3con') ? op.filename : `${op.filename}_rb3con`)
         files.push(songPath)
         const writer = await songPath.createWriteStream()

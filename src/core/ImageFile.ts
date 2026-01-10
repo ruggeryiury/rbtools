@@ -4,7 +4,7 @@ import { type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, typ
 import { useDefaultOptions } from 'use-default-options'
 import { temporaryFile } from 'tempy'
 import { PythonAPI, type TextureFile, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'
-import { imageToTexWii, imageToTexXboxPs3, isURL } from '../lib.exports'
+import { imageToTexWii, imageToTexXboxPs3, isValidURL } from '../lib.exports'
 
 // #region Types
 
@@ -47,7 +47,7 @@ export class ImageFile {
    * @returns {Promise<Buffer>}
    */
   static async urlToBuffer(url: string): Promise<Buffer> {
-    if (!isURL(url)) throw new TypeError(`Provided string "${url}" is not a valid URL.`)
+    if (!isValidURL(url)) throw new TypeError(`Provided string "${url}" is not a valid URL.`)
     const imgRes = await axios.get<ArrayBuffer>(url, {
       responseType: 'arraybuffer',
       timeout: 4000,

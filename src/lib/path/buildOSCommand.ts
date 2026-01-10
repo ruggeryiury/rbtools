@@ -16,14 +16,9 @@ export interface OSCommandBuiltOptions {
  * @returns {string}
  */
 export const buildOSCommand = (command: string, options?: OSCommandBuiltOptions): string => {
-  const opts = useDefaultOptions(
-    {
-      useWine: true,
-    },
-    options
-  )
+  const { useWine } = useDefaultOptions({ useWine: true }, options)
   let val = ''
-  if (platform() === 'linux') val += 'WINEDEBUG=-all wine '
+  if (platform() === 'linux' && useWine) val += 'WINEDEBUG=-all wine '
   val += command.trim()
   return val
 }
