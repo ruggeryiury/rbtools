@@ -32,17 +32,18 @@ export * from './lib/pkg/pkgContentKeys'
 export * from './lib/pkg/PkgXorSha1Counter'
 
 export * from './lib/rb3savedata/bytesToScore'
-export * from './lib/rb3savedata/dtb'
+export * from './lib/rb3savedata/dtbCrypt'
 export * from './lib/rb3savedata/getMostPlayedInstrument'
 export * from './lib/rb3savedata/getProfileName'
 export * from './lib/rb3savedata/getScoresListBytesWii'
 export * from './lib/rb3savedata/getScoresListBytesXboxPS3'
 export * from './lib/rb3savedata/getXboxPS3BandName'
 
-export * from './lib/rpcs3/getRPCS3SongStats'
-export * from './lib/rpcs3/getRPCS3Stats'
-export * from './lib/rpcs3/isDevHDD0PathValid'
-export * from './lib/rpcs3/isRPCS3ExePathValid'
+// export * from './lib/rpcs3/getRPCS3Stats'
+// export * from './lib/rpcs3/isDevHDD0PathValid'
+// export * from './lib/rpcs3/isRPCS3ExePathValid'
+// export * from './lib/rpcs3/rpcs3GetPackagesData'
+// export * from './lib/rpcs3/rpcs3GetSongData'
 
 export * from './lib/u8/parseU8ArchiveHeader'
 

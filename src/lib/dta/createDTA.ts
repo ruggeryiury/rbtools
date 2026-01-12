@@ -518,7 +518,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
   const backingTracksPan = channelsCountToPanArray(typeof backingTracksCount === 'object' ? backingTracksCount.channels : backingTracksCount).length
   tracksCount.push(backingTracksPan)
 
-  map.set('tracks_count', tracksCount)
+  map.set('tracks_count', tracksCount as RB3CompatibleDTAFile['tracks_count'])
 
   let drumR = 0,
     bassR = 0,
@@ -563,7 +563,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
 
     if (real_bassR > 0) {
       if (bass.tuning as typeof bass.tuning | undefined) bassTuning = bass.tuning
-      map.set('real_bass_tuning', bassTuning)
+      map.set('real_bass_tuning', bassTuning as RB3CompatibleDTAFile['real_bass_tuning'])
     }
 
     channelsCountToPanArray(bass.channels).forEach((pan) => {
@@ -594,7 +594,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
 
     if (real_guitarR > 0) {
       if (guitar.tuning as typeof guitar.tuning | undefined) gtrTuning = guitar.tuning
-      map.set('real_guitar_tuning', gtrTuning)
+      map.set('real_guitar_tuning', gtrTuning as RB3CompatibleDTAFile['real_guitar_tuning'])
     }
 
     channelsCountToPanArray(guitar.channels).forEach((pan) => {
@@ -622,7 +622,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     vocalsR = rankValuesToDTARankSystem('vocals', vocals.rank)
     map.set('rank_vocals', vocalsR)
     map.set('vocal_parts', typeof vocals.vocalParts === 'number' ? vocals.vocalParts : vocals.vocalParts === 'Solo Vocals' ? 1 : vocals.vocalParts === '2-Part Harmonies' ? 2 : 3)
-    map.set('vocal_gender', (vocals.vocalGender as typeof vocals.vocalGender | undefined) ? vocals.vocalGender.toLowerCase() : 'male')
+    map.set('vocal_gender', (vocals.vocalGender as typeof vocals.vocalGender | undefined) ? (vocals.vocalGender.toLowerCase() as RB3CompatibleDTAFile['vocal_gender']) : 'male')
 
     channelsCountToPanArray(vocals.channels).forEach((pan) => {
       pans.push(pan)
@@ -721,11 +721,11 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
   map.set('mute_volume', muteVolume)
   map.set('mute_volume_vocals', muteVolumeVocals)
   map.set('hopo_threshold', hopoThreshold)
-  map.set('bank', getKeyFromMapValue(dta.percussionBank, bank))
-  map.set('drum_bank', getKeyFromMapValue(dta.drumBank, drumBank))
-  map.set('anim_tempo', Number(getKeyFromMapValue(dta.animTempo, animTempo)))
-  map.set('band_fail_cue', getKeyFromMapValue(dta.bandFailCue, bandFailCue))
-  map.set('song_scroll_speed', Number(getKeyFromMapValue(dta.songScrollSpeed, songScrollSpeed)))
+  map.set('bank', getKeyFromMapValue(dta.percussionBank, bank) as RB3CompatibleDTAFile['bank'])
+  map.set('drum_bank', getKeyFromMapValue(dta.drumBank, drumBank) as RB3CompatibleDTAFile['drum_bank'])
+  map.set('anim_tempo', Number(getKeyFromMapValue(dta.animTempo, animTempo)) as RB3CompatibleDTAFile['anim_tempo'])
+  map.set('band_fail_cue', getKeyFromMapValue(dta.bandFailCue, bandFailCue) as RB3CompatibleDTAFile['band_fail_cue'])
+  map.set('song_scroll_speed', Number(getKeyFromMapValue(dta.songScrollSpeed, songScrollSpeed)) as RB3CompatibleDTAFile['song_scroll_speed'])
 
   if (typeof preview === 'number') map.set('preview', [preview, preview + 30000])
   else {
@@ -738,7 +738,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
   map.set('guide_pitch_volume', guidePitchVolume)
   map.set('format', format)
   map.set('version', version)
-  map.set('game_origin', getKeyFromMapValue(dta.gameOrigin, gameOrigin))
+  map.set('game_origin', getKeyFromMapValue(dta.gameOrigin, gameOrigin) as RB3CompatibleDTAFile['game_origin'])
   map.set(
     'encoding',
     ((): SongEncoding => {
@@ -756,10 +756,10 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
       return hasNonASCIIChars ? 'utf8' : 'latin1'
     })()
   )
-  map.set('rating', Number(getKeyFromMapValue(dta.rating, rating)))
+  map.set('rating', Number(getKeyFromMapValue(dta.rating, rating)) as RB3CompatibleDTAFile['rating'])
 
-  map.set('genre', getKeyFromMapValue(dta.genre, g))
-  map.set('sub_genre', getKeyFromMapValue(dta.subGenre, subGenre))
+  map.set('genre', getKeyFromMapValue(dta.genre, g) as RB3CompatibleDTAFile['genre'])
+  map.set('sub_genre', getKeyFromMapValue(dta.subGenre, subGenre) as RB3CompatibleDTAFile['sub_genre'])
 
   map.set(`year_released`, yearReleased)
   if (yearRecorded !== null) map.set(`year_recorded`, yearRecorded)
@@ -1112,5 +1112,5 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
   if (customsource) map.set('customsource', customsource)
   if (magma) map.set('magma', magma)
 
-  return map.toObject()
+  return map.toJSON()
 }

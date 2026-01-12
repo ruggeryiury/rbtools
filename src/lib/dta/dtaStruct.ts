@@ -850,24 +850,24 @@ export const customSourceIfdefDeconstructor = (song: MyObject<RB3CompatibleDTAFi
 
   if (gameOrigin && gameOrigin.startsWith('#ifdef')) {
     const split = gameOrigin.split(' ')
-    song.set('game_origin', split[4])
+    song.set('game_origin', split[4] as RB3CompatibleDTAFile['game_origin'])
     customSource.set('game_origin', split[2])
     hasAnyCustomSource = true
   }
   if (genre && genre.startsWith('#ifdef')) {
     const split = genre.split(' ')
-    song.set('genre', split[4])
+    song.set('genre', split[4] as RB3CompatibleDTAFile['genre'])
     customSource.set('genre', split[2])
     hasAnyCustomSource = true
   }
   if (subGenre && subGenre.startsWith('#ifdef')) {
     const split = subGenre.split(' ')
-    song.set('sub_genre', split[4])
+    song.set('sub_genre', split[4] as RB3CompatibleDTAFile['sub_genre'])
     customSource.set('sub_genre', split[2])
     hasAnyCustomSource = true
   }
 
-  if (hasAnyCustomSource) song.set('customsource', customSource.toObject())
+  if (hasAnyCustomSource) song.set('customsource', customSource.toJSON())
 
   return song
 }

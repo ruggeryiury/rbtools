@@ -51,7 +51,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       const proof = Boolean(Number(key.split('=')[1].slice(0, 1).trim()))
       if (proof) {
         if (key.startsWith('Karaoke=')) map.set('multitrack', 'karaoke')
-        else if (key.startsWith('Multitrack=')) map.set('multitrack', 'multitrack')
+        else if (key.startsWith('Multitrack=')) map.set('multitrack', 'full')
         else if (key.startsWith('DIYStems=')) map.set('multitrack', 'diy_stems')
         else if (key.startsWith('PartialMultitrack=')) map.set('multitrack', 'partial')
         else if (key.startsWith('UnpitchedVocals=')) map.set('unpitchedVocals', true)
@@ -89,6 +89,16 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
 
   // This count the index of the ranks info, if it reaches -1, it's done. Starts on 0
   let ranksIndex = 0
+
+  // Workaround when parsing bloody RB1 songs
+  const processedSongObject = {
+    songname: false,
+    pans: false,
+    vols: false,
+    cores: false,
+    vocal_parts: false,
+    crowd_channels: false,
+  }
 
   const tracksCount: number[] = [0, 0, 0, 0, 0, 0]
   const preview: number[] = [0, 0]
@@ -139,19 +149,24 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
     else if (processedArrayName) {
       // Numbers array
       if (processedArrayName === 'pans' || processedArrayName === 'vols' || processedArrayName === 'cores' || processedArrayName === 'real_guitar_tuning' || processedArrayName === 'real_bass_tuning') {
-        const numbers: number[] = []
-        if (key && !isNaN(Number(key))) numbers.push(Number(key))
-        if (valuesLength > 0) numbers.push(...values.map((val) => Number(val)))
-        map.set(processedArrayName, numbers)
-        if ((processedArrayName === 'pans' || processedArrayName === 'vols' || processedArrayName === 'cores') && tracksCount[5] === 0) {
-          const allTracksCount = numbers.length
+        if (Object.keys(processedSongObject).includes(processedArrayName) && processedSongObject[processedArrayName as keyof typeof processedSongObject]) {
+          // Do nothing, probably is "song_vocals" duplicated song object.
+        } else {
+          if (processedArrayName in processedSongObject) processedSongObject[processedArrayName as keyof typeof processedSongObject] = true
+          const numbers: number[] = []
+          if (key && !isNaN(Number(key))) numbers.push(Number(key))
+          if (valuesLength > 0) numbers.push(...values.map((val) => Number(val)))
+          map.set(processedArrayName, numbers)
+          if ((processedArrayName === 'pans' || processedArrayName === 'vols' || processedArrayName === 'cores') && tracksCount[5] === 0) {
+            const allTracksCount = numbers.length
 
-          let tracksCountDifference = 0
-          for (const trackChannels of tracksCount) {
-            if (trackChannels) tracksCountDifference += trackChannels
+            let tracksCountDifference = 0
+            for (const trackChannels of tracksCount) {
+              if (trackChannels) tracksCountDifference += trackChannels
+            }
+            if (allTracksCount - tracksCountDifference > 2) tracksCount[5] = allTracksCount - tracksCountDifference
+            else tracksCount[5] = allTracksCount - tracksCountDifference
           }
-          if (allTracksCount - tracksCountDifference > 2) tracksCount[5] = allTracksCount - tracksCountDifference
-          else tracksCount[5] = allTracksCount - tracksCountDifference
         }
       }
 
@@ -170,19 +185,31 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       if (ranksIndex === -1) ranksStarted = false
     } else {
       // Get songname used by the song files
-      if (key === 'name' && (valuesJoin.startsWith('songs/') || valuesJoin.startsWith('"songs/'))) map.set('songname', valuesJoin.split('/')[1])
+      if (key === 'name' && !processedSongObject.songname && (valuesJoin.startsWith('songs/') || valuesJoin.startsWith('"songs/'))) {
+        map.set('songname', valuesJoin.split('/')[1])
+        processedSongObject.songname = true
+      }
       // This is strings that's captured on "allStrings" variable
       else if (key === 'name' || key === 'artist' || key === 'album_name' || key === 'pack_name' || key === 'author' || key === 'loading_phrase' || key === 'strings_author' || key === 'keys_author') {
-        map.set(key, slashQToQuote(allStrings[stringIndex]))
-        stringIndex++
-        if (!valuesJoin.endsWith('"')) unfinishedString = true
+        if (key === 'name' && allStrings[stringIndex] === undefined) {
+          // Wrong capture because of "song_vocals" object found on RB1 songs
+        } else {
+          map.set(key, slashQToQuote(allStrings[stringIndex]))
+          stringIndex++
+          if (!valuesJoin.endsWith('"')) unfinishedString = true
+        }
       }
       // Parse general boolean values
       else if (key === 'master' || key === 'album_art' || key === 'fake' || key === 'alternate_path') map.set(key, valuesJoin.toLowerCase() === '1' || valuesJoin.toLowerCase() === 'true' ? true : false)
       // Parse general number values
-      else if (key === 'context' || key === 'vocal_parts' || key === 'mute_volume' || key === 'mute_volume_vocals' || key === 'hopo_threshold' || key === 'song_scroll_speed' || key === 'song_length' || key === 'version' || key === 'format' || key === 'year_released' || key === 'year_recorded' || key === 'rating' || key === 'tuning_offset_cents' || key === 'guide_pitch_volume' || key === 'album_track_number' || key === 'vocal_tonic_note' || key === 'song_tonality' || key === 'song_key' || key === 'upgrade_version' || key === 'base_points') map.set(key, Number(valuesJoin))
+      else if (key === 'context' || key === 'vocal_parts' || key === 'mute_volume' || key === 'mute_volume_vocals' || key === 'hopo_threshold' || key === 'song_scroll_speed' || key === 'song_length' || key === 'version' || key === 'format' || key === 'year_released' || key === 'year_recorded' || key === 'rating' || key === 'tuning_offset_cents' || key === 'guide_pitch_volume' || key === 'album_track_number' || key === 'vocal_tonic_note' || key === 'song_tonality' || key === 'song_key' || key === 'upgrade_version' || key === 'base_points') {
+        if (key === 'vocal_parts' && !processedSongObject.vocal_parts) {
+          map.set(key, Number(valuesJoin) as RB3CompatibleDTAFile['vocal_parts'])
+          processedSongObject.vocal_parts = true
+        } else map.set(key, Number(valuesJoin))
+      }
       // Parse locale-dependant key strings
-      else if (key === 'bank' || key === 'drum_bank' || key === 'band_fail_cue' || key === 'genre' || key === 'vocal_gender' || key === 'sub_genre' || key === 'game_origin' || key === 'encoding') map.set(key, valuesJoin.replaceAll('"', '').replaceAll("'", ''))
+      else if (key === 'bank' || key === 'drum_bank' || key === 'band_fail_cue' || key === 'genre' || key === 'vocal_gender' || key === 'sub_genre' || key === 'game_origin' || key === 'encoding') map.set(key, valuesJoin.replaceAll('"', '').replaceAll("'", '') as RB3CompatibleDTAFile[typeof key])
       // Parse Song ID
       else if (key === 'song_id') {
         if (!Number.isNaN(Number(valuesJoin))) map.set('song_id', Number(valuesJoin))
@@ -200,16 +227,18 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
           map.set('anim_tempo', 64)
           continue
         } else if (!isNaN(Number(valuesJoin))) {
-          map.set('anim_tempo', valuesJoin)
+          map.set('anim_tempo', Number(valuesJoin) as RB3CompatibleDTAFile['anim_tempo'])
           continue
         } else throw new Error('DTA Parsing error: Invalid value for anim_tempo entry.')
       }
       // Put crowd channels
-      else if (key === 'crowd_channels') {
+      else if (key === 'crowd_channels' && !processedSongObject.crowd_channels) {
         if (tracksCount.length === 7) tracksCount[6] = 2
         else tracksCount.push(2)
 
         if (tracksCount.length > 6 && tracksCount[5] > 2) tracksCount[5] -= 2
+
+        processedSongObject.crowd_channels = true
       }
       // Parse preview
       else if (key === 'preview') {
@@ -226,13 +255,12 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       else if (key === 'pans' || key === 'vols' || key === 'cores' || key === 'real_guitar_tuning' || key === 'real_bass_tuning' || key === 'solo') processedArrayName = key
     }
   }
+  
+  if (!(tracksCount[5] > 2) && !isTracksCountEmpty(tracksCount)) map.set('tracks_count', tracksCount as RB3CompatibleDTAFile['tracks_count'])
+  if (preview[1] !== 0) map.set('preview', preview as RB3CompatibleDTAFile['preview'])
+  if (solo.length > 0) map.set('solo', solo as RB3CompatibleDTAFile['solo'])
+  if (extraAuthoring.length > 0) map.set('extra_authoring', extraAuthoring as RB3CompatibleDTAFile['extra_authoring'])
+  if (languages.length > 0) map.set('languages', languages as RB3CompatibleDTAFile['languages'])
 
-  if (!(tracksCount[5] > 2) && !isTracksCountEmpty(tracksCount)) map.set('tracks_count', tracksCount)
-  if (tracksCount[3] > 0 && map.has('rank_vocals') && (map.get('rank_vocals') as number) > 0 && !map.has('vocal_parts')) map.set('vocal_parts', 1)
-  if (preview[1] !== 0) map.set('preview', preview)
-  if (solo.length > 0) map.set('solo', solo)
-  if (extraAuthoring.length > 0) map.set('extra_authoring', extraAuthoring)
-  if (languages.length > 0) map.set('languages', languages)
-
-  return customSourceIfdefDeconstructor(sortDTAMap(map)).toObject() as RB3CompatibleDTAFile | PartialDTAFile
+  return customSourceIfdefDeconstructor(sortDTAMap(map)).toJSON() as RB3CompatibleDTAFile | PartialDTAFile
 }

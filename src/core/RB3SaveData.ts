@@ -108,7 +108,7 @@ export interface RB3Scores {
 }
 
 export type DifficultyTypes = 0 | 1 | 2 | 3 | 'easy' | 'medium' | 'hard' | 'expert'
-export type DetailedScoreDataInstrumentTypes = 'drums' | 'bass' | 'guitar' | 'vocals' | 'harmonies' | 'keys' | 'proDrums' | 'proBass' | 'proGuitar' | 'proKeys' | 'band'
+export type ScoreDataInstrumentTypes = 'drums' | 'bass' | 'guitar' | 'vocals' | 'harmonies' | 'keys' | 'proDrums' | 'proBass' | 'proGuitar' | 'proKeys' | 'band'
 
 export interface ParsedRB3SaveData {
   /**
@@ -126,15 +126,15 @@ export interface ParsedRB3SaveData {
   /**
    * The most played instrument by the player.
    */
-  mostPlayedInstrument: DetailedScoreDataInstrumentTypes | null
+  mostPlayedInstrument: ScoreDataInstrumentTypes | null
   /**
    * An array with all played songs scores.
    */
   scores: RB3Scores[]
 }
 
-export interface DetailedScoreDataObject {
-  instrument: DetailedScoreDataInstrumentTypes
+export interface ScoreDataObject {
+  instrument: ScoreDataInstrumentTypes
   difficulty: DifficultyTypes
   songsPlayed: number
   playedSongIDs: number[]
@@ -254,11 +254,11 @@ export class RB3SaveData {
    * Returns  detailed information of saved scores specific for an instrument and difficulty.
    * - - - -
    * @param {ParsedRB3SaveData} saveData A parsed save data object.
-   * @param {DetailedScoreDataInstrumentTypes} instrument The instrument you want to retrieve score data about.
+   * @param {ScoreDataInstrumentTypes} instrument The instrument you want to retrieve score data about.
    * @param {DifficultyTypes | undefined} [difficulty] `OPTIONAL` The difficulty of the played songs to calculate scores. Default is `'expert'`.
-   * @returns {DetailedScoreDataObject}
+   * @returns {ScoreDataObject}
    */
-  static getDetailedScoreData(saveData: ParsedRB3SaveData, instrument: DetailedScoreDataInstrumentTypes, difficulty: DifficultyTypes = 'expert'): DetailedScoreDataObject {
+  static getDetailedScoreData(saveData: ParsedRB3SaveData, instrument: ScoreDataInstrumentTypes, difficulty: DifficultyTypes = 'expert'): ScoreDataObject {
     const diff = (() => {
       switch (difficulty) {
         case 'easy':

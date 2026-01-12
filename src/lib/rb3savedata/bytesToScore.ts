@@ -9,162 +9,186 @@ export const bytesToScore = (input: Buffer, isWiiScore: boolean): RB3Scores => {
     score.set('song_id', input.readUInt32LE(0x04))
     input = removeDupeID0x04(input)
   }
-  score.set('lighterRating', input[0x06])
-  score.set('playCount', input.readInt32LE(0x0b))
+  score.setMany({
+    lighterRating: input[0x06],
+    playCount: input.readInt32LE(0x0b),
+  })
 
   // Drums
   const drums = new MyObject<RB3InstrumentScores>()
-  drums.set('topScore', input.readInt32LE(0x3f))
-  drums.set('topScoreDifficulty', input[0x43])
-  drums.set('starsEasy', input[0x44])
-  drums.set('percentEasy', input[0x45])
-  drums.set('starsMedium', input[0x4c])
-  drums.set('percentMedium', input[0x4d])
-  drums.set('starsHard', input[0x54])
-  drums.set('percentHard', input[0x55])
-  drums.set('starsExpert', input[0x5c])
-  drums.set('percentExpert', input[0x5d])
-  score.set('drums', drums.toObject())
+  drums.setMany({
+    topScore: input.readInt32LE(0x3f),
+    topScoreDifficulty: input[0x43],
+    starsEasy: input[0x44],
+    percentEasy: input[0x45],
+    starsMedium: input[0x4c],
+    percentMedium: input[0x4d],
+    starsHard: input[0x54],
+    percentHard: input[0x55],
+    starsExpert: input[0x5c],
+    percentExpert: input[0x5d],
+  })
+  score.set('drums', drums.toJSON())
 
   // Bass
   const bass = new MyObject<RB3InstrumentScores>()
-  bass.set('topScore', input.readInt32LE(0x64))
-  bass.set('topScoreDifficulty', input[0x68])
-  bass.set('starsEasy', input[0x69])
-  bass.set('percentEasy', input[0x6a])
-  bass.set('starsMedium', input[0x71])
-  bass.set('percentMedium', input[0x72])
-  bass.set('starsHard', input[0x79])
-  bass.set('percentHard', input[0x7a])
-  bass.set('starsExpert', input[0x81])
-  bass.set('percentExpert', input[0x82])
-  score.set('bass', bass.toObject())
+  bass.setMany({
+    topScore: input.readInt32LE(0x64),
+    topScoreDifficulty: input[0x68],
+    starsEasy: input[0x69],
+    percentEasy: input[0x6a],
+    starsMedium: input[0x71],
+    percentMedium: input[0x72],
+    starsHard: input[0x79],
+    percentHard: input[0x7a],
+    starsExpert: input[0x81],
+    percentExpert: input[0x82],
+  })
+  score.set('bass', bass.toJSON())
 
   // Guitar
   const guitar = new MyObject<RB3InstrumentScores>()
-  guitar.set('topScore', input.readInt32LE(0x89))
-  guitar.set('topScoreDifficulty', input[0x8d])
-  guitar.set('starsEasy', input[0x8e])
-  guitar.set('percentEasy', input[0x8f])
-  guitar.set('starsMedium', input[0x96])
-  guitar.set('percentMedium', input[0x97])
-  guitar.set('starsHard', input[0x9e])
-  guitar.set('percentHard', input[0x9f])
-  guitar.set('starsExpert', input[0xa6])
-  guitar.set('percentExpert', input[0xa7])
-  score.set('guitar', guitar.toObject())
+  guitar.setMany({
+    topScore: input.readInt32LE(0x89),
+    topScoreDifficulty: input[0x8d],
+    starsEasy: input[0x8e],
+    percentEasy: input[0x8f],
+    starsMedium: input[0x96],
+    percentMedium: input[0x97],
+    starsHard: input[0x9e],
+    percentHard: input[0x9f],
+    starsExpert: input[0xa6],
+    percentExpert: input[0xa7],
+  })
+  score.set('guitar', guitar.toJSON())
 
   // Vocals
   const vocals = new MyObject<RB3InstrumentScores>()
-  vocals.set('topScore', input.readInt32LE(0xae))
-  vocals.set('topScoreDifficulty', input[0xb2])
-  vocals.set('starsEasy', input[0xb3])
-  vocals.set('percentEasy', input[0xb4])
-  vocals.set('starsMedium', input[0xbb])
-  vocals.set('percentMedium', input[0xbc])
-  vocals.set('starsHard', input[0xc3])
-  vocals.set('percentHard', input[0xc4])
-  vocals.set('starsExpert', input[0xcb])
-  vocals.set('percentExpert', input[0xcc])
-  score.set('vocals', vocals.toObject())
+  vocals.setMany({
+    topScore: input.readInt32LE(0xae),
+    topScoreDifficulty: input[0xb2],
+    starsEasy: input[0xb3],
+    percentEasy: input[0xb4],
+    starsMedium: input[0xbb],
+    percentMedium: input[0xbc],
+    starsHard: input[0xc3],
+    percentHard: input[0xc4],
+    starsExpert: input[0xcb],
+    percentExpert: input[0xcc],
+  })
+  score.set('vocals', vocals.toJSON())
 
   // Harmonies
   const harmonies = new MyObject<RB3InstrumentScores>()
-  harmonies.set('topScore', input.readInt32LE(0xd3))
-  harmonies.set('topScoreDifficulty', input[0xd7])
-  harmonies.set('starsEasy', input[0xd8])
-  harmonies.set('percentEasy', input[0xd9])
-  harmonies.set('starsMedium', input[0xe0])
-  harmonies.set('percentMedium', input[0xe1])
-  harmonies.set('starsHard', input[0xe8])
-  harmonies.set('percentHard', input[0xe9])
-  harmonies.set('starsExpert', input[0xf0])
-  harmonies.set('percentExpert', input[0xf1])
-  score.set('harmonies', harmonies.toObject())
+  harmonies.setMany({
+    topScore: input.readInt32LE(0xd3),
+    topScoreDifficulty: input[0xd7],
+    starsEasy: input[0xd8],
+    percentEasy: input[0xd9],
+    starsMedium: input[0xe0],
+    percentMedium: input[0xe1],
+    starsHard: input[0xe8],
+    percentHard: input[0xe9],
+    starsExpert: input[0xf0],
+    percentExpert: input[0xf1],
+  })
+  score.set('harmonies', harmonies.toJSON())
 
   // Keys
   const keys = new MyObject<RB3InstrumentScores>()
-  keys.set('topScore', input.readInt32LE(0xf8))
-  keys.set('topScoreDifficulty', input[0xfc])
-  keys.set('starsEasy', input[0xfd])
-  keys.set('percentEasy', input[0xfe])
-  keys.set('starsMedium', input[0x105])
-  keys.set('percentMedium', input[0x106])
-  keys.set('starsHard', input[0x10d])
-  keys.set('percentHard', input[0x10e])
-  keys.set('starsExpert', input[0x115])
-  keys.set('percentExpert', input[0x116])
-  score.set('keys', keys.toObject())
+  keys.setMany({
+    topScore: input.readInt32LE(0xf8),
+    topScoreDifficulty: input[0xfc],
+    starsEasy: input[0xfd],
+    percentEasy: input[0xfe],
+    starsMedium: input[0x105],
+    percentMedium: input[0x106],
+    starsHard: input[0x10d],
+    percentHard: input[0x10e],
+    starsExpert: input[0x115],
+    percentExpert: input[0x116],
+  })
+  score.set('keys', keys.toJSON())
 
   // PRO Drums
   const proDrums = new MyObject<RB3InstrumentScores>()
-  proDrums.set('topScore', input.readInt32LE(0x11d))
-  proDrums.set('topScoreDifficulty', input[0x121])
-  proDrums.set('starsEasy', input[0x122])
-  proDrums.set('percentEasy', input[0x123])
-  proDrums.set('starsMedium', input[0x12a])
-  proDrums.set('percentMedium', input[0x12b])
-  proDrums.set('starsHard', input[0x132])
-  proDrums.set('percentHard', input[0x133])
-  proDrums.set('starsExpert', input[0x13a])
-  proDrums.set('percentExpert', input[0x13b])
-  score.set('proDrums', proDrums.toObject())
+  proDrums.setMany({
+    topScore: input.readInt32LE(0x11d),
+    topScoreDifficulty: input[0x121],
+    starsEasy: input[0x122],
+    percentEasy: input[0x123],
+    starsMedium: input[0x12a],
+    percentMedium: input[0x12b],
+    starsHard: input[0x132],
+    percentHard: input[0x133],
+    starsExpert: input[0x13a],
+    percentExpert: input[0x13b],
+  })
+  score.set('proDrums', proDrums.toJSON())
 
   // PRO Guitar
   const proGuitar = new MyObject<RB3InstrumentScores>()
-  proGuitar.set('topScore', input.readInt32LE(0x142))
-  proGuitar.set('topScoreDifficulty', input[0x146])
-  proGuitar.set('starsEasy', input[0x147])
-  proGuitar.set('percentEasy', input[0x148])
-  proGuitar.set('starsMedium', input[0x14f])
-  proGuitar.set('percentMedium', input[0x150])
-  proGuitar.set('starsHard', input[0x157])
-  proGuitar.set('percentHard', input[0x158])
-  proGuitar.set('starsExpert', input[0x15f])
-  proGuitar.set('percentExpert', input[0x160])
-  score.set('proGuitar', proGuitar.toObject())
+  proGuitar.setMany({
+    topScore: input.readInt32LE(0x142),
+    topScoreDifficulty: input[0x146],
+    starsEasy: input[0x147],
+    percentEasy: input[0x148],
+    starsMedium: input[0x14f],
+    percentMedium: input[0x150],
+    starsHard: input[0x157],
+    percentHard: input[0x158],
+    starsExpert: input[0x15f],
+    percentExpert: input[0x160],
+  })
+  score.set('proGuitar', proGuitar.toJSON())
 
   // PRO Bass
   const proBass = new MyObject<RB3InstrumentScores>()
-  proBass.set('topScore', input.readInt32LE(0x167))
-  proBass.set('topScoreDifficulty', input[0x16b])
-  proBass.set('starsEasy', input[0x16c])
-  proBass.set('percentEasy', input[0x16d])
-  proBass.set('starsMedium', input[0x174])
-  proBass.set('percentMedium', input[0x175])
-  proBass.set('starsHard', input[0x17c])
-  proBass.set('percentHard', input[0x17d])
-  proBass.set('starsExpert', input[0x184])
-  proBass.set('percentExpert', input[0x185])
-  score.set('proBass', proBass.toObject())
+  proBass.setMany({
+    topScore: input.readInt32LE(0x167),
+    topScoreDifficulty: input[0x16b],
+    starsEasy: input[0x16c],
+    percentEasy: input[0x16d],
+    starsMedium: input[0x174],
+    percentMedium: input[0x175],
+    starsHard: input[0x17c],
+    percentHard: input[0x17d],
+    starsExpert: input[0x184],
+    percentExpert: input[0x185],
+  })
+  score.set('proBass', proBass.toJSON())
 
   // PRO Keys
   const proKeys = new MyObject<RB3InstrumentScores>()
-  proKeys.set('topScore', input.readInt32LE(0x18c))
-  proKeys.set('topScoreDifficulty', input[0x190])
-  proKeys.set('starsEasy', input[0x191])
-  proKeys.set('percentEasy', input[0x192])
-  proKeys.set('starsMedium', input[0x199])
-  proKeys.set('percentMedium', input[0x19a])
-  proKeys.set('starsHard', input[0x1a1])
-  proKeys.set('percentHard', input[0x1a2])
-  proKeys.set('starsExpert', input[0x1a9])
-  proKeys.set('percentExpert', input[0x1aa])
-  score.set('proKeys', proKeys.toObject())
+  proKeys.setMany({
+    topScore: input.readInt32LE(0x18c),
+    topScoreDifficulty: input[0x190],
+    starsEasy: input[0x191],
+    percentEasy: input[0x192],
+    starsMedium: input[0x199],
+    percentMedium: input[0x19a],
+    starsHard: input[0x1a1],
+    percentHard: input[0x1a2],
+    starsExpert: input[0x1a9],
+    percentExpert: input[0x1aa],
+  })
+  score.set('proKeys', proKeys.toJSON())
 
   // Band
   const band = new MyObject<RB3InstrumentScores>()
-  band.set('topScore', input.readInt32LE(0x1b1))
-  band.set('topScoreDifficulty', input[0x1b5])
-  band.set('starsEasy', input[0x1b6])
-  band.set('percentEasy', input[0x1b7])
-  band.set('starsMedium', input[0x1be])
-  band.set('percentMedium', input[0x1bf])
-  band.set('starsHard', input[0x1c6])
-  band.set('percentHard', input[0x1c7])
-  band.set('starsExpert', input[0x1ce])
-  band.set('percentExpert', input[0x1cf])
-  score.set('band', band.toObject())
+  band.setMany({
+    topScore: input.readInt32LE(0x1b1),
+    topScoreDifficulty: input[0x1b5],
+    starsEasy: input[0x1b6],
+    percentEasy: input[0x1b7],
+    starsMedium: input[0x1b3],
+    percentMedium: input[0x1bf],
+    starsHard: input[0x1c6],
+    percentHard: input[0x1c7],
+    starsExpert: input[0x1ce],
+    percentExpert: input[0x1cf],
+  })
+  score.set('band', band.toJSON())
 
-  return score.toObject()
+  return score.toJSON()
 }

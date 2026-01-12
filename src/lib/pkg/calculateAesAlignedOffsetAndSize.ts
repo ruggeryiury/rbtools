@@ -24,5 +24,5 @@ export const calculateAesAlignedOffsetAndSize = (offset: number, size: number): 
   map.set('sizeDelta', sizeDelta)
   map.set('size', size + sizeDelta)
 
-  return map.toObject()
+  return map.toJSON()
 }

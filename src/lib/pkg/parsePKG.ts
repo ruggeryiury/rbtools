@@ -196,7 +196,7 @@ export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file
 
     metadataSize = reader.offset - metadataOffset
 
-    metadata.push(metadataMap.toObject())
+    metadata.push(metadataMap.toJSON())
   }
 
   // Content keys
@@ -236,7 +236,7 @@ export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file
   map.set('metadata', metadata)
   map.set('xorCtr', xorCtr)
 
-  return map.toObject()
+  return map.toJSON()
 }
 
 /**
@@ -307,7 +307,7 @@ export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader:
     offset2 += itemEntrySize
 
     await itemEntryReader.close()
-    itemEntries.push(entryMap.toObject())
+    itemEntries.push(entryMap.toJSON())
   }
 
   if (nameOffsetEnd === null || namesOffset === null) throw new Error('PKG Item Entries Parsing Error: Name offset and its end can remain null after iterating through PKG file entries.')
@@ -367,7 +367,7 @@ export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader:
   map.set('dlcFolderName', dlcFolderName)
   map.set('items', itemEntries)
 
-  return map.toObject()
+  return map.toJSON()
 }
 
 /**
