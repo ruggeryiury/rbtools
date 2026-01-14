@@ -39,9 +39,13 @@ export interface DTAStringifyOptions {
   /**
    * An object that changes the behavior of the DTA rendering process.
    *
-   * RB3 and MAGMA formatting options are available as static property on `DTAIO.formatOptions`.
+   * RB3 and MAGMA formatting options are available as static property on `DTAIO.formatOptions`. Default is `DTAIO.formatOptions.defaultRB3`.
    */
   formatOptions?: DTAIOFormattingOptions
+  /**
+   * Add `tracks_count` property on songs. Default is `true`.
+   */
+  addTracksCount?: boolean
 }
 
 /**
@@ -53,7 +57,7 @@ export interface DTAStringifyOptions {
  */
 export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: DTAStringifyOptions): string => {
   let { songs, updates } = songsAndUpdates
-  const { ignoreFakeSongs, wiiMode, addMAGMAValues, sortBy, omitUnusedValues, formatOptions } = useDefaultOptions(
+  const { ignoreFakeSongs, wiiMode, addMAGMAValues, sortBy, omitUnusedValues, formatOptions, addTracksCount } = useDefaultOptions(
     {
       ignoreFakeSongs: false,
       wiiMode: null,
@@ -61,6 +65,7 @@ export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: D
       sortBy: null,
       omitUnusedValues: true,
       formatOptions: DTAIO.formatOptions.defaultRB3,
+      addTracksCount: true,
     },
     options
   )
@@ -107,7 +112,6 @@ export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: D
         if (tracks_count !== undefined && tracks) {
           if (io.options.array.keyAndValueInline === 'expanded') {
             // MAGMA style
-            songMap.set('tracks_count', tracks_count)
             const tracksArray: object[] = []
             if (tracks.drum) tracksArray.push({ drum: tracks.drum })
             if (tracks.bass) tracksArray.push({ bass: tracks.bass })
@@ -278,7 +282,7 @@ export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: D
         if (tracks_count !== undefined && tracks) {
           if (io.options.array.keyAndValueInline === 'expanded') {
             // MAGMA style
-            songMap.set('tracks_count', tracks_count)
+            if (addTracksCount) songMap.set('tracks_count', tracks_count)
             const tracksArray: object[] = []
             if (tracks.drum) tracksArray.push({ drum: tracks.drum })
             if (tracks.bass) tracksArray.push({ bass: tracks.bass })
@@ -288,6 +292,7 @@ export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: D
             songMap.set('tracks', DTAIO.useArray(tracksArray, io.options))
           } else {
             // RB3 style
+            if (addTracksCount) songMap.set('tracks_count', tracks_count)
             let firstInstrument = true
             let content = '('
             if (tracks.drum) {

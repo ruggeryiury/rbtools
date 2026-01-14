@@ -133,7 +133,7 @@ export interface ParsedRB3SaveData {
   scores: RB3Scores[]
 }
 
-export interface ScoreDataObject {
+export interface InstrumentScoreData {
   instrument: ScoreDataInstrumentTypes
   difficulty: DifficultyTypes
   songsPlayed: number
@@ -256,9 +256,9 @@ export class RB3SaveData {
    * @param {ParsedRB3SaveData} saveData A parsed save data object.
    * @param {ScoreDataInstrumentTypes} instrument The instrument you want to retrieve score data about.
    * @param {DifficultyTypes | undefined} [difficulty] `OPTIONAL` The difficulty of the played songs to calculate scores. Default is `'expert'`.
-   * @returns {ScoreDataObject}
+   * @returns {InstrumentScoreData}
    */
-  static getDetailedScoreData(saveData: ParsedRB3SaveData, instrument: ScoreDataInstrumentTypes, difficulty: DifficultyTypes = 'expert'): ScoreDataObject {
+  static getInstrumentScoreData(saveData: ParsedRB3SaveData, instrument: ScoreDataInstrumentTypes, difficulty: DifficultyTypes = 'expert'): InstrumentScoreData {
     const diff = (() => {
       switch (difficulty) {
         case 'easy':

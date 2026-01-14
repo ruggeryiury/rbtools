@@ -255,7 +255,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       else if (key === 'pans' || key === 'vols' || key === 'cores' || key === 'real_guitar_tuning' || key === 'real_bass_tuning' || key === 'solo') processedArrayName = key
     }
   }
-  
+
   if (!(tracksCount[5] > 2) && !isTracksCountEmpty(tracksCount)) map.set('tracks_count', tracksCount as RB3CompatibleDTAFile['tracks_count'])
   if (preview[1] !== 0) map.set('preview', preview as RB3CompatibleDTAFile['preview'])
   if (solo.length > 0) map.set('solo', solo as RB3CompatibleDTAFile['solo'])
