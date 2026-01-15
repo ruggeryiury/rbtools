@@ -1,6 +1,6 @@
 import { pathLikeToDirPath, pathLikeToFilePath, type DirPath, type DirPathLikeTypes, type FilePath, type FilePathLikeTypes } from 'node-lib'
-import { isDevHDD0PathValid, isRPCS3ExePathValid, rpcs3GetPackagesStats, rpcs3GetStats, type RPCS3StatsObject, type SongPackageDataObject } from '../lib.exports'
-import { RB3SaveData, type DifficultyTypes, type ParsedRB3SaveData, type ScoreDataInstrumentTypes } from './RB3SaveData'
+import { isDevHDD0PathValid, isRPCS3ExePathValid, rpcs3GetPackagesData, rpcs3GetStats, type RPCS3StatsObject, type RB3SongPackagesData } from '../lib.exports'
+import { RB3SaveData, type DifficultyTypes, type InstrumentScoreData, type ParsedRB3SaveData, type ScoreDataInstrumentTypes } from './RB3SaveData'
 
 export interface RPCS3JSONRepresentation {
   /**
@@ -106,9 +106,9 @@ export class RPCS3 {
     return await rpcs3GetStats(this.devhdd0Path, this.rpcs3ExePath)
   }
 
-  async getPackagesStats(): Promise<SongPackageDataObject> {
+  async getPackagesStats(): Promise<RB3SongPackagesData> {
     this._checkIntegrity()
-    return await rpcs3GetPackagesStats(this.devhdd0Path)
+    return await rpcs3GetPackagesData(this.devhdd0Path)
   }
   async getSaveData(): Promise<ParsedRB3SaveData | undefined> {
     this._checkIntegrity()
@@ -117,12 +117,10 @@ export class RPCS3 {
       return await RB3SaveData.parseFromFile(saveDataPath)
     }
   }
-  async getScoresData(instrument?: ScoreDataInstrumentTypes, difficulty: DifficultyTypes = 'expert') {
-    this._checkIntegrity()
-    const saveDataPath = this.devhdd0Path.gotoFile('home/00000001/savedata/BLUS30463-AUTOSAVE/SAVE.DAT')
-    if (saveDataPath.exists) {
-      const saveData = await RB3SaveData.parseFromFile(saveDataPath)
-      return RB3SaveData.getInstrumentScoreData(saveData, instrument ?? saveData.mostPlayedInstrument ?? 'band', difficulty)
-    }
+
+  async getSongData() {}
+
+  getInstrumentScoresData(saveData: ParsedRB3SaveData, instrument?: ScoreDataInstrumentTypes, difficulty: DifficultyTypes = 'expert'): InstrumentScoreData {
+    return RB3SaveData.getInstrumentScoreData(saveData, instrument ?? saveData.mostPlayedInstrument ?? 'band', difficulty)
   }
 }

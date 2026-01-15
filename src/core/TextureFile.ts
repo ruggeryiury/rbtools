@@ -115,8 +115,7 @@ export class TextureFile {
     const writer = new BinaryWriter()
     const srcBuffer = await this.path.read()
     // 32 is the size of the texture file header we need to skip
-    const loopIteration = (srcBuffer.length - 32) / 4
-    const srcContents = srcBuffer.subarray(32)
+    const srcContents = this.path.ext === '.png_ps3' ? srcBuffer.subarray(32) : srcBuffer.subarray(32).swap16()
 
     const fullHeader = srcBuffer.subarray(0, 16)
     const shortHeader = srcBuffer.subarray(5, 11)
@@ -124,13 +123,7 @@ export class TextureFile {
     const srcHeader = await getDDSHeader(fullHeader, shortHeader)
 
     writer.write(srcHeader.data)
-
-    for (let i = 0; i <= loopIteration; i++) {
-      const newBuffer = Buffer.alloc(4)
-      srcContents.copy(newBuffer, 0, i * 4, i * 4 + 4)
-      const swappedBytes = this.path.ext === '.png_ps3' ? newBuffer : Buffer.from([newBuffer[1], newBuffer[0], newBuffer[3], newBuffer[2]])
-      writer.write(swappedBytes)
-    }
+    writer.write(srcContents)
 
     const base64 = (await PythonAPI.imageBufferProcessor(writer.toBuffer(), 'webp', { height: 256, width: 256 })).toString('base64')
 

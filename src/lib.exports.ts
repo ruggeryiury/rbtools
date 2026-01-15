@@ -17,7 +17,6 @@ export * from './lib/imagetex/ddsHeader'
 export * from './lib/imagetex/getTPLHeader'
 export * from './lib/imagetex/imageHeaders'
 export * from './lib/imagetex/imageToTex'
-export * from './lib/imagetex/swapTextureBytes'
 export * from './lib/imagetex/texStat'
 export * from './lib/imagetex/texToImage'
 
@@ -41,9 +40,8 @@ export * from './lib/rb3savedata/getXboxPS3BandName'
 
 export * from './lib/rpcs3/isDevHDD0PathValid'
 export * from './lib/rpcs3/isRPCS3ExePathValid'
-export * from './lib/rpcs3/rpcs3GetPackagesStats'
+export * from './lib/rpcs3/rpcs3GetPackagesData'
 export * from './lib/rpcs3/rpcs3GetStats'
-// export * from './lib/rpcs3/rpcs3GetSongData'
 
 export * from './lib/u8/parseU8ArchiveHeader'
 

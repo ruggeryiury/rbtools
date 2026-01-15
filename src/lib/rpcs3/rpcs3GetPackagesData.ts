@@ -1,5 +1,6 @@
-import { createHashFromBuffer, DirPath, FilePath, MyObject, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
-import { DTAParser, EDATFile } from '../../core.exports'
+import { createHashFromBuffer, DirPath, FilePath, MyObject, parseReadableBytesSize, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
+import { DTAParser, EDATFile, RBTools } from '../../core.exports'
+import type { RB3CompatibleDTAFile } from '../dta/dtaStruct'
 
 // #region Types
 
@@ -53,9 +54,10 @@ export interface InstalledSongPackagesStats {
    * An array with relative paths to all files included in the package.
    */
   files: string[]
+  imgData?: string
 }
 
-export interface SongPackageDataObject {
+export interface RB3SongPackagesData {
   /**
    * The amount of songs on the Rock Band 3.
    */
@@ -103,7 +105,7 @@ export interface SongPackageDataObject {
 export const rpcs3GetPackageFilesData = async (packageDirPath: DirPathLikeTypes): Promise<string[]> => {
   const packagePath = pathLikeToDirPath(packageDirPath)
   const files = (await packagePath.gotoDir('songs').readDir(true)).filter((entry) => entry instanceof FilePath).map((entry) => entry.path.slice(packagePath.gotoDir('songs').path.length + 1).replace(/\\/g, '/'))
-  return files
+  return files.toReversed()
 }
 
 export interface RPCS3PackageFilesManifestData {
@@ -123,10 +125,7 @@ export const rpcs3GetPackageFilesManifest = async (packageDirPath: DirPathLikeTy
   let manifest = ''
   let packageSize = 0
   let i = 0
-  const filesPath = files
-    .toReversed()
-    .filter((val) => val !== 'songs.dta')
-    .map((f) => FilePath.of(insideSongsFolderPath, f))
+  const filesPath = files.filter((val) => val !== 'songs.dta').map((f) => FilePath.of(insideSongsFolderPath, f))
 
   for (const file of filesPath) {
     const fileStat = await file.stat()
@@ -142,9 +141,9 @@ export const rpcs3GetPackageFilesManifest = async (packageDirPath: DirPathLikeTy
  * Returns an object containing information about all installed song packages.
  * - - - -
  * @param {DirPathLikeTypes} devhdd0DirPath The path of the user's `dev_hdd0` folder.
- * @returns {Promise<SongPackageDataObject>}
+ * @returns {Promise<RB3SongPackagesData>}
  */
-export const rpcs3GetPackagesStats = async (devhdd0DirPath: DirPathLikeTypes): Promise<SongPackageDataObject> => {
+export const rpcs3GetPackagesData = async (devhdd0DirPath: DirPathLikeTypes): Promise<RB3SongPackagesData> => {
   const devhdd0Path = pathLikeToDirPath(devhdd0DirPath)
 
   const packages: InstalledSongPackagesStats[] = []
@@ -153,8 +152,28 @@ export const rpcs3GetPackagesStats = async (devhdd0DirPath: DirPathLikeTypes): P
     preRB3DLCPacksCount = 0,
     preRB3DLCSongsCount = 0
 
+  // RB3 Songs
+  const rb3Songs = await RBTools.dbFolder.gotoFile('rb3.json').readJSON<RB3CompatibleDTAFile[]>()
+  const packMap = new MyObject<InstalledSongPackagesStats>({
+    name: 'Rock Band 3',
+    packagePath: '_ark/songs',
+    dtaFilePath: '',
+    origin: 'rb3DLC',
+    packageSize: parseReadableBytesSize('2.38GB'),
+    songsCount: rb3Songs.length,
+    devKLic: EDATFile.genDevKLicHash('RB3-Rock-Band-3-Export'),
+    dtaHash: Buffer.alloc(56 / 2).toString('hex'),
+    contentsHash: Buffer.alloc(56 / 2).toString('hex'),
+    allIDs: rb3Songs.map((song) => song.id).toSorted(),
+    allSongnames: rb3Songs.map((song) => song.songname).toSorted(),
+    allSongIDs: rb3Songs.map((song) => song.song_id).toSorted(),
+    manifest: '',
+    files: [],
+  })
+
+  packages.push(packMap.toJSON())
+
   const usrdir = devhdd0Path.gotoDir('game/BLUS30463/USRDIR')
-  const usrdirPreRB3 = devhdd0Path.gotoDir('game/BLUS30050/USRDIR')
   if (usrdir.exists) {
     const allPacksFolder = (await usrdir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen').map((entry) => DirPath.of(entry.path))
 
@@ -198,10 +217,11 @@ export const rpcs3GetPackagesStats = async (devhdd0DirPath: DirPathLikeTypes): P
     }
   }
 
-  // CHECK: Maybe limit the pre-RB3 DLC to official packs due to DTAParser logic
+  const usrdirPreRB3 = devhdd0Path.gotoDir('game/BLUS30050/USRDIR')
   if (usrdirPreRB3.exists) {
     const RB1_RAP_FOLDER = 'CCF0099'
-    const allPacksFolder = (await usrdirPreRB3.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== RB1_RAP_FOLDER).map((entry) => DirPath.of(entry.path))
+    const OFFICIAL_PACK_NAMES = ['RB1FULLEXPORTPS3', 'RB2-Rock-Band-2-Export', 'RB4-to-RB2-DISC', 'RB1DLCPACK01OF10', 'RB1DLCPACK02OF10', 'RB1DLCPACK03OF10', 'RB1DLCPACK04OF10', 'RB1DLCPACK05OF10', 'RB1DLCPACK06OF10', 'RB1DLCPACK07OF10', 'RB1DLCPACK08OF10', 'RB1DLCPACK09OF10', 'RB1DLCPACK10OF10']
+    const allPacksFolder = (await usrdirPreRB3.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== RB1_RAP_FOLDER && OFFICIAL_PACK_NAMES.includes(entry.name)).map((entry) => DirPath.of(entry.path))
 
     for (const packagePath of allPacksFolder) {
       const dtaFilePath = packagePath.gotoFile('songs/songs.dta')
@@ -238,7 +258,7 @@ export const rpcs3GetPackagesStats = async (devhdd0DirPath: DirPathLikeTypes): P
     }
   }
 
-  const value = new MyObject<SongPackageDataObject>()
+  const value = new MyObject<RB3SongPackagesData>()
   const rb3SongsCount = 83
   const allPacksCount = preRB3DLCPacksCount + rb3DLCPacksCount
   const allSongsCount = preRB3DLCSongsCount + rb3DLCSongsCount

@@ -229,6 +229,7 @@ export class DTAParser {
    */
   async applyDXUpdatesOnSongs(deleteNonAppliedUpdates = true, fetchUpdates = false): Promise<string[]> {
     const localUpdates = RBTools.dbFolder.gotoFile('updates.json')
+    if (!localUpdates.exists) fetchUpdates = true
     if (fetchUpdates) {
       const dta = await DTAParser.fromURL('https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/harmonix_upgrades.dta')
       for (const link of ['https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/official_additional_metadata.dta', 'https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/unofficial_additional_metadata.dta', 'https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/metadata_updates.dta', 'https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/harms_and_updates.dta', 'https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/rbhp_upgrades.dta', 'https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/rb_plus_upgrades.dta', 'https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/vanilla.dta', 'https://raw.githubusercontent.com/hmxmilohax/rock-band-3-deluxe/refs/heads/develop/_ark/dx/song_updates/loading_phrases.dta']) {
@@ -284,7 +285,6 @@ export class DTAParser {
 
     // Patching some update errors while parsing
     for (let i = 0; i < newSongs.length; i++) {
-      if ('tracks_count' in newSongs[i] && newSongs[i].tracks_count[3] > 0 && 'rank_vocals' in newSongs[i] && newSongs[i].rank_vocals! > 0 && newSongs[i].vocal_parts === undefined) newSongs[i].vocal_parts = 1
       if ('pans' in newSongs[i] && newSongs[i].pans![newSongs[i].pans!.length - 1] === 2.5) {
         if ('tracks_count' in newSongs[i] && !newSongs[i].tracks_count[6]) newSongs[i].tracks_count.push(2)
       }

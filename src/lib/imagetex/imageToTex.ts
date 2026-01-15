@@ -34,18 +34,10 @@ export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: Fi
   const texStream = await dest.createWriteStream()
 
   // 128 is the size of the DDS file header we need to skip
-  // 4 for byte swapping
-  const loopIteration = (ddsBuffer.length - 128) / 4
-  const ddsContents = ddsBuffer.subarray(128)
+  const ddsContents = src.ext === '.png_ps3' ? ddsBuffer.subarray(128) : ddsBuffer.subarray(128).swap16()
 
   texStream.write(ddsHeader)
-  for (let i = 0; i <= loopIteration; i++) {
-    const newBuffer = Buffer.alloc(4)
-    ddsContents.copy(newBuffer, 0, i * 4, i * 4 + 4)
-    const swappedBytes = src.ext === '.png_ps3' ? newBuffer : Buffer.from([newBuffer[1], newBuffer[0], newBuffer[3], newBuffer[2]])
-    if (i === loopIteration) texStream.end(swappedBytes)
-    else texStream.write(swappedBytes)
-  }
+  texStream.end(ddsContents)
 
   await once(texStream, 'finish')
   await dds.delete()

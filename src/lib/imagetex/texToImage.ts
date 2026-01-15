@@ -21,9 +21,7 @@ export const texXboxPs3ToImage = async (srcFile: FilePathLikeTypes, destPath: Fi
 
   const srcBuffer = await src.read()
   // 32 is the size of the texture file header we need to skip
-  // 4 for byte swapping
-  const loopIteration = (srcBuffer.length - 32) / 4
-  const srcContents = srcBuffer.subarray(32)
+  const srcContents = src.ext === '.png_ps3' ? srcBuffer.subarray(32) : srcBuffer.subarray(32).swap16()
 
   const fullHeader = srcBuffer.subarray(0, 16)
   const shortHeader = srcBuffer.subarray(5, 11)
@@ -31,14 +29,7 @@ export const texXboxPs3ToImage = async (srcFile: FilePathLikeTypes, destPath: Fi
   const srcHeader = await getDDSHeader(fullHeader, shortHeader)
   const ddsStream = await dds.createWriteStream()
   ddsStream.write(srcHeader.data)
-
-  for (let i = 0; i <= loopIteration; i++) {
-    const newBuffer = Buffer.alloc(4)
-    srcContents.copy(newBuffer, 0, i * 4, i * 4 + 4)
-    const swappedBytes = src.ext === '.png_ps3' ? newBuffer : Buffer.from([newBuffer[1], newBuffer[0], newBuffer[3], newBuffer[2]])
-    if (i === loopIteration) ddsStream.end(swappedBytes)
-    else ddsStream.write(swappedBytes)
-  }
+  ddsStream.end(srcContents)
 
   await once(ddsStream, 'finish')
 
