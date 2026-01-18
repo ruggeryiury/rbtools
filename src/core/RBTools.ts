@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import type { DirPath } from 'node-lib'
 import { thisFilePath } from '../lib.exports'
 
@@ -20,7 +19,7 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get binFolder(): DirPath {
-    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ?? 'dist/bin')
+    return this.moduleRoot.gotoDir('dist/bin')
   }
 
   /**
@@ -29,7 +28,7 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get dbFolder(): DirPath {
-    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/db` : 'dist/bin/db')
+    return this.moduleRoot.gotoDir('dist/bin/db')
   }
 
   /**
@@ -38,7 +37,7 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get headersFolder(): DirPath {
-    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/headers` : 'dist/bin/headers')
+    return this.moduleRoot.gotoDir('dist/bin/headers')
   }
 
   /**
@@ -47,6 +46,6 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get pyFolder(): DirPath {
-    return this.moduleRoot.gotoDir(process.env.RBTOOLS_BIN_PATH ? `${process.env.RBTOOLS_BIN_PATH}/python` : 'dist/bin/python')
+    return this.moduleRoot.gotoDir('dist/bin/python')
   }
 }
