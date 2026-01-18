@@ -157,7 +157,7 @@ export const rpcs3GetPackagesData = async (devhdd0DirPath: DirPathLikeTypes): Pr
   const packMap = new MyObject<InstalledSongPackagesStats>({
     name: 'Rock Band 3',
     packagePath: '_ark/songs',
-    dtaFilePath: '',
+    dtaFilePath: '_ark/songs/songs.dta',
     origin: 'rb3DLC',
     packageSize: parseReadableBytesSize('2.38GB'),
     songsCount: rb3Songs.length,
@@ -262,7 +262,7 @@ export const rpcs3GetPackagesData = async (devhdd0DirPath: DirPathLikeTypes): Pr
   const rb3SongsCount = 83
   const allPacksCount = preRB3DLCPacksCount + rb3DLCPacksCount
   const allSongsCount = preRB3DLCSongsCount + rb3DLCSongsCount
-  const allSongsCountWithRB3Songs = allSongsCount + rb3DLCSongsCount
+  const allSongsCountWithRB3Songs = allSongsCount + rb3SongsCount
   const starsCount = allSongsCountWithRB3Songs * 5
 
   value.setMany({
