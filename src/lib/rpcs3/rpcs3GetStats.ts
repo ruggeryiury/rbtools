@@ -58,7 +58,7 @@ export interface RPCS3StatsObject {
   /**
    * The name of the user in the PS3 console.
    */
-  userName: string
+  user: string
   /**
    * Stats from Rock Band 3.
    */
@@ -83,7 +83,7 @@ export const rpcs3GetStats = async (devhdd0DirPath: DirPathLikeTypes, rpcs3ExeFi
   const games = parseYAMLBuffer(await rpcs3ExePath.gotoFile('config/games.yml').read('utf-8')) as Record<'BLUS30463' | 'BLUS30147', string>
 
   const localUsernameFilePath = devhdd0Path.gotoFile(`home/0000000${(userIndex + 1).toString()}/localusername`)
-  map.set('userName', await localUsernameFilePath.read('utf8'))
+  map.set('user', await localUsernameFilePath.read('utf8'))
 
   const ROCKBAND3_ID = 'BLUS30463'
   if (ROCKBAND3_ID in games) {

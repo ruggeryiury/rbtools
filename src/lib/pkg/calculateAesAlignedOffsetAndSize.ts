@@ -12,8 +12,10 @@ export const calculateAesAlignedOffsetAndSize = (offset: number, size: number): 
   const map = new MyObject<CalculatedAesOffsetAndSizeObject>()
 
   const offsetDelta = offset & (blockSize - 1)
-  map.set('offsetDelta', offsetDelta)
-  map.set('offset', offset - offsetDelta)
+  map.setMany({
+    offsetDelta,
+    offset: offset - offsetDelta,
+  })
 
   let sizeDelta = (offsetDelta + size) & (blockSize - 1)
 
@@ -21,6 +23,10 @@ export const calculateAesAlignedOffsetAndSize = (offset: number, size: number): 
     sizeDelta = blockSize - sizeDelta
   }
   sizeDelta += offsetDelta
+  map.setMany({
+    sizeDelta,
+    size: size + sizeDelta,
+  })
   map.set('sizeDelta', sizeDelta)
   map.set('size', size + sizeDelta)
 

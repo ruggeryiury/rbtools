@@ -6,5 +6,5 @@ export default defineConfig({
   fixedExtension: false,
   minify: true,
   unbundle: true,
-  copy: { from: 'src/bin', to: 'dist/bin' },
+  copy: { from: 'src/bin', to: 'dist' },
 })

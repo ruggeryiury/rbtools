@@ -46,7 +46,10 @@ export interface PKGMetadata {
         type: string
         data: number[]
       }
+    | string
     | number
+    | bigint
+    | Buffer
   size?: number
   hexSize?: number
   binSize?: number
@@ -191,7 +194,7 @@ export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file
       metadataMap.set('value', value)
       await tempBytesReader.close()
 
-      if (metadataEntryType === 4) metadataMap.set('pkgSize', value.readBigUint64BE())
+      if (metadataEntryType === 4) metadataMap.set('pkgSize', Number(value.readBigUint64BE()))
     }
 
     metadataSize = reader.offset - metadataOffset
