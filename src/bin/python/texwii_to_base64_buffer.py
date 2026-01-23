@@ -2,7 +2,7 @@
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse, base64
 from io import BytesIO
-from lib.tpl import PNG_WII
+from .lib.tpl import PNG_WII
 
 
 def texwii_to_base64_buffer(src_path: str, header: bytes) -> str:

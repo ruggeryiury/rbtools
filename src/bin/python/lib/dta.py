@@ -4,7 +4,6 @@
 DTA Parser, by HughToBasic, typed by Ruggy.
 """
 from os import PathLike
-from pathlib import Path
 from typing import List, Union, Dict
 
 

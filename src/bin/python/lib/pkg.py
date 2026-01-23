@@ -113,7 +113,6 @@ import packaging.version
 ## pip install ecdsa
 ## https://pypi.org/project/ecdsa/
 import ecdsa.ecdsa
-import ecdsa.ellipticcurve
 
 
 ## Debug level for Python initializations (will be reset in "main" code)

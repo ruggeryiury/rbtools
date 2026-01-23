@@ -2,7 +2,7 @@
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse, os
 from pathlib import Path
-from lib.stfs import STFS
+from .lib.stfs import STFS
 import shutil
 
 

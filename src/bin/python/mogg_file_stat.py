@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse, json, struct, tempfile
-from os import PathLike, path, unlink
+from os import PathLike, path
 from typing import TypedDict, Union
 from pydub.utils import mediainfo
-from lib.mogg import decrypt_mogg_bytes
+from .lib.mogg import decrypt_mogg_bytes
 
 
 class MOGGStatObject(TypedDict):

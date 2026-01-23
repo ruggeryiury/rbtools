@@ -5,8 +5,8 @@ from pydub import AudioSegment
 from io import BytesIO
 from typing import TypedDict, Optional, List, Literal
 from pathlib import Path
-from lib.mogg import decrypt_mogg_bytes
-from lib.pydub_utils import mogg_import_channel_order_fixer
+from .lib.mogg import decrypt_mogg_bytes
+from .lib.pydub_utils import mogg_import_channel_order_fixer
 
 
 class DrumsTracksStructure(TypedDict):

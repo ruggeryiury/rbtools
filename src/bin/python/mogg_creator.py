@@ -5,7 +5,7 @@ from os import PathLike
 from pydub import AudioSegment
 from pathlib import Path
 from typing import List, Union
-from lib.pydub_utils import ogg_channel_order_fixer
+from .lib.pydub_utils import ogg_channel_order_fixer
 
 
 def mogg_creator(
