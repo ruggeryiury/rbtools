@@ -60,7 +60,6 @@ Also, **_RBTools_** uses modified Python scripts from:
 - [PKG Module (from PSN_get_pkg_info)](https://github.com/windsurfer1122/PSN_get_pkg_info)
 - [STFS Module (from py360)](https://github.com/valmyzk/py360)
 - [TPL Module (from Wii.py)](https://github.com/DorkmasterFlek/Wii.py)
-- [Swap RB Art Bytes (from RB3DX Dependencies)](https://github.com/hmxmilohax/rock-band-3-deluxe/blob/develop/dependencies/python/swap_rb_art_bytes.py)
 
 At last, **_RBTools_** comes with a few special Node packages made by myself, such as:
 
