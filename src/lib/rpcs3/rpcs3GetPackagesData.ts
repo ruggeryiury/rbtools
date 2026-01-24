@@ -189,8 +189,8 @@ export const rpcs3GetPackagesData = async (devhdd0DirPath: DirPathLikeTypes): Pr
       const origin: GamePackageOriginTypes = 'rb3DLC'
       const devKLic = EDATFile.genDevKLicHash(packagePath.name)
       const { manifest, packageSize } = await rpcs3GetPackageFilesManifest(packagePath, packageFiles)
-      const dtaHash = createHashFromBuffer(Buffer.from(parsedData.stringify()), 'sha3-224')
-      const contentsHash = createHashFromBuffer(Buffer.from(manifest), 'sha3-224')
+      const dtaHash = createHashFromBuffer(Buffer.from(parsedData.stringify()), 'sha256')
+      const contentsHash = createHashFromBuffer(Buffer.from(manifest), 'sha256')
       const songsCount = parsedData.songs.length
       const allIDs = parsedData.songs.map((song) => song.id).toSorted()
       const allSongnames = parsedData.songs.map((song) => song.songname).toSorted()
@@ -236,8 +236,8 @@ export const rpcs3GetPackagesData = async (devhdd0DirPath: DirPathLikeTypes): Pr
       const origin: GamePackageOriginTypes = 'preRb3DLC'
       const devKLic = EDATFile.genDevKLicHash(packagePath.name)
       const { manifest, packageSize } = await rpcs3GetPackageFilesManifest(packagePath, packageFiles)
-      const dtaHash = createHashFromBuffer(Buffer.from(parsedData.stringify()), 'sha3-224')
-      const contentsHash = createHashFromBuffer(Buffer.from(manifest), 'sha3-224')
+      const dtaHash = createHashFromBuffer(Buffer.from(parsedData.stringify()), 'sha256')
+      const contentsHash = createHashFromBuffer(Buffer.from(manifest), 'sha256')
       const songsCount = parsedData.songs.length
 
       const packMap = new MyObject<InstalledSongPackagesStats>({
