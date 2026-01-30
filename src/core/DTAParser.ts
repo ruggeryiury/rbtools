@@ -363,6 +363,25 @@ export class DTAParser {
   }
 
   /**
+   * Patches the `format` and `version` values, forcing all songs to use RBN2 velues, and returns an array with IDs of songs where the encoding patch were applied.
+   *
+   * _NOTE: This patch must not be applied when parsing any official song._
+   * - - - -
+   * @returns {string[]}
+   */
+  patchFmtVers(): string[] {
+    const patchedSongsID: string[] = []
+    const newSongs: RB3CompatibleDTAFile[] = []
+    for (const song of this.songs) {
+      if (song.format !== 10 || song.version !== 30) patchedSongsID.push(song.id)
+      newSongs.push({ ...song, format: 10, version: 30 })
+    }
+
+    this.songs = newSongs
+    return patchedSongsID
+  }
+
+  /**
    * Sorts the `songs` array based on a song data value.
    * - - - -
    * @param {SongSortingTypes} sortBy The sorting type.

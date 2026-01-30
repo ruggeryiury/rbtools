@@ -29,21 +29,14 @@
 
 ## Python
 
-| Package name    | Install command             | Description                                                                                                                       | PyPI link                                         |
-| --------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `aenum`         | `pip install aenum`         | Advanced Enumerations (compatible with Python's stdlib `Enum`), `NamedTuples`, and `NamedConstants`.                              | [[link]](https://pypi.org/project/aenum/)         |
-| `audioop-lts`   | `pip install audioop-lts`   | LTS Port of Python `audioop`.                                                                                                     | [[link]](https://pypi.org/project/audioop-lts/)   |
-| `cryptography`  | `pip install cryptography`  | A package which provides cryptographic recipes and primitives to Python developers.                                               | [[link]](https://pypi.org/project/cryptography/)  |
-| `ecdsa`         | `pip install ecdsa`         | ECDSA cryptographic signature library.                                                                                            | [[link]](https://pypi.org/project/ecdsa/)         |
-| `mido`          | `pip install mido`          | MIDI Objects for Python.                                                                                                          | [[link]](https://pypi.org/project/mido/)          |
-| `packaging`     | `pip install packaging`     | Core utilities for Python packages.                                                                                               | [[link]](https://pypi.org/project/packaging/)     |
-| `puremagic`     | `pip install puremagic`     | Pure python implementation of magic file detection.                                                                               | [[link]](https://pypi.org/project/mido/)          |
-| `fastxor`       | `pip install fastxor`       | A C++ fast XOR implementation strongly inspired by [eryksun's StackOverflow post](http://stackoverflow.com/users/205580/eryksun). | [[link]](https://pypi.org/project/fastxor/)       |
-| `pillow`        | `pip install pillow`        | Python Imaging Library (fork).                                                                                                    | [[link]](https://pypi.org/project/pillow/)        |
-| `pycryptodome`  | `pip install pycryptodome`  | Cryptographic library for Python.                                                                                                 | [[link]](https://pypi.org/project/pycryptodome/)  |
-| `pycryptodomex` | `pip install pycryptodomex` | Cryptographic library for Python.                                                                                                 | [[link]](https://pypi.org/project/pycryptodomex/) |
-| `pydub`         | `pip install pydub`         | Manipulate audio with an simple and easy high level interface.                                                                    | [[link]](https://pypi.org/project/pydub/)         |
-| `requests`      | `pip install requests`      | Python HTTP for Humans.                                                                                                           | [[link]](https://pypi.org/project/requests/)      |
+| Package name   | Install command            | Description                                                                         | PyPI link                                        |
+| -------------- | -------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `audioop-lts`  | `pip install audioop-lts`  | LTS Port of Python `audioop`.                                                       | [[link]](https://pypi.org/project/audioop-lts/)  |
+| `cryptography` | `pip install cryptography` | A package which provides cryptographic recipes and primitives to Python developers. | [[link]](https://pypi.org/project/cryptography/) |
+| `mido`         | `pip install mido`         | MIDI Objects for Python.                                                            | [[link]](https://pypi.org/project/mido/)         |
+| `puremagic`    | `pip install puremagic`    | Pure python implementation of magic file detection.                                 | [[link]](https://pypi.org/project/mido/)         |
+| `pillow`       | `pip install pillow`       | Python Imaging Library (fork).                                                      | [[link]](https://pypi.org/project/pillow/)       |
+| `pydub`        | `pip install pydub`        | Manipulate audio with an simple and easy high level interface.                      | [[link]](https://pypi.org/project/pydub/)        |
 
 # Package Resources
 
@@ -56,7 +49,6 @@
 Also, **_RBTools_** uses modified Python scripts from:
 
 - [MOGG Module (from moggulator)](https://github.com/LocalH/moggulator/tree/master)
-- [PKG Module (from PSN_get_pkg_info)](https://github.com/windsurfer1122/PSN_get_pkg_info)
 - [STFS Module (from py360)](https://github.com/valmyzk/py360)
 - [TPL Module (from Wii.py)](https://github.com/DorkmasterFlek/Wii.py)
 

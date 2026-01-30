@@ -38,11 +38,6 @@ export * from './lib/rb3savedata/getScoresListBytesWii'
 export * from './lib/rb3savedata/getScoresListBytesXboxPS3'
 export * from './lib/rb3savedata/getXboxPS3BandName'
 
-export * from './lib/rpcs3/isDevHDD0PathValid'
-export * from './lib/rpcs3/isRPCS3ExePathValid'
-export * from './lib/rpcs3/rpcs3GetPackagesData'
-export * from './lib/rpcs3/rpcs3GetStats'
-
 export * from './lib/u8/parseU8ArchiveHeader'
 
 export * from './lib/utils/formatStringFromDTA'
