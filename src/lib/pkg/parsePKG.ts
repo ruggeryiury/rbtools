@@ -1,5 +1,6 @@
-import { BinaryReader, createHashFromBuffer, HexStr, MyObject, pathLikeToString, type FilePathLikeTypes } from 'node-lib'
-import { calculateAesAlignedOffsetAndSize, parseSFOFromBuffer, PkgXorSha1Counter, type CalculatedAesOffsetAndSizeObject, type SFOData } from '../../lib.exports'
+import { BinaryReader, createHashFromBuffer, HexStr, MyObject, pathLikeToFilePath, pathLikeToString, type FilePathLikeTypes } from 'node-lib'
+import { calculateAesAlignedOffsetAndSize, parseSFOFileOrBuffer, PkgAesCtrCounter, pkgContentKeys, PkgXorSha1Counter, type CalculatedAesOffsetAndSizeObject, type SFOData } from '../../lib.exports'
+import { createCipheriv } from 'node:crypto'
 
 // #region Types
 export interface PKGHeaderData {
@@ -14,7 +15,7 @@ export interface PKGHeaderData {
    *
    * Always `[0x00 0x00]` for Rock Band 3 Song Package.
    */
-  resivion: number
+  revision: number
   pkgType: number
   pkgPlatform: string
   metadataOffset: number
@@ -35,7 +36,7 @@ export interface PKGHeaderData {
   paramSFO: string
   debugXorIV: string
   metadata: PKGMetadata[]
-  // aesCtr: PkgAesCtrCounter[]
+  aesCtr: PkgAesCtrCounter[]
   xorCtr: PkgXorSha1Counter
 }
 
@@ -74,6 +75,8 @@ export interface PKGItemEntriesData {
 
 export interface PKGItemEntriesMap {
   name: string
+  itemIndex: number
+  itemKeyIndex: number
   itemNameOffset: number
   itemNameSize: number
   itemDataOffset: number
@@ -100,26 +103,22 @@ export interface PKGData {
 /**
  * Parses a PKG file header.
  * - - - -
- * @param {Buffer | BinaryReader} bufferOrReader A `Buffer` of the PKG file or a `BinaryReader` class instantiated to a PKG file.
- * @param {FilePathLikeTypes} [file] `OPTIONAL` The path to the corresponding PKG file that you've working on. This parameter is only used when passing a `BinaryReader` argument to work upon. Not passing a `file` parameter when an instantiated `BinaryReader` is provided as `bufferOrReader` will throw an Error.
+ * @param {FilePathLikeTypes | Buffer} pkgFilePathOrBuffer A `Buffer` of the PKG file or a path to a PKG file.
  * @returns {PKGHeaderData}
  */
-export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file?: FilePathLikeTypes): Promise<PKGHeaderData> => {
-  let reader: BinaryReader
-  if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
-  else if (file && bufferOrReader instanceof BinaryReader) reader = bufferOrReader
-  else throw new Error(`Invalid argument pairs for "bufferOrReader" and "file" provided while trying to read Rock Band 3 PKG file or buffer.`)
+export const parsePKGHeader = async (pkgFilePathOrBuffer: FilePathLikeTypes | Buffer): Promise<PKGHeaderData> => {
+  const reader = Buffer.isBuffer(pkgFilePathOrBuffer) ? BinaryReader.fromBuffer(pkgFilePathOrBuffer) : await BinaryReader.fromFile(pkgFilePathOrBuffer)
 
   // Header
   const magic = await reader.readHex(4)
-  if (magic !== '0x7f504b47') throw new Error(file ? `Provided file "${pathLikeToString(file)}" has invalid PS3 PKG file signature.` : 'Provided buffer has invalid PS3 PKG file buffer signature.')
-  const resivion = await reader.readUInt16LE()
-  const pkgDebug = resivion === 0
+  if (magic !== '0x7f504b47') throw new Error(reader.getOperatorType() === 'fileHandle' && reader.path !== null ? `Provided file "${pathLikeToString(reader.path)}" has invalid PS3 PKG file signature.` : 'Provided buffer has invalid PS3 PKG file buffer signature.')
+  const revision = await reader.readUInt16LE()
+  const pkgDebug = revision === 0
   const pkgType = await reader.readUInt16BE()
   const pkgPlatform = pkgType === 1 ? 'PS3' : pkgType === 2 ? 'PSP/PSVita' : 'Unknown'
   if (pkgPlatform !== 'PS3') {
     await reader.close()
-    throw new Error(file ? `Provided file "${pathLikeToString(file)}" is not a PS3 PKG file.` : 'Provided buffer  is not a PS3 PKG file buffer.')
+    throw new Error(reader.getOperatorType() === 'fileHandle' && reader.path !== null ? `Provided file "${pathLikeToString(reader.path)}" is not a PS3 PKG file.` : 'Provided buffer  is not a PS3 PKG file buffer.')
   }
   const metadataOffset = await reader.readUInt32BE()
   const metadataCount = await reader.readUInt32BE()
@@ -148,10 +147,13 @@ export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file
     if (metadataEntryType === 1 || metadataEntryType === 2) {
       if (metadataEntryType === 1) metadataMap.set('typeDesc', 'DRM Type')
       else metadataMap.set('typeDesc', 'Content Type')
-      metadataMap.set('value', tempBytes.readUInt32BE())
-      metadataMap.set('size', 4)
-      metadataMap.set('hexSize', 2 + 4 * 2)
-      metadataMap.set('binSize', 2 + 4 * 8)
+      metadataMap.setMany({
+        value: tempBytes.readUInt32BE(),
+        size: 4,
+        hexSize: 2 + 4 * 2,
+        binSize: 2 + 4 * 8,
+      })
+
       if (metadataEntrySize > 4) metadataMap.set('unknownBytes', tempBytes.subarray(0x04))
     }
 
@@ -162,13 +164,15 @@ export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file
       metadataMap.set('value', await tempBytesReader.read())
       let revision = ''
       let pkgVersion = ''
-      await tempBytesReader.close()
       revision += await tempBytesReader.readHex(1, false)
       revision += await tempBytesReader.readHex(1, false)
       pkgVersion += await tempBytesReader.readHex(1, false)
       pkgVersion += `.${await tempBytesReader.readHex(1, false)}`
-      metadataMap.set('revision', revision)
-      metadataMap.set('version', pkgVersion)
+      metadataMap.setMany({
+        revision,
+        version: pkgVersion,
+      })
+      await tempBytesReader.close()
     }
 
     // (6) TitleID (when size 0xc) (otherwise Version + App Version)
@@ -206,6 +210,20 @@ export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file
   const keyIndex = 0
   const paramSFO = 'PARAM.SFO'
 
+  // const aesCtr = new PkgAesCtrCounter()
+  const aesCtr: PkgAesCtrCounter[] = []
+
+  for (const key of pkgContentKeys) {
+    if ('derive' in key && key.derive) {
+      const aes = createCipheriv('aes-128-ecb', key.key, null)
+      aes.setAutoPadding(false)
+      const pkgKey = Buffer.concat([aes.update(Buffer.from(dataRIV, 'hex')), aes.final()])
+      aesCtr.push(new PkgAesCtrCounter(pkgKey, Buffer.from(dataRIV, 'hex')))
+    } else {
+      aesCtr.push(new PkgAesCtrCounter(key.key, Buffer.from(dataRIV, 'hex')))
+    }
+  }
+
   const debugXorIV = Buffer.alloc(0x40)
   const digestBuf = Buffer.from(digest, 'hex')
   digestBuf.subarray(0x00, 0x08).copy(debugXorIV, 0x00)
@@ -215,57 +233,64 @@ export const parsePKGHeader = async (bufferOrReader: Buffer | BinaryReader, file
   const xorCtr = new PkgXorSha1Counter(debugXorIV)
 
   const map = new MyObject<PKGHeaderData>()
-  map.set('magic', magic)
-  map.set('resivion', resivion)
-  map.set('pkgType', pkgType)
-  map.set('pkgPlatform', pkgPlatform)
-  map.set('metadataOffset', metadataOffset)
-  map.set('metadataCount', metadataCount)
-  map.set('headerSize', headerSize)
-  map.set('itemCount', itemCount)
-  map.set('totalSize', totalSize)
-  map.set('dataOffset', dataOffset)
-  map.set('dataSize', dataSize)
-  map.set('contentID', contentID)
-  map.set('cidTitle1', contentID.slice(7, 16))
-  map.set('cidTitle2', contentID.slice(20))
-  map.set('digest', digest)
-  map.set('dataRIV', dataRIV)
-  map.set('metadataSize', metadataSize)
-  map.set('keyIndex', keyIndex)
-  map.set('pkgDebug', pkgDebug)
-  map.set('paramSFO', paramSFO)
-  map.set('debugXorIV', debugXorIV.toString('hex'))
-  map.set('metadata', metadata)
-  map.set('xorCtr', xorCtr)
+  map.setMany({
+    magic,
+    revision,
+    pkgType,
+    pkgPlatform,
+    metadataOffset,
+    metadataCount,
+    headerSize,
+    itemCount,
+    totalSize,
+    dataOffset,
+    dataSize,
+    contentID,
+    cidTitle1: contentID.slice(7, 16),
+    cidTitle2: contentID.slice(20),
+    digest,
+    dataRIV,
+    metadataSize,
+    keyIndex,
+    pkgDebug,
+    paramSFO,
+    debugXorIV: debugXorIV.toString('hex'),
+    metadata,
+    xorCtr,
+    aesCtr,
+  })
 
+  await reader.close()
   return map.toJSON()
 }
 
 /**
  * Parses the item entries of a PKG file.
  * - - - -
- * @param {PKGHeaderData} header An object with parsed information of the header from the PKG file.
- * @param {Buffer | BinaryReader} bufferOrReader A `Buffer` of the PKG file or a `BinaryReader` class instantiated to a PKG file.
- * @param {FilePathLikeTypes} [file] `OPTIONAL` The path to the corresponding PKG file that you've working on. This parameter is only used when passing a `BinaryReader` argument to work upon.
+ * @param {FilePathLikeTypes | Buffer} pkgFilePathOrBuffer A `Buffer` of the PKG file or a path to a PKG file.
  * @returns {Promise<PKGItemEntriesData>}
  */
-export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader: Buffer | BinaryReader, file?: FilePathLikeTypes): Promise<PKGItemEntriesData> => {
-  let reader: BinaryReader
-  if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
-  else if (file && bufferOrReader instanceof BinaryReader) reader = bufferOrReader
-  else throw new Error(`Invalid argument pairs for "bufferOrReader" and "file" provided while trying to read Rock Band 3 PKG file or buffer.`)
+export const parsePKGItemEntries = async (pkgFilePathOrBuffer: FilePathLikeTypes | Buffer): Promise<PKGItemEntriesData> => {
+  const header = await parsePKGHeader(pkgFilePathOrBuffer)
+  const reader = Buffer.isBuffer(pkgFilePathOrBuffer) ? BinaryReader.fromBuffer(pkgFilePathOrBuffer) : await BinaryReader.fromFile(pkgFilePathOrBuffer)
 
-  const itemEntrySize = 32
+  const itemEntrySize = 0x20
   const offset = 0
   let size = header.itemCount * itemEntrySize
   const entriesSize = header.itemCount * itemEntrySize
   let align = calculateAesAlignedOffsetAndSize(offset, size)
 
+  if (align.offsetDelta > 0) throw new Error(`Unaligned encrypted offset ${offset} - ${align.offsetDelta} = ${align.offset} (+${header.dataOffset})`)
+
   reader.seek(header.dataOffset + align.offset)
 
   let encryptedData = await reader.read(align.size)
-  let decryptedData = header.xorCtr.decrypt(align.offset, encryptedData)
+  let decryptedData: Buffer
+  if (header.pkgDebug) {
+    decryptedData = header.xorCtr.decrypt(align.offset, encryptedData)
+  } else {
+    decryptedData = header.aesCtr[header.keyIndex].decrypt(align.offset, encryptedData)
+  }
 
   const itemEntries: PKGItemEntriesMap[] = []
   let offset2 = align.offsetDelta
@@ -278,27 +303,37 @@ export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader:
     const itemEntryReader = BinaryReader.fromBuffer(decryptedData.subarray(offset2, offset2 + itemEntrySize))
     const itemNameOffset = await itemEntryReader.readUInt32BE()
     const itemNameSize = await itemEntryReader.readUInt32BE()
-    const itemDataOffset = Number(await itemEntryReader.readUInt64BE())
-    const itemDataSize = Number(await itemEntryReader.readUInt64BE())
+    const itemDataOffset = Number((await itemEntryReader.readUInt64BE()).toString())
+    const itemDataSize = Number((await itemEntryReader.readUInt64BE()).toString())
+    console.log(itemDataSize)
     const flags = await itemEntryReader.readUInt32BE()
-    entryMap.set('name', '')
-    entryMap.set('itemNameOffset', itemNameOffset)
-    entryMap.set('itemNameSize', itemNameSize)
-    entryMap.set('itemDataOffset', itemDataOffset)
-    entryMap.set('itemDataSize', itemDataSize)
-    entryMap.set('flags', flags)
+    itemEntryReader.padding(0x04)
+    const itemKeyIndex = (flags >> 28) & 0x7
+    entryMap.setMany({
+      itemIndex: i,
+      itemKeyIndex,
+      itemNameOffset,
+      itemNameSize,
+      itemDataOffset,
+      itemDataSize,
+      flags,
+    })
 
-    const itemAlign = calculateAesAlignedOffsetAndSize(header.dataOffset, header.dataSize)
+    const itemAlign = calculateAesAlignedOffsetAndSize(itemDataOffset, itemDataSize)
     if (itemAlign.offsetDelta > 0) throw new Error(`PKG Item Entries Parsing Error: Unaligned encrypted offset ${HexStr.processHex(header.dataOffset)} - ${HexStr.processHex(itemAlign.offsetDelta)} = ${HexStr.processHex(itemAlign.offset)} (+${HexStr.processHex(header.dataOffset)}) for item #${i.toString()}.`)
 
     const itemFlags = flags & 0xff
 
-    if (itemFlags == 4 || itemFlags === 18) {
-      entryMap.set('isFile', false)
-      entryMap.set('isDir', true)
+    if (itemFlags == 0x04 || itemFlags === 0x12) {
+      entryMap.setMany({
+        isFile: false,
+        isDir: true,
+      })
     } else {
-      entryMap.set('isFile', true)
-      entryMap.set('isDir', false)
+      entryMap.setMany({
+        isFile: true,
+        isDir: false,
+      })
     }
 
     if (itemNameSize > 0) {
@@ -313,7 +348,7 @@ export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader:
     itemEntries.push(entryMap.toJSON())
   }
 
-  if (nameOffsetEnd === null || namesOffset === null) throw new Error('PKG Item Entries Parsing Error: Name offset and its end can remain null after iterating through PKG file entries.')
+  if (nameOffsetEnd === null || namesOffset === null) throw new Error("PKG Item Entries Parsing Error: Name offset and its end can't remain null after iterating through PKG file entries.")
 
   const namesSize = nameOffsetEnd - namesOffset
 
@@ -333,25 +368,30 @@ export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader:
   } else throw new Error('PKG Item Entries Parsing Error: Read size of names from file entries if smaller than the provided size of buffer.')
 
   let dlcFolderName = ''
-  let i = 0
-  for (const entry of itemEntries) {
-    const thisIndex = i
-    i++
+  for (let i = 0; i < itemEntries.length; i++) {
+    const entry = itemEntries[i]
     if (entry.itemNameSize <= 0) continue
+    const keyIndex = entry.itemKeyIndex
     offset2 = offset + entry.itemNameOffset
-    const itemAlign = calculateAesAlignedOffsetAndSize(offset2, entry.itemDataSize)
-    entry.itemAlign = itemAlign
-    if (itemAlign.offsetDelta > 0) throw new Error(`PKG Item Entries Parsing Error: Unaligned encrypted offset ${HexStr.processHex(offset2)} - ${HexStr.processHex(itemAlign.offsetDelta)} = ${HexStr.processHex(itemAlign.offset)} (+${header.dataOffset.toString()}) for item #${thisIndex.toString()}.`)
+    const itemAlign = calculateAesAlignedOffsetAndSize(offset2, entry.itemNameSize)
+    // entry.itemAlign = itemAlign
+    if (itemAlign.offsetDelta > 0) throw new Error(`PKG Item Entries Parsing Error: Unaligned encrypted offset ${HexStr.processHex(offset2)} - ${HexStr.processHex(itemAlign.offsetDelta)} = ${HexStr.processHex(itemAlign.offset)} (+${header.dataOffset.toString()}) for item #${i.toString()}.`)
+
     offset2 = itemAlign.offset - align.offset
-    const decryptXor = header.xorCtr.decrypt(itemAlign.offset, encryptedData.subarray(offset2, offset2 + itemAlign.size))
-    decryptXor.copy(decryptedData, offset2)
-    const decryptedName = decryptedData.subarray(offset2 + itemAlign.offsetDelta, offset2 + itemAlign.offsetDelta + entry.itemNameSize)
-    const decryptedNameReader = BinaryReader.fromBuffer(decryptedName)
-    entry.name = await decryptedNameReader.readUTF8()
+
+    if (header.pkgDebug) {
+      const decryptedName = header.xorCtr.decrypt(itemAlign.offset, encryptedData.subarray(offset2, offset2 + itemAlign.size))
+      decryptedName.copy(decryptedData, offset2)
+    } else {
+      const decryptedName = header.aesCtr[keyIndex].decrypt(itemAlign.offset, encryptedData.subarray(offset2, offset2 + itemAlign.size))
+      decryptedName.copy(decryptedData, offset2)
+    }
+
+    const nameBytes = decryptedData.subarray(offset2 + itemAlign.offsetDelta, offset2 + itemAlign.offsetDelta + entry.itemNameSize)
+    entry.name = nameBytes.toString('utf8')
 
     const nameSplit = entry.name.split('/')
     if (nameSplit.length > 1 && nameSplit[0] === 'USRDIR') dlcFolderName = nameSplit[1]
-    await decryptedNameReader.close()
   }
 
   const sha256 = createHashFromBuffer(decryptedData)
@@ -359,17 +399,20 @@ export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader:
   const fileOffsetEnd = fileOffset + size
 
   const map = new MyObject<PKGItemEntriesData>()
-  map.set('offset', offset)
-  map.set('size', size)
-  map.set('entriesSize', entriesSize)
-  map.set('namesOffset', namesOffset)
-  map.set('namesSize', namesSize)
-  map.set('sha256', sha256)
-  map.set('fileOffset', fileOffset)
-  map.set('fileOffsetEnd', fileOffsetEnd)
-  map.set('dlcFolderName', dlcFolderName)
-  map.set('items', itemEntries)
+  map.setMany({
+    offset,
+    size,
+    entriesSize,
+    namesOffset,
+    namesSize,
+    sha256,
+    fileOffset,
+    fileOffsetEnd,
+    dlcFolderName,
+    items: itemEntries,
+  })
 
+  await reader.close()
   return map.toJSON()
 }
 
@@ -378,18 +421,13 @@ export const parsePKGItemEntries = async (header: PKGHeaderData, bufferOrReader:
  * - - - -
  * @param {PKGHeaderData} pkgFileHeader An object with parsed information of the header from the PKG file.
  * @param {PKGItemEntriesData} pkgFileEntries An object with parsed information of the entries from the PKG file.
- * @param {Buffer | BinaryReader} bufferOrReader A `Buffer` of the PKG file or a `BinaryReader` class instantiated to a PKG file.
- * @param {FilePathLikeTypes} [file] `OPTIONAL` The path to the corresponding PKG file that you've working on. This parameter is only used when passing a `BinaryReader` argument to work upon.
+ * @param {FilePathLikeTypes | Buffer} pkgFilePathOrBuffer A `Buffer` of the PKG file or a path to a PKG file.
  * @param {string | RegExp} [pathPattern] `OPTIONAL` A pattern.
  * @returns {Promise<Buffer[]>}
  */
-export const processPKGItemEntries = async (pkgFileHeader: PKGHeaderData, pkgFileEntries: PKGItemEntriesData, bufferOrReader: Buffer | BinaryReader, file?: FilePathLikeTypes, pathPattern?: string | RegExp): Promise<Buffer[]> => {
-  let reader: BinaryReader
-  if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
-  else if (file && bufferOrReader instanceof BinaryReader) reader = bufferOrReader
-  else throw new Error(`Invalid argument pairs for "bufferOrReader" and "file" provided while trying to read Rock Band 3 PKG file or buffer.`)
-  reader.seek(0)
-  let itemDataUsage = 0
+export const processPKGItemEntries = async (pkgFileHeader: PKGHeaderData, pkgFileEntries: PKGItemEntriesData, pkgFilePathOrBuffer: FilePathLikeTypes | Buffer, pathPattern?: string | RegExp): Promise<Buffer[]> => {
+  const reader = Buffer.isBuffer(pkgFilePathOrBuffer) ? BinaryReader.fromBuffer(pkgFilePathOrBuffer) : await BinaryReader.fromFile(pkgFilePathOrBuffer)
+  let itemDataUsable = 0
 
   const decryptedBytes: Buffer[] = []
 
@@ -405,28 +443,29 @@ export const processPKGItemEntries = async (pkgFileHeader: PKGHeaderData, pkgFil
 
       let encBytes: Buffer
       let decBytes: Buffer
-      // const blockDataOffset = align.offsetDelta
-      // let blockDataSizeDelta = 0
+      let blockDataOffset = align.offsetDelta
+      let blockDataSizeDelta = 0
       let blockSize = 0
       while (restSize > 0) {
-        if (itemDataUsage > 0) blockSize = itemDataUsage
+        if (itemDataUsable > 0) blockSize = itemDataUsable
         else blockSize = Math.min(restSize, (Math.floor(Math.random() * (100 - 50 + 1)) + 50) * 0x100000)
 
-        // if (restSize <= blockSize) blockDataSizeDelta = align.sizeDelta - align.offsetDelta
-        // const blockDataSize = blockSize - blockDataOffset - blockDataSizeDelta
+        if (restSize <= blockSize) blockDataSizeDelta = align.sizeDelta - align.offsetDelta
+        const blockDataSize = blockSize - blockDataOffset - blockDataSizeDelta
 
         reader.seek(fileOffset)
         encBytes = await reader.read(blockSize)
-        decBytes = pkgFileHeader.xorCtr.decrypt(dataOffset, encBytes)
+
+        if (pkgFileHeader.pkgDebug) decBytes = pkgFileHeader.xorCtr.decrypt(dataOffset, encBytes)
+        else decBytes = pkgFileHeader.aesCtr[pkgFileHeader.keyIndex].decrypt(dataOffset, encBytes)
+
         restSize -= blockSize
         fileOffset += blockSize
         dataOffset += blockSize
-        itemDataUsage = 0
+        blockDataOffset = 0
+        itemDataUsable = 0
 
-        const decBytesReader = BinaryReader.fromBuffer(decBytes)
-        const content = await decBytesReader.read()
-        await decBytesReader.close()
-        decryptedBytes.push(content)
+        decryptedBytes.push(decBytes)
       }
     }
   }
@@ -436,39 +475,23 @@ export const processPKGItemEntries = async (pkgFileHeader: PKGHeaderData, pkgFil
 }
 
 /**
- * Parses a PKG file buffer.
+ * Parses a PKG file of file buffer.
  * - - - -
- * @param {Buffer | BinaryReader} bufferOrReader A `Buffer` of the PKG file or a `BinaryReader` class instantiated to a PKG file.
- * @param {FilePathLikeTypes} [file] `OPTIONAL` The path to the corresponding PKG file that you've working on. This parameter is only used when passing a `BinaryReader` argument to work upon. Not passing a `file` parameter when an instantiated `BinaryReader` is provided as `bufferOrReader` will throw an Error.
+ * @param {FilePathLikeTypes | Buffer} pkgFilePathOrBuffer A `Buffer` of the PKG file or a path to a PKG file.
  * @returns {Promise<PKGData>}
  */
-export const parsePKGFromBuffer = async (bufferOrReader: Buffer | BinaryReader, file?: FilePathLikeTypes): Promise<PKGData> => {
-  let reader: BinaryReader
-  if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
-  else if (file && bufferOrReader instanceof BinaryReader) reader = bufferOrReader
-  else throw new Error(`Invalid argument pairs for "bufferOrReader" and "file" provided while trying to read Rock Band 3 PKG file or buffer.`)
-  const header = await parsePKGHeader(reader, file)
-  const entries = await parsePKGItemEntries(header, reader, file)
-  const sfoArray = await processPKGItemEntries(header, entries, reader, file, /\.(sfo|SFO)$/)
-  if (sfoArray.length === 0) throw new Error(`No SFO file was found on ${file ? `provided PKG path "${pathLikeToString(file)}".` : 'provided PKG file buffer.'}`)
-  const sfo = await parseSFOFromBuffer(sfoArray[0])
-  await reader.close()
+export const parsePKGFileOrBuffer = async (pkgFilePathOrBuffer: FilePathLikeTypes | Buffer): Promise<PKGData> => {
+  const header = await parsePKGHeader(pkgFilePathOrBuffer)
+  const entries = await parsePKGItemEntries(pkgFilePathOrBuffer)
+  const sfoArray = await processPKGItemEntries(header, entries, pkgFilePathOrBuffer, /\.(sfo|SFO)$/)
+  if (sfoArray.length === 0) throw new Error(`No SFO file was found on ${!Buffer.isBuffer(pkgFilePathOrBuffer) ? `provided PKG path "${pathLikeToString(pkgFilePathOrBuffer)}".` : 'provided PKG file buffer.'}`)
+  const sfo = await parseSFOFileOrBuffer(sfoArray[0])
+  const fileSize = Buffer.isBuffer(pkgFilePathOrBuffer) ? pkgFilePathOrBuffer.length : (await pathLikeToFilePath(pkgFilePathOrBuffer).stat()).size
   return {
-    pkgFilePath: null,
+    pkgFilePath: !Buffer.isBuffer(pkgFilePathOrBuffer) ? pathLikeToString(pkgFilePathOrBuffer) : null,
     header,
     entries,
     sfo,
-    fileSize: reader.length,
+    fileSize,
   }
-}
-
-/**
- * Parses a PKG file.
- * - - - -
- * @param {FilePathLikeTypes} pkgFilePath The path to the PKG file.
- * @returns {Promise<PKGData>}
- */
-export const parsePKGFromFile = async (pkgFilePath: FilePathLikeTypes): Promise<PKGData> => {
-  const reader = await BinaryReader.fromFile(pkgFilePath)
-  return await parsePKGFromBuffer(reader, pkgFilePath)
 }

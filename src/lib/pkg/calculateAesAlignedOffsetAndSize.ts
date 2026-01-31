@@ -8,7 +8,7 @@ export interface CalculatedAesOffsetAndSizeObject {
 }
 
 export const calculateAesAlignedOffsetAndSize = (offset: number, size: number): CalculatedAesOffsetAndSizeObject => {
-  const blockSize = 16 // AES block size in bytes
+  const blockSize = 0x10 // AES block size in bytes
   const map = new MyObject<CalculatedAesOffsetAndSizeObject>()
 
   const offsetDelta = offset & (blockSize - 1)

@@ -37,20 +37,16 @@ export interface SFOData {
 }
 
 /**
- * Parses the information of a `PARAM.SFO` file buffer.
+ * Parses the information of a `PARAM.SFO` file.
  * - - - -
- * @param {Buffer | BinaryReader} bufferOrReader A `Buffer` of the SFO file or a `BinaryReader` class instantiated to a SFO file.
- * @param {FilePathLikeTypes} [file] `OPTIONAL` The path to the corresponding SFO file that you've working on. This parameter is only used when passing a `BinaryReader` argument to work upon.
+ * @param {FilePathLikeTypes} sfoFilePathOrBuffer A path to a `PARAM.SFO` file to be parsed.
  * @returns {Promise<SFOData>}
  */
-export const parseSFOFromBuffer = async (bufferOrReader: Buffer | BinaryReader, file?: FilePathLikeTypes): Promise<SFOData> => {
-  let reader: BinaryReader
-  if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
-  else if (file && bufferOrReader instanceof BinaryReader) reader = bufferOrReader
-  else throw new Error(`Invalid argument pairs for "bufferOrReader" and "file" provided while trying to read PS3 SFO file or buffer.`)
+export const parseSFOFileOrBuffer = async (sfoFilePathOrBuffer: FilePathLikeTypes | Buffer): Promise<SFOData> => {
+  const reader = Buffer.isBuffer(sfoFilePathOrBuffer) ? BinaryReader.fromBuffer(sfoFilePathOrBuffer) : await BinaryReader.fromFile(sfoFilePathOrBuffer)
 
   const magic = await reader.readHex(4)
-  if (magic !== '0x00505346') throw new Error(file ? `Provided file "${pathLikeToString(file)}" has invalid PS3 SFO file signature.` : 'Provided buffer has invalid PS3 SFO file buffer signature.')
+  if (magic !== '0x00505346') throw new Error(reader.getOperatorType() === 'fileHandle' && reader.path ? `Provided file "${reader.path.path}" has invalid PS3 SFO file signature.` : 'Provided SFO file buffer has invalid PS3 SFO file signature.')
   let version = ''
   version += `${(await reader.readUInt8()).toString()}.`
   version += (await reader.readUInt8()).toString()
@@ -138,15 +134,4 @@ export const parseSFOFromBuffer = async (bufferOrReader: Buffer | BinaryReader, 
     tableEntriesCount,
     data,
   }
-}
-
-/**
- * Parses the information of a `PARAM.SFO` file.
- * - - - -
- * @param {FilePathLikeTypes} sfoFilePath A path to a `PARAM.SFO` file to be parsed.
- * @returns {Promise<SFOData>}
- */
-export const parseSFOFromFile = async (sfoFilePath: FilePathLikeTypes): Promise<SFOData> => {
-  const reader = await BinaryReader.fromFile(sfoFilePath)
-  return await parseSFOFromBuffer(reader, sfoFilePath)
 }

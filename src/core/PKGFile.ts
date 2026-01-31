@@ -1,6 +1,6 @@
-import { BinaryReader, type DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, type DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, parseReadableBytesSize, getReadableBytesSize } from 'node-lib'
 import { DTAParser } from '../core.exports'
-import { parsePKGFromFile, processPKGItemEntries, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
+import { parsePKGFileOrBuffer, processPKGItemEntries, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export interface PKGFileStatObject {
   /**
@@ -94,11 +94,11 @@ export class PKGFile {
    */
   async stat(): Promise<PKGFileStatObject> {
     await this.checkFileIntegrity()
-    const data = await parsePKGFromFile(this.path)
+    const data = await parsePKGFileOrBuffer(this.path)
     let isPack = false
     let hasUpgrades = false
-    const dtaEntry = (await processPKGItemEntries(data.header, data.entries, await BinaryReader.fromFile(this.path), this.path, /songs\.(dta|DTA)$/))[0] as Buffer | undefined
-    const upgradesEntry = (await processPKGItemEntries(data.header, data.entries, await BinaryReader.fromFile(this.path), this.path, /upgrades\.(dta|DTA)$/))[0] as Buffer | undefined
+    const dtaEntry = (await processPKGItemEntries(data.header, data.entries, this.path, /songs\.(dta|DTA)$/))[0] as Buffer | undefined
+    const upgradesEntry = (await processPKGItemEntries(data.header, data.entries, this.path, /upgrades\.(dta|DTA)$/))[0] as Buffer | undefined
     if (!dtaEntry) throw new Error(`Provided PS3 PKG file "${this.path.path}" doesn't have a songs.dta file.`)
     const dta = DTAParser.fromBuffer(dtaEntry)
     if (dta.songs.length > 1) isPack = true
@@ -151,7 +151,7 @@ export class PKGFile {
       await dest.deleteDir(true)
       await dest.mkDir()
     }
-    const parsedData = await parsePKGFromFile(this.path)
+    const parsedData = await parsePKGFileOrBuffer(this.path)
     const filteredEntries = parsedData.entries.items.filter((val) => val.isFile && val.name !== 'ICON0.PNG' && val.name !== 'PARAM.SFO' && val.name !== 'PS3LOGO.DAT').map((val) => ({ ...val, entryName: val.name, name: val.name.startsWith('USRDIR/') ? val.name.slice(7) : val.name }))
     for (const entry of filteredEntries) {
       let entryPath = dest.gotoFile(entry.name)
@@ -159,7 +159,7 @@ export class PKGFile {
 
       const root = pathLikeToDirPath(entryPath.root)
       if (!root.exists) await root.mkDir(true)
-      const buf = (await processPKGItemEntries(parsedData.header, { ...parsedData.entries, items: [entry] }, await BinaryReader.fromFile(this.path), this.path))[0]
+      const buf = (await processPKGItemEntries(parsedData.header, { ...parsedData.entries, items: [entry] }, this.path))[0]
       await entryPath.write(buf)
     }
     return dest
