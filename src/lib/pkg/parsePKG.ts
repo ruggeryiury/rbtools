@@ -305,7 +305,6 @@ export const parsePKGItemEntries = async (pkgFilePathOrBuffer: FilePathLikeTypes
     const itemNameSize = await itemEntryReader.readUInt32BE()
     const itemDataOffset = Number((await itemEntryReader.readUInt64BE()).toString())
     const itemDataSize = Number((await itemEntryReader.readUInt64BE()).toString())
-    console.log(itemDataSize)
     const flags = await itemEntryReader.readUInt32BE()
     itemEntryReader.padding(0x04)
     const itemKeyIndex = (flags >> 28) & 0x7
@@ -451,7 +450,7 @@ export const processPKGItemEntries = async (pkgFileHeader: PKGHeaderData, pkgFil
         else blockSize = Math.min(restSize, (Math.floor(Math.random() * (100 - 50 + 1)) + 50) * 0x100000)
 
         if (restSize <= blockSize) blockDataSizeDelta = align.sizeDelta - align.offsetDelta
-        const blockDataSize = blockSize - blockDataOffset - blockDataSizeDelta
+        // const blockDataSize = blockSize - blockDataOffset - blockDataSizeDelta
 
         reader.seek(fileOffset)
         encBytes = await reader.read(blockSize)

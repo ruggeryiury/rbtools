@@ -1,4 +1,4 @@
-import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, resolve, type FilePathLikeTypes } from 'node-lib'
+import { execAsync, type FilePath, pathLikeToFilePath, pathLikeToString, resolve, type FilePathLikeTypes, type DirPathLikeTypes, pathLikeToDirPath, DirPath } from 'node-lib'
 import { EDATFile, ImageFile, MIDIFile, MOGGFile, RBTools } from '../core.exports'
 import { buildOSCommand } from '../lib.exports'
 
@@ -126,6 +126,18 @@ export class BinaryAPI {
     const dest = pathLikeToFilePath(destDdsPath)
 
     const command = buildOSCommand(`${exeName} -nocuda -bc3 "${src.path}" "${dest.path}"`)
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
+    if (stderr) throw new Error(stderr.trim())
+    return dest
+  }
+
+  static async ps3PKGRipper(pkgFilePath: FilePathLikeTypes, destFolder: DirPathLikeTypes): Promise<DirPath> {
+    const exeName = RBTools.binFolder.gotoFile('PS3P_PKG_Ripper.exe').name
+    const pkgFile = pathLikeToFilePath(pkgFilePath)
+    const dest = pathLikeToDirPath(destFolder)
+
+    const command = buildOSCommand(`${exeName} -o "${dest.path}" "${pkgFile.path}"`)
+    console.log(command)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     return dest
