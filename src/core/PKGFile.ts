@@ -150,7 +150,7 @@ export class PKGFile {
       await dest.mkDir()
     }
 
-    await BinaryAPI.ps3PKGRipper(this.path, dest)
+    await BinaryAPI.ps3pPKGRipper(this.path, dest)
     return dest
     // const parsedData = await parsePKGFileOrBuffer(this.path)
     // const filteredEntries = parsedData.entries.items.filter((val) => val.isFile && val.name !== 'ICON0.PNG' && val.name !== 'PARAM.SFO' && val.name !== 'PS3LOGO.DAT').map((val) => ({ ...val, entryName: val.name, name: val.name.startsWith('USRDIR/') ? val.name.slice(7) : val.name }))
@@ -163,6 +163,6 @@ export class PKGFile {
     //   const buf = (await processPKGItemEntries(parsedData.header, { ...parsedData.entries, items: [entry] }, this.path))[0]
     //   await entryPath.write(buf)
     // }
-    return dest
+    // return dest
   }
 }

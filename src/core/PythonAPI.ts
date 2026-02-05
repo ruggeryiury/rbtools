@@ -259,7 +259,7 @@ export class PythonAPI {
   /**
    * Returns an object with stats of an audio file.
    * - - - -
-   * @param {FilePathLikeTypes} audioFilePath The path to the image file.
+   * @param {FilePathLikeTypes} audioFilePath The path to the audio file.
    * @returns {Promise<AudioFileStatPythonObject>}
    */
   static async audioFileStat(audioFilePath: FilePathLikeTypes): Promise<AudioFileStatPythonObject> {
@@ -279,7 +279,7 @@ export class PythonAPI {
    * @param {boolean} [encrypt] `OPTIONAL` Encrypts the MOGG file using `0B` encryption. The encryption works on all systems. Default is `false`.
    * @returns {Promise<MOGGFile>}
    */
-  static async moggCreator(tracks: FilePathLikeTypes[], destPath: FilePathLikeTypes, encrypt = false): Promise<MOGGFile> {
+  static async moggCreator(tracks: FilePathLikeTypes[], destPath: FilePathLikeTypes, encrypt: boolean = false): Promise<MOGGFile> {
     const pythonScript = 'mogg_creator.py'
 
     let audioFilesInput = ''

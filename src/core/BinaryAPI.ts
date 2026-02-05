@@ -131,13 +131,21 @@ export class BinaryAPI {
     return dest
   }
 
-  static async ps3PKGRipper(pkgFilePath: FilePathLikeTypes, destFolder: DirPathLikeTypes): Promise<DirPath> {
+  /**
+   * Execute the PS3P_PKG_Ripper executable.
+   *
+   * _PS3P_PKG_Ripper extracts PKG files._
+   * - - - -
+   * @param pkgFilePath The path to the PKG file to be extracted.
+   * @param destFolder The folder you want to extract the PKG file contents.
+   * @returns {Promise<DirPath>}
+   */
+  static async ps3pPKGRipper(pkgFilePath: FilePathLikeTypes, destFolder: DirPathLikeTypes): Promise<DirPath> {
     const exeName = RBTools.binFolder.gotoFile('PS3P_PKG_Ripper.exe').name
     const pkgFile = pathLikeToFilePath(pkgFilePath)
     const dest = pathLikeToDirPath(destFolder)
 
     const command = buildOSCommand(`${exeName} -o "${dest.path}" "${pkgFile.path}"`)
-    console.log(command)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     return dest
