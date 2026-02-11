@@ -25,7 +25,8 @@
 
 ## System
 
-- [Visual Studio Build Tools for C++](https://visualstudio.microsoft.com/visual-cpp-build-tools/).
+- [FFMPEG](https://www.ffmpeg.org/).
+  - The FFMPEG path must also be settled on the system environment variables.
 
 ## Python
 
