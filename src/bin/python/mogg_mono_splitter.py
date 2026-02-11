@@ -6,8 +6,8 @@ from os import PathLike
 from pathlib import Path
 from pydub import AudioSegment
 from typing import List, Union
-from .lib.mogg import decrypt_mogg_bytes
-from .lib.pydub_utils import mogg_import_channel_order_fixer
+from lib.mogg import decrypt_mogg_bytes
+from lib.pydub_utils import mogg_import_channel_order_fixer
 
 
 def mogg_mono_splitter(mogg_file_path: Union[str, PathLike[str]]) -> List[AudioSegment]:

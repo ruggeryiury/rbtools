@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import argparse, json, os
-from .lib.stfs import STFS
+from lib.stfs import STFS
 from typing import TypedDict
 
 

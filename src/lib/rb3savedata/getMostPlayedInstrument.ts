@@ -1,8 +1,8 @@
 import type { ScoreDataInstrumentTypes, RB3Scores } from '../../core.exports'
 
-export const getMostPlayedInstrument = (scoresList: RB3Scores[]): ScoreDataInstrumentTypes | null => {
+export const getMostPlayedInstrument = (scoresList: RB3Scores[]): ScoreDataInstrumentTypes => {
   const results: ScoreDataInstrumentTypes[] = []
-  if (scoresList.length === 0) return null
+  if (scoresList.length === 0) return 'band'
   for (const score of scoresList) {
     if (score.bass.topScore > 0) results.push('bass')
     if (score.drums.topScore > 0) results.push('drums')

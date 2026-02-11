@@ -3,7 +3,7 @@
 import argparse, json, base64
 from pydub import AudioSegment
 from typing import List
-from .mogg_track_extractor import AudioFileTracksStructureDocument, mogg_track_extractor
+from mogg_track_extractor import AudioFileTracksStructureDocument, mogg_track_extractor
 
 
 def mogg_preview_creator(

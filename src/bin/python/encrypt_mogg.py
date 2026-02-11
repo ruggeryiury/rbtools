@@ -4,7 +4,7 @@ import argparse
 from os import PathLike
 from pathlib import Path
 from typing import Union, Literal
-from .lib.mogg import reencrypt_mogg
+from lib.mogg import reencrypt_mogg
 
 
 def mogg_encrypt(

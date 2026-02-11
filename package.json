@@ -1,6 +1,6 @@
 {
   "name": "rbtools",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "private": true,
   "description": "A module package to manipulate several Rock Band game files.",
   "homepage": "https://github.com/ruggeryiury/rbtools#readme",

@@ -1,6 +1,6 @@
-import { BinaryReader, type DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, parseReadableBytesSize, getReadableBytesSize } from 'node-lib'
+import { BinaryReader, type DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { BinaryAPI, DTAParser } from '../core.exports'
-import { parsePKGFileOrBuffer, processPKGItemEntries, type PartialDTAFile, type PKGData, type RB3CompatibleDTAFile } from '../lib.exports'
+import { parsePKGFileOrBuffer, processPKGItemEntries, type PKGData } from '../lib.exports'
 
 export interface PKGFileSongPackageStatObject {
   /**
@@ -152,17 +152,5 @@ export class PKGFile {
 
     await BinaryAPI.ps3pPKGRipper(this.path, dest)
     return dest
-    // const parsedData = await parsePKGFileOrBuffer(this.path)
-    // const filteredEntries = parsedData.entries.items.filter((val) => val.isFile && val.name !== 'ICON0.PNG' && val.name !== 'PARAM.SFO' && val.name !== 'PS3LOGO.DAT').map((val) => ({ ...val, entryName: val.name, name: val.name.startsWith('USRDIR/') ? val.name.slice(7) : val.name }))
-    // for (const entry of filteredEntries) {
-    //   let entryPath = dest.gotoFile(entry.name)
-    //   if (extractOnRoot) entryPath = dest.gotoFile(entryPath.fullname)
-
-    //   const root = pathLikeToDirPath(entryPath.root)
-    //   if (!root.exists) await root.mkDir(true)
-    //   const buf = (await processPKGItemEntries(parsedData.header, { ...parsedData.entries, items: [entry] }, this.path))[0]
-    //   await entryPath.write(buf)
-    // }
-    // return dest
   }
 }

@@ -136,16 +136,17 @@ export class BinaryAPI {
    *
    * _PS3P_PKG_Ripper extracts PKG files._
    * - - - -
-   * @param pkgFilePath The path to the PKG file to be extracted.
-   * @param destFolder The folder you want to extract the PKG file contents.
+   * @param {FilePathLikeTypes} pkgFilePath The path to the PKG file to be extracted.
+   * @param {DirPathLikeTypes} destFolder The folder you want to extract the PKG file contents.
+   * @param {string[]} [files] `OPTIONAL` An array with files to be extracted.
    * @returns {Promise<DirPath>}
    */
-  static async ps3pPKGRipper(pkgFilePath: FilePathLikeTypes, destFolder: DirPathLikeTypes): Promise<DirPath> {
+  static async ps3pPKGRipper(pkgFilePath: FilePathLikeTypes, destFolder: DirPathLikeTypes, files?: string[]): Promise<DirPath> {
     const exeName = RBTools.binFolder.gotoFile('PS3P_PKG_Ripper.exe').name
     const pkgFile = pathLikeToFilePath(pkgFilePath)
     const dest = pathLikeToDirPath(destFolder)
 
-    const command = buildOSCommand(`${exeName} -o "${dest.path}" "${pkgFile.path}"`)
+    const command = buildOSCommand(`${exeName} -o "${dest.path}" "${pkgFile.path}"${files && files.reduce((prev, curr) => `${prev} -i "${curr}"`, '')}`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     return dest

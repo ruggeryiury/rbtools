@@ -4,7 +4,7 @@ import argparse, json, struct, tempfile
 from os import PathLike, path
 from typing import TypedDict, Union
 from pydub.utils import mediainfo
-from .lib.mogg import decrypt_mogg_bytes
+from lib.mogg import decrypt_mogg_bytes
 
 
 class MOGGStatObject(TypedDict):

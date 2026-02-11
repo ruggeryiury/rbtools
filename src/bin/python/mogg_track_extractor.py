@@ -5,8 +5,8 @@ from pydub import AudioSegment
 from io import BytesIO
 from typing import TypedDict, Optional, List, Literal
 from pathlib import Path
-from .lib.mogg import decrypt_mogg_bytes
-from .lib.pydub_utils import mogg_import_channel_order_fixer
+from lib.mogg import decrypt_mogg_bytes
+from lib.pydub_utils import mogg_import_channel_order_fixer
 
 
 class DrumsTracksStructure(TypedDict):
@@ -97,12 +97,12 @@ def mogg_track_extractor(
         drum_channels = tracks["drum"]["channels"]
         if drum_channels == 2:
             drums_left = (
-                oggtracks[i + 2]
+                oggtracks[i]
                 .append(AudioSegment.silent(duration, frame_rate=frame_rate))
                 .pan(tracks["drum"]["pan"][0])
             )
             drums_right = (
-                oggtracks[i + 2]
+                oggtracks[i + 1]
                 .append(AudioSegment.silent(duration, frame_rate=frame_rate))
                 .pan(tracks["drum"]["pan"][1])
             )
@@ -124,12 +124,12 @@ def mogg_track_extractor(
             )
             exports.append(kick_audio)
             kit_left = (
-                oggtracks[i + 1]
+                oggtracks[i]
                 .append(AudioSegment.silent(duration, frame_rate=frame_rate))
                 .pan(tracks["drum"]["pan"][1])
             )
             kit_right = (
-                oggtracks[i + 2]
+                oggtracks[i + 1]
                 .append(AudioSegment.silent(duration, frame_rate=frame_rate))
                 .pan(tracks["drum"]["pan"][2])
             )
@@ -225,7 +225,7 @@ def mogg_track_extractor(
             )
             exports.append(kit_audio)
             i += 5
-        elif drum_channels == 5:
+        elif drum_channels == 6:
             kick_left = (
                 oggtracks[i]
                 .append(AudioSegment.silent(duration, frame_rate=frame_rate))
@@ -492,9 +492,16 @@ if __name__ == "__main__":
     arg = parser.parse_args()
 
     tracks: AudioFileTracksStructureDocument = json.loads(base64.b64decode(arg.tracks))
+    
+    print(tracks)
 
+    output = Path(arg.output)
+    if not output.exists():
+        output.mkdir(parents=True)
+        
     audios = mogg_track_extractor(arg.mogg_file_path, tracks, True)
-
+    print(tracks)
+    
     drums_path = Path(arg.output, "drums.wav")
     kick_path = Path(arg.output, "kick.wav")
     snare_path = Path(arg.output, "snare.wav")
@@ -550,7 +557,7 @@ if __name__ == "__main__":
 
     keys_enabled = tracks["keys"]["enabled"]
     if keys_enabled:
-        audios[i].export(vocals_path, format="wav")
+        audios[i].export(keys_path, format="wav")
         i += 1
 
     backing_enabled = tracks["backing"]["enabled"]
@@ -560,4 +567,4 @@ if __name__ == "__main__":
 
     crowd_enabled = tracks["crowd"]["enabled"]
     if crowd_enabled:
-        audios[i].export(backing_path, format="wav")
+        audios[i].export(crowd_path, format="wav")

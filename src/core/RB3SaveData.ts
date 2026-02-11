@@ -126,7 +126,7 @@ export interface ParsedRB3SaveData {
   /**
    * The most played instrument by the player.
    */
-  mostPlayedInstrument: ScoreDataInstrumentTypes | null
+  mostPlayedInstrument: ScoreDataInstrumentTypes
   /**
    * An array with all played songs scores.
    */
