@@ -146,7 +146,7 @@ export class BinaryAPI {
     const pkgFile = pathLikeToFilePath(pkgFilePath)
     const dest = pathLikeToDirPath(destFolder)
 
-    const command = buildOSCommand(`${exeName} -o "${dest.path}" "${pkgFile.path}"${files && files.reduce((prev, curr) => `${prev} -i "${curr}"`, '')}`)
+    const command = buildOSCommand(`${exeName} -o "${dest.path}" "${pkgFile.path}"${files ? files.reduce((prev, curr) => `${prev} -i "${curr}"`, '') : ''}`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     return dest

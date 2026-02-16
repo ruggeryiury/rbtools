@@ -34,9 +34,7 @@ export const containsLatin1SpecificChars = (input: string): boolean => {
     const charCode = input.charCodeAt(i)
 
     // Check if the character is within the Latin-1 specific range (128–255)
-    if (charCode >= 128 && charCode <= 255) {
-      return true
-    }
+    if (charCode >= 128 && charCode <= 255) return true
   }
   return false
 }

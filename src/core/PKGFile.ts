@@ -1,4 +1,4 @@
-import { BinaryReader, type DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, DirPath, FilePath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { BinaryAPI, DTAParser } from '../core.exports'
 import { parsePKGFileOrBuffer, processPKGItemEntries, type PKGData } from '../lib.exports'
 
@@ -139,9 +139,10 @@ export class PKGFile {
    * Extracts the PKG file contents and returns the folder path where all contents were extracted.
    * - - - -
    * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
+   * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire PKG file system recursively. Default is `false`.
    * @returns {Promise<DirPath>}
    */
-  async extract(destPath: DirPathLikeTypes): Promise<DirPath> {
+  async extract(destPath: DirPathLikeTypes, extractOnRoot: boolean = false): Promise<DirPath> {
     await this.checkFileIntegrity()
     const dest = pathLikeToDirPath(destPath)
     if (!dest.exists) await dest.mkDir()
@@ -151,6 +152,21 @@ export class PKGFile {
     }
 
     await BinaryAPI.ps3pPKGRipper(this.path, dest)
+
+    if (extractOnRoot) {
+      const paths = await dest.readDir(true)
+      const allFiles = paths.filter((p) => p instanceof FilePath)
+      const allDirs = paths.filter((p) => p instanceof DirPath)
+
+      for (const file of allFiles) {
+        const rootFile = dest.gotoFile(file.fullname)
+        if (!rootFile.exists) await file.move(rootFile)
+      }
+
+      for (const dir of allDirs) {
+        if (dir.exists) await dir.deleteDir(true)
+      }
+    }
     return dest
   }
 }

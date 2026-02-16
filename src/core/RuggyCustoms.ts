@@ -3,10 +3,10 @@ import { sortDTA, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export class RuggyCustoms {
   static readonly magmaConfig: MAGMAProjectSongData = {
-    magmaPath: 'C:/Users/Ruggery/Desktop/Rock Band/Magma',
-    songsProjectRootFolderPath: 'C:/Users/Ruggery/Documents/Visual Studio Code/projects/ruggy-customs/songs',
-    destPath: 'C:/Users/Ruggery/Documents/Visual Studio Code/projects/ruggy-customs/magma/{{songname}}.rba',
-    rbaPath: 'C:/Users/Ruggery/Documents/Visual Studio Code/projects/ruggy-customs/packages/{{songname}}.rba',
+    magmaPath: 'C:/Users/Ruggery/Documents/RockBand/MAGMA',
+    songsProjectRootFolderPath: 'C:/Users/Ruggery/Documents/RockBand/RuggyCustoms/songs',
+    destPath: 'C:/Users/Ruggery/Documents/RockBand/RuggyCustoms/magma/{{songname}}.rba',
+    rbaPath: 'C:/Users/Ruggery/Documents/RockBand/RuggyCustoms/packages/{{songname}}.rba',
   }
 
   /**

@@ -121,7 +121,7 @@ export class STFSFile {
    * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire STFS file system recursively. Default is `false`.
    * @returns {Promise<DirPath>}
    */
-  async extract(destPath: DirPathLikeTypes, extractOnRoot = false): Promise<DirPath> {
+  async extract(destPath: DirPathLikeTypes, extractOnRoot: boolean = false): Promise<DirPath> {
     await this.checkFileIntegrity()
     const dest = pathLikeToDirPath(destPath)
     if (!dest.exists) await dest.mkDir()
@@ -131,4 +131,6 @@ export class STFSFile {
     }
     return await PythonAPI.stfsExtract(this.path, destPath, extractOnRoot)
   }
+
+  
 }
