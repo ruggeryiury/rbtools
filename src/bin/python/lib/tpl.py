@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 TPL Library Script taken and modified from "Wii.py" repository by GitHub user "DorkmasterFlek".
 

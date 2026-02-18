@@ -21,6 +21,14 @@ export type STFSFileStatObject = Omit<STFSFileStatRawObject, 'dta' | 'upgrades'>
    * A boolean value that tells if the package has PRO Guitar/Bass upgrades.
    */
   hasUpgrades: boolean
+  /**
+   * The thumbnail that appears on the Xbox dashboard encoded in Data URL string.
+   */
+  thumbnail: string
+  /**
+   * The title thumbnail encoded in Data URL string.
+   */
+  titleThumbnail: string
 }
 
 export interface STFSFileJSONRepresentation extends FilePathJSONRepresentation, Omit<STFSFileStatObject, 'dta' | 'upgrades'> {
@@ -131,6 +139,4 @@ export class STFSFile {
     }
     return await PythonAPI.stfsExtract(this.path, destPath, extractOnRoot)
   }
-
-  
 }

@@ -16,6 +16,6 @@
     "verbatimModuleSyntax": true,
     // "isolatedDeclarations": true
   },
-  "include": ["dev/**/*.ts", "src/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }

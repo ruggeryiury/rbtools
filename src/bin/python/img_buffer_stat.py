@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 import sys, json, base64, puremagic
 from io import BytesIO
 from PIL import Image

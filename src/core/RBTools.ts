@@ -1,6 +1,8 @@
 import type { DirPath } from 'node-lib'
 import { thisFilePath } from '../lib.exports'
 
+export const isDev = () => process.env.NODE_ENV === 'development'
+
 export class RBTools {
   /**
    * Gets the root directory path of the _RBTools_ module.
@@ -19,7 +21,7 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get binFolder(): DirPath {
-    return this.moduleRoot.gotoDir('dist/bin')
+    return isDev() ? this.moduleRoot.gotoDir('src/bin') : this.moduleRoot.gotoDir('dist/bin')
   }
 
   /**
@@ -28,7 +30,7 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get dbFolder(): DirPath {
-    return this.moduleRoot.gotoDir('dist/bin/db')
+    return isDev() ? this.moduleRoot.gotoDir('src/bin/db') : this.moduleRoot.gotoDir('dist/bin/db')
   }
 
   /**
@@ -37,7 +39,7 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get headersFolder(): DirPath {
-    return this.moduleRoot.gotoDir('dist/bin/headers')
+    return isDev() ? this.moduleRoot.gotoDir('src/bin/headers') : this.moduleRoot.gotoDir('dist/bin/headers')
   }
 
   /**
@@ -46,6 +48,6 @@ export class RBTools {
    * @returns {DirPath}
    */
   static get pyFolder(): DirPath {
-    return this.moduleRoot.gotoDir('dist/bin/python')
+    return isDev() ? this.moduleRoot.gotoDir('src/bin/python') : this.moduleRoot.gotoDir('dist/bin/python')
   }
 }

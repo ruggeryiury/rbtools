@@ -4,7 +4,7 @@ import { temporaryFile } from 'tempy'
 import { BinaryAPI, PythonAPI, TextureFile, type TextureFormatTypes, type TextureSizeTypes } from '../../core.exports'
 import { imageHeaders } from '../../lib.exports'
 
-export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: FilePathLikeTypes, toFormat: TextureFormatTypes, size: TextureSizeTypes = 256): Promise<TextureFile> => {
+export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: FilePathLikeTypes, toFormat: Exclude<TextureFormatTypes, 'png_wii'>, size: TextureSizeTypes = 256): Promise<TextureFile> => {
   const src = pathLikeToFilePath(srcFile)
   const dest = pathLikeToFilePath(destPath).changeFileExt(toFormat)
 
@@ -34,7 +34,7 @@ export const imageToTexXboxPs3 = async (srcFile: FilePathLikeTypes, destPath: Fi
   const texStream = await dest.createWriteStream()
 
   // 128 is the size of the DDS file header we need to skip
-  const ddsContents = src.ext === '.png_ps3' ? ddsBuffer.subarray(128) : ddsBuffer.subarray(128).swap16()
+  const ddsContents = toFormat === 'png_ps3' ? ddsBuffer.subarray(128) : ddsBuffer.subarray(128).swap16()
 
   texStream.write(ddsHeader)
   texStream.end(ddsContents)

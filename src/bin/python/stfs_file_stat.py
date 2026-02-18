@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
-import argparse, json, os
+import argparse
+import json
+import os
 from lib.stfs import STFS
 from typing import TypedDict
+import base64
 
 
 class STFSFileStatRequired(TypedDict):
@@ -10,6 +12,8 @@ class STFSFileStatRequired(TypedDict):
     desc: str
     files: list[str]
     fileSize: int
+    thumbnail: str
+    titleThumbnail: str
 
 
 class STFSFileStatOptional(TypedDict, total=False):
@@ -32,6 +36,8 @@ def stfs_file_stat(file_path: str) -> STFSFileStat:
         "files": [],
         "dta": "",
         "fileSize": os.path.getsize(file_path),
+        "thumbnail": f"data:image/png;base64,{base64.b64encode(con.thumbnail).decode()}",
+        "titleThumbnail": f"data:image/png;base64,{base64.b64encode(con.titleimage).decode()}"
     }
 
     all_files = con.allfiles.keys()
@@ -71,7 +77,8 @@ def stfs_file_stat(file_path: str) -> STFSFileStat:
         upg_file_contents_bytes = con.read_file(upg_file)
 
         try:
-            status["upgrades"] = upg_file_contents_bytes.decode().replace('\ufeff', '')
+            status["upgrades"] = upg_file_contents_bytes.decode().replace(
+                '\ufeff', '')
         except UnicodeDecodeError:
             status["upgrades"] = upg_file_contents_bytes.decode("latin-1")
     except AttributeError:

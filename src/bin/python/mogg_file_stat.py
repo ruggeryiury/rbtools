@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
-import argparse, json, struct, tempfile
+import argparse
+import json
+import struct
+import tempfile
 from os import PathLike, path
+from pathlib import Path
 from typing import TypedDict, Union
 from pydub.utils import mediainfo
-from lib.mogg import decrypt_mogg_bytes
+from lib.mogg import decrypt_mogg
 
 
 class MOGGStatObject(TypedDict):
@@ -42,11 +45,10 @@ def mogg_file_stat(mogg_file_path: Union[str, PathLike[str]]) -> MOGGFileStat:
     with open(mogg_file_path, "rb") as fin:
         version = struct.unpack("<I", fin.read(4))[0]
         fin.seek(0)
-        ogg_bytes = decrypt_mogg_bytes(True, False, fin.read())
         temp_ogg = tempfile.NamedTemporaryFile(delete=False, suffix=".ogg")
+
+        decrypt_mogg(False, False, fin, temp_ogg)
         try:
-            temp_ogg.write(ogg_bytes)
-            temp_ogg.flush()
             audio = mediainfo(temp_ogg.name)
 
             return {
@@ -69,16 +71,19 @@ def mogg_file_stat(mogg_file_path: Union[str, PathLike[str]]) -> MOGGFileStat:
             }
         except Exception as e:
             temp_ogg.close()
+            Path(temp_ogg.name).unlink(True)
             raise e
         finally:
             temp_ogg.close()
+            Path(temp_ogg.name).unlink(True)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="RBTools: MOGG File Stat", epilog="By Ruggery Iury Corrêa."
     )
-    parser.add_argument("mogg_file_path", help="The path to the MOGG file", type=str)
+    parser.add_argument(
+        "mogg_file_path", help="The path to the MOGG file", type=str)
     parser.add_argument(
         "-p",
         "--print-results",

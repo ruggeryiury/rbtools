@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
-import argparse, os
+import argparse
+import os
 from pathlib import Path
 from lib.stfs import STFS
 import shutil
 
 
-def stfs_extract(stfs_file_path: str, dest_path: str, clean_dest_dir: bool) -> str:
+def stfs_extract(stfs_file_path: str, dest_path: str) -> str:
     dest = Path(dest_path)
 
-    if clean_dest_dir and dest.exists() and dest.is_dir():
+    if dest.exists() and dest.is_dir():
         shutil.rmtree(dest)  # Remove entire directory and contents
 
     # Recreate it empty
@@ -41,11 +41,11 @@ def stfs_extract(stfs_file_path: str, dest_path: str, clean_dest_dir: bool) -> s
 
 
 def stfs_extract_on_root(
-    stfs_file_path: str, dest_path: str, clean_dest_dir: bool
+    stfs_file_path: str, dest_path: str
 ) -> str:
     dest = Path(dest_path)
 
-    if clean_dest_dir and dest.exists() and dest.is_dir():
+    if dest.exists() and dest.is_dir():
         shutil.rmtree(dest)  # Remove entire directory and contents
 
     # Recreate it empty
@@ -84,16 +84,10 @@ if __name__ == "__main__":
         action=argparse.BooleanOptionalAction,
         default=False,
     )
-    parser.add_argument(
-        "--clean-dest-dir",
-        help="Delete the entire destination folder contents before extracting",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-    )
 
     arg = parser.parse_args()
 
     if arg.extract_on_root:
-        stfs_extract_on_root(arg.stfs_file_path, arg.dest_path, arg.clean_dest_dir)
+        stfs_extract_on_root(arg.stfs_file_path, arg.dest_path)
     else:
-        stfs_extract(arg.stfs_file_path, arg.dest_path, arg.clean_dest_dir)
+        stfs_extract(arg.stfs_file_path, arg.dest_path)

@@ -526,13 +526,13 @@ export class MAGMAProject {
     return [rbprojFile.toString(), rokFile.toBuffer().toString()]
   }
 
-  saveMAGMAC3FileContentsSync(): [FilePath, FilePath] {
+  async saveMAGMAC3FileContents(): Promise<[FilePath, FilePath]> {
     const [rbprojFile, c3File] = this.getMAGMAC3FileContents()
     const rbprojFilePath = FilePath.of(formatStringFromDTA(this.songData, this.options.destPath)).changeFileExt('.rbproj')
     const c3FilePath = FilePath.of(formatStringFromDTA(this.songData, this.options.destPath)).changeFileExt('.rok')
 
-    rbprojFilePath.writeSync(rbprojFile.replace(new RegExp('\\n', 'g'), '\r\n'), 'latin1')
-    c3FilePath.writeWithBOMSync(c3File.replace(new RegExp('\\n', 'g'), '\r\n'))
+    await rbprojFilePath.write(rbprojFile.replace(new RegExp('\\n', 'g'), '\r\n'), 'latin1')
+    await c3FilePath.writeWithBOM(c3File.replace(new RegExp('\\n', 'g'), '\r\n'))
 
     return [rbprojFilePath, c3FilePath]
   }

@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process'
 import { execAsync, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes, type DirPath, pathLikeToDirPath, type FilePath } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
-import { ImageFile, MOGGFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes, type MOGGFileEncryptionVersion } from '../core.exports'
+import { ImageFile, MOGGFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes } from '../core.exports'
 import { genAudioFileStructure, type RB3CompatibleDTAFile, type TPLHeaderParserObject } from '../lib.exports'
 
 // #region Types
@@ -97,6 +97,14 @@ export interface STFSFileStatRawObject {
    * The size of the STFS file.
    */
   fileSize: number
+  /**
+   * The thumbnail that appears on the Xbox dashboard encoded in Data URL string.
+   */
+  thumbnail: string
+  /**
+   * The title thumbnail encoded in Data URL string.
+   */
+  titleThumbnail: string
 }
 
 export type PreviewAudioFormatTypes = 'wav' | 'flac' | 'ogg' | 'mp3'
@@ -302,8 +310,15 @@ export class PythonAPI {
     const pythonScript = 'mogg_file_stat.py'
     const command = `python "${pythonScript}" "${pathLikeToString(moggFilePath)}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    // if (isDev()) console.log(`RBTools Python script: ${pythonScript}\n----------------------------------\n`, stdout.trim(), '\n\nEND OF PROGRAM\n----------------------------------')
     if (stderr) throw new Error(stderr)
-    const returnValue = JSON.parse(stdout) as MOGGFileStatPythonObject
+    const returnValue = JSON.parse(
+      stdout
+        .split('\n')
+        .filter((line) => line.startsWith('{'))
+        .map((line) => line.trim())
+        .join('')
+    ) as MOGGFileStatPythonObject
     return returnValue
   }
 
@@ -322,28 +337,6 @@ export class PythonAPI {
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return new MOGGFile(dec)
-  }
-
-  /**
-   * Encrypts a MOGG file and returns an instantiated `MOGGFile` class pointing to the new encrypted MOGG file.
-   * - - - -
-   * @param {FilePathLikeTypes} decMoggPath The path to the decrypted MOGG file.
-   * @param {FilePathLikeTypes} encMoggPath The path of the encrypted MOGG file.
-   * @param {MOGGFileEncryptionVersion} [encVersion] `OPTIONAL` The type of the encryption. Default is `11`.
-   * @param {boolean} [usePS3] `OPTIONAL` Use PS3 keys for encryption, used only on certain encryption versions. Default is `false`.
-   * @param {boolean} [useRed] `OPTIONAL` Use red keys for encryption, used only on certain encryption versions. Default is `false`.
-   * @returns {Promise<MOGGFile>}
-   */
-  static async encryptMOGG(decMoggPath: FilePathLikeTypes, encMoggPath: FilePathLikeTypes, encVersion: MOGGFileEncryptionVersion = 11, usePS3 = false, useRed = false): Promise<MOGGFile> {
-    const dec = pathLikeToFilePath(decMoggPath)
-    const enc = pathLikeToFilePath(encMoggPath)
-    const pythonScript = 'encrypt_mogg.py'
-    let command = `python "${pythonScript}" "${enc.path}" "${dec.path}" -e ${encVersion.toString()}`
-    if (usePS3) command += ' -p'
-    if (useRed) command += ' -r'
-    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
-    if (stderr) throw new Error(stderr)
-    return new MOGGFile(enc)
   }
 
   /**
@@ -379,7 +372,7 @@ export class PythonAPI {
    * @param {boolean} [mixCrowd] `OPTIONAL` If true, the crowd track will be mixed into the preview audio.
    * @returns {Promise<FilePath>}
    */
-  static async moggPreviewCreator(moggPath: FilePathLikeTypes, songdata: RB3CompatibleDTAFile, destPath: FilePathLikeTypes, format: PreviewAudioFormatTypes = 'wav', mixCrowd = false): Promise<FilePath> {
+  static async moggPreviewCreator(moggPath: FilePathLikeTypes, songdata: RB3CompatibleDTAFile, destPath: FilePathLikeTypes, format: PreviewAudioFormatTypes = 'wav', mixCrowd: boolean = false): Promise<FilePath> {
     const mogg = pathLikeToFilePath(moggPath)
     const dest = pathLikeToFilePath(destPath).changeFileExt(`.${format}`)
 
@@ -433,16 +426,14 @@ export class PythonAPI {
    * @param {FilePathLikeTypes} stfsFilePath The path of the CON file.
    * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
    * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire STFS file system recursively. Default is `false`.
-   * @param {boolean} [cleanDestDir] `OPTIONAL` Delete the entire destination folder contents before extracting. Default is `false`.
    * @returns {Promise<DirPath>}
    */
-  static async stfsExtract(stfsFilePath: FilePathLikeTypes, destPath: DirPathLikeTypes, extractOnRoot = false, cleanDestDir = false): Promise<DirPath> {
+  static async stfsExtract(stfsFilePath: FilePathLikeTypes, destPath: DirPathLikeTypes, extractOnRoot: boolean = false): Promise<DirPath> {
     const stfs = pathLikeToFilePath(stfsFilePath)
     const dest = pathLikeToDirPath(destPath)
     const pythonScript = 'stfs_extract.py'
     let command = `python "${pythonScript}" "${stfs.path}" "${dest.path}"`
     if (extractOnRoot) command += ' --extract-on-root'
-    if (cleanDestDir) command += ' --clean-dest-dir'
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return dest

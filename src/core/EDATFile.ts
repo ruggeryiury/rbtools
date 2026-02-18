@@ -46,14 +46,14 @@ export class EDATFile {
   static genContentID(text: string, game: RockBandPS3TitleIDs = 'rb3'): string {
     let contentID = `UP${game === 'rb1' ? '0002' : '8802'}-${ps3GameIDs[game]}_00-`
     text = text.replace(/\s+/g, '').toUpperCase()
-    if ((contentID + text).length > 0x1c) {
+    if ((contentID + text).length > 36) {
       contentID += text
-      contentID = contentID.slice(0, 0x1c)
-    } else if ((contentID + text).length < 0x1c) {
-      const diff = 0x1c - (contentID + text).length
+      contentID = contentID.slice(0, 36)
+    } else if ((contentID + text).length < 36) {
+      const diff = 36 - (contentID + text).length
       contentID += text
       for (let i = 0; i < diff; i++) {
-        contentID += '\0'
+        contentID += '_'
       }
     } else contentID += text
 

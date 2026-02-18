@@ -1,6 +1,6 @@
 import { BinaryReader, DirPath, FilePath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { BinaryAPI, DTAParser } from '../core.exports'
-import { parsePKGFileOrBuffer, processPKGItemEntries, type PKGData } from '../lib.exports'
+import { parsePKGFileOrBuffer, processPKGItemEntries, type PartialDTAFile, type PKGData, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export interface PKGFileSongPackageStatObject {
   /**
@@ -41,7 +41,16 @@ export interface PKGFileSongPackageStatObject {
   fileSize: number
 }
 
-export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, PKGData {}
+export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, Omit<PKGFileSongPackageStatObject, 'dta' | 'upgrades'> {
+  /**
+   * The contents of the package's DTA file.
+   */
+  dta?: RB3CompatibleDTAFile[]
+  /**
+   * The contents of the package's upgrades DTA file.
+   */
+  upgrades?: PartialDTAFile[]
+}
 
 /**
  * `PKGFile` is a class that represents a PS3 PKG file.
@@ -129,9 +138,12 @@ export class PKGFile {
    * @returns {Promise<PKGFileJSONRepresentation>}
    */
   async toJSON(): Promise<PKGFileJSONRepresentation> {
+    const songPackageStat = await this.songPackageStat()
     return {
       ...this.path.toJSON(),
-      ...(await this.stat()),
+      ...songPackageStat,
+      dta: songPackageStat.dta.songs,
+      upgrades: songPackageStat.upgrades ? songPackageStat.upgrades.updates : undefined,
     }
   }
 

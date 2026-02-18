@@ -43,6 +43,8 @@ export * from './lib/rpcs3/isRPCS3ExePathValid'
 
 export * from './lib/u8/parseU8ArchiveHeader'
 
+export * from './lib/unpacker/unpackExtractForRPCS3'
+
 export * from './lib/utils/formatStringFromDTA'
 export * from './lib/utils/getKeyFromMapValue'
 export * from './lib/utils/isValidURL'

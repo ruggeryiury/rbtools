@@ -562,6 +562,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     map.set('rank_bass', bassR)
 
     if (real_bassR > 0) {
+      map.set('rank_real_bass', real_bassR)
       if (bass.tuning as typeof bass.tuning | undefined) bassTuning = bass.tuning
       map.set('real_bass_tuning', bassTuning as RB3CompatibleDTAFile['real_bass_tuning'])
     }
@@ -593,6 +594,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     map.set('rank_guitar', guitarR)
 
     if (real_guitarR > 0) {
+      map.set('rank_real_guitar', real_guitarR)
       if (guitar.tuning as typeof guitar.tuning | undefined) gtrTuning = guitar.tuning
       map.set('real_guitar_tuning', gtrTuning as RB3CompatibleDTAFile['real_guitar_tuning'])
     }

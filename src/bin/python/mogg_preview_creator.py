@@ -94,7 +94,6 @@ if __name__ == "__main__":
         "--crowd",
         help="Mix the crowd track into the preview",
         action=argparse.BooleanOptionalAction,
-        type=bool,
         default=False,
     )
     parser.add_argument(

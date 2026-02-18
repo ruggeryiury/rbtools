@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8; tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 """
 STFS Script taken from "py360" repository by GitHub user arkem, ported to Python3 by valmyzk and typed by ruggeryiury.
 

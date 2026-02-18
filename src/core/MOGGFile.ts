@@ -1,5 +1,5 @@
 import { type DirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
-import { PythonAPI, type MOGGFileStatPythonObject } from '../core.exports'
+import { BinaryAPI, PythonAPI, type MOGGFileStatPythonObject } from '../core.exports'
 import type { RB3CompatibleDTAFile } from '../lib.exports'
 
 // #region Types
@@ -93,19 +93,15 @@ export class MOGGFile {
   }
 
   /**
-   * Encrypts a MOGG file and returns an instantiated `MOGGFile` class pointing to the new encrypted MOGG file. Returns this
-   * instantiated `MOGGFile` class if the MOGG file is already encrypted using the same encryption version.
+   * Encrypts a MOGG file using `0B` encryption and returns an instantiated `MOGGFile` class pointing to the new encrypted MOGG file. Returns this instantiated `MOGGFile` class if the MOGG file is already encrypted using the same `0B` encryption version.
    * - - - -
    * @param {FilePathLikeTypes} encMoggPath The path of the encrypted MOGG file.
-   * @param {MOGGFileEncryptionVersion} [encVersion] `OPTIONAL` The type of the encryption. Default is `11`.
-   * @param {boolean} [usePS3] `OPTIONAL` Use PS3 keys for encryption, used only on certain encryption versions. Default is `false`.
-   * @param {boolean} [useRed] `OPTIONAL` Use red keys for encryption, used only on certain encryption versions. Default is `false`.
    * @returns {Promise<MOGGFile>}
    */
-  async encrypt(encMoggPath: FilePathLikeTypes, encVersion: MOGGFileEncryptionVersion = 11, usePS3 = false, useRed = false): Promise<MOGGFile> {
+  async encrypt(encMoggPath: FilePathLikeTypes): Promise<MOGGFile> {
     const thisEncVersion = await this.checkFileIntegrity()
-    if (thisEncVersion === encVersion) return this
-    return await PythonAPI.encryptMOGG(this.path, encMoggPath, encVersion, usePS3, useRed)
+    if (thisEncVersion === 11) return this
+    return await BinaryAPI.makeMoggEncrypt(this.path, encMoggPath)
   }
 
   /**

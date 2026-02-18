@@ -14,9 +14,24 @@ export class BinaryAPI {
    * @param {boolean} [encrypt] `OPTIONAL` Encrypts the MOGG file if `true`. Default is `false`.
    * @returns {MOGGFile} A `MOGGFile` instance pointing to the new MOGG file path.
    */
-  static async makeMogg(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, encrypt = false): Promise<MOGGFile> {
+  static async makeMogg(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, encrypt: boolean = false): Promise<MOGGFile> {
     const exeName = RBTools.binFolder.gotoFile('makemogg.exe').name
     const command = buildOSCommand(`${exeName} "${pathLikeToString(srcPath)}" -${encrypt ? 'e' : ''}m "${pathLikeToString(destPath)}"`)
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
+    if (stderr) throw new Error(stderr.trim())
+    return new MOGGFile(destPath)
+  }
+
+  /**
+   * Encrypts a decrypted MOGG file.
+   * - - - -
+   * @param {FilePathLikeTypes} srcPath The path to the MOGG file to be encrypted.
+   * @param {FilePathLikeTypes} destPath The destination path of the new, encrypted MOGG file.
+   * @returns {MOGGFile} A `MOGGFile` instance pointing to the new MOGG file path.
+   */
+  static async makeMoggEncrypt(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, encrypt: boolean = false): Promise<MOGGFile> {
+    const exeName = RBTools.binFolder.gotoFile('makemogg.exe').name
+    const command = buildOSCommand(`${exeName} "${pathLikeToString(srcPath)}" -e "${pathLikeToString(destPath)}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     return new MOGGFile(destPath)
@@ -37,8 +52,7 @@ export class BinaryAPI {
     let dest: FilePath
     if (destPath) dest = pathLikeToFilePath(`${pathLikeToString(destPath)}${pathLikeToString(destPath).toLowerCase().endsWith('.edat') ? '' : '.edat'}`)
     else dest = pathLikeToFilePath(`${midi.root}/${midi.fullname}${midi.fullname.toLowerCase().endsWith('.edat') ? '' : '.edat'}`)
-
-    const command = buildOSCommand(`${exeName} encrypt -custom:${devKLic} ${contentID.slice(0, 36)} 03 02 00 "${midi.path}" "${dest.path}"`)
+    const command = buildOSCommand(`${exeName} encrypt -custom:${devKLic} ${contentID.slice(0, 36).replaceAll('\x00', '')} 03 02 00 "${midi.path}" "${dest.path}"`)
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })
     if (stderr) throw new Error(stderr.trim())
     if (!stdout.split('\r\n').slice(-2)[0].startsWith('COMPLETE:')) throw new Error(stdout.split('\r\n').slice(-2)[0].slice(7))

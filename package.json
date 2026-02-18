@@ -1,6 +1,6 @@
 {
   "name": "rbtools",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "private": true,
   "description": "A module package to manipulate several Rock Band game files.",
   "homepage": "https://github.com/ruggeryiury/rbtools#readme",
@@ -49,7 +49,7 @@
   "scripts": {
     "build": "tsdown",
     "clear": "rimraf dist",
-    "dev": "tsx watch dev/main.ts",
+    "dev": "set NODE_ENV=development&& tsx watch dev/main.ts",
     "format": "prettier --write src",
     "lint": "eslint src"
   },

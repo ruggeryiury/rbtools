@@ -1,11 +1,11 @@
 import { execAsync, FilePath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
 import { pathLikeToString } from 'node-lib'
 
-export type OnyxCLIOperators = 'import' | 'build' | 'web-player' | 'reaper' | 'pro-keys-hanging' | 'stfs' | 'mogg' | 'encrypt-mogg-rb1' | 'u8' | 'milo' | 'encrypt-gh-fsb' | 'fsb' | 'pak' | 'pkg' | 'edat' | 'port-gh-ps3' | 'extract' | 'unwrap' | 'midi-text' | 'midi-merge' | 'bin-to-dta' | 'dta-to-bin'
+export type OnyxCLIOperators = 'import' | 'build' | 'web-player' | 'reaper' | 'pro-keys-hanging' | 'stfs' | 'mogg' | 'encrypt-mogg-rb1' | 'u8' | 'milo' | 'encrypt-gh-fsb' | 'fsb' | 'pak' | 'pkg' | 'edat' | 'port-gh-ps3' | 'extract' | 'unwrap' | 'midi-text' | 'midi-merge' | 'bin-to-dta' | 'dta-to-bin' | 'fix-mogg'
 export type STFSGameTypes = 'rb3' | 'rb2' | 'gh2'
 
 /**
- * Use Onyx CLI features as an JavaScript API.
+ * Use Onyx CLI features as an API.
  */
 export class OnyxCLI {
   /**
@@ -14,6 +14,8 @@ export class OnyxCLI {
   readonly path: FilePath
 
   /**
+   * Use Onyx CLI features as an API.
+   * - - - -
    * @param {FilePathLikeTypes} onyxCLIExePath The path to the Onyx CLI executable.
    */
   constructor(onyxCLIExePath: FilePathLikeTypes) {
@@ -121,9 +123,24 @@ export class OnyxCLI {
    * @returns {Promise<string>} The printable text from the child process.
    */
   async edat(srcFile: FilePathLikeTypes, destFile: FilePathLikeTypes, contentID: string, devKLic: string): Promise<string> {
-    const src = FilePath.of(pathLikeToString(srcFile))
-    const dest = FilePath.of(pathLikeToString(destFile)).changeFileExt('edat')
+    const src = pathLikeToFilePath(srcFile)
+    const dest = pathLikeToFilePath(destFile).changeFileExt('edat')
     const cmd = `"${this.path.path}" edat ${contentID} ${devKLic} "${src.path}" --to ${dest.path}`
+    const { stderr, stdout } = await execAsync(cmd, { windowsHide: true })
+    if (stderr) throw new Error(stderr)
+    return stdout
+  }
+
+  /**
+   * Extract various archive/container formats to a folder.
+   * - - - -
+   * @param {FilePathLikeTypes} srcFile The path to the package file to be extracted.
+   * @param {FilePathLikeTypes} destPath The path to the folder where the contents will be extracted.
+   */
+  async extract(srcFile: FilePathLikeTypes, destPath: DirPathLikeTypes) {
+    const src = pathLikeToFilePath(srcFile)
+    const dest = pathLikeToDirPath(destPath)
+    const cmd = `"${this.path.path}" extract "${src.path}" --to ${dest.path}`
     const { stderr, stdout } = await execAsync(cmd, { windowsHide: true })
     if (stderr) throw new Error(stderr)
     return stdout
