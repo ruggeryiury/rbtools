@@ -26,6 +26,7 @@ export interface RPCS3ExtractionOptions {
    * Force encryption/decryption of all possible encrypted files. Default is `"disabled"`.
    */
   forceEncryption?: 'enabled' | 'disabled'
+  songs: (string | { type: 'id' | 'songname' | 'songID'; value: string | number })[]
 }
 
 export interface UnpackedFilesFromSongObject {
@@ -148,17 +149,18 @@ const getUnpackedFilesFromExtraction = (type: SupportedRB3PackageFileNames, root
  *
  * The `options` parameter is an object where you can tweak the extraction and package creation process, placing the `dev_hdd0` folder path, selecting the package folder name, and forcing encryption/decryption of all files for vanilla Rock Band 3 support.
  * - - - -
- * @param {SupportedRB3PackageFileType[]} packs An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
+ * @param {SupportedRB3PackageFileType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
  * @param {RPCS3ExtractionOptions} options An object that settles and tweaks the extraction and package creation process.
  * @returns {Promise<RPCS3PackageExtractionObject>}
  */
-export const unpackExtractForRPCS3 = async (packs: SupportedRB3PackageFileType[], options: RPCS3ExtractionOptions): Promise<RPCS3PackageExtractionObject> => {
+export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileType[], options: RPCS3ExtractionOptions): Promise<RPCS3PackageExtractionObject> => {
   const { devhdd0Path, forceEncryption, overwritePackFolder, packageFolderName } = useDefaultOptions(
     {
       devhdd0Path: '',
       packageFolderName: '',
       forceEncryption: 'disabled',
       overwritePackFolder: true,
+      songs: [],
     },
     options
   )
@@ -178,7 +180,7 @@ export const unpackExtractForRPCS3 = async (packs: SupportedRB3PackageFileType[]
   const parser = new DTAParser()
 
   const tempFolders: (STFSExtractionTempFolderObject | PKGExtractionTempFolderObject)[] = []
-  for (const pack of packs) {
+  for (const pack of packages) {
     const tempFolderPath = pathLikeToDirPath(temporaryDirectory())
     const type = pack instanceof STFSFile ? 'stfs' : 'pkg'
     const stat = await pack.toJSON()

@@ -20,6 +20,8 @@ export * from './lib/imagetex/imageToTex'
 export * from './lib/imagetex/texStat'
 export * from './lib/imagetex/texToImage'
 
+export * from './lib/packExtractor/extractPackagesForRPCS3'
+
 export * from './lib/path/buildOSCommand'
 export * from './lib/path/thisFilePath'
 
@@ -42,8 +44,6 @@ export * from './lib/rpcs3/isDevhdd0PathValid'
 export * from './lib/rpcs3/isRPCS3ExePathValid'
 
 export * from './lib/u8/parseU8ArchiveHeader'
-
-export * from './lib/unpacker/unpackExtractForRPCS3'
 
 export * from './lib/utils/formatStringFromDTA'
 export * from './lib/utils/getKeyFromMapValue'

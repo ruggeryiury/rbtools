@@ -63,8 +63,8 @@ At last, **_RBTools_** comes with a few special Node packages made by myself, su
 - [raphaelgoulart](https://github.com/raphaelgoulart): Close friend and always helping me in some sort.
 - [Onyxite](https://github.com/mtolly): General helping and for the creation of [Onyx Toolkit](https://github.com/mtolly/onyx)!
 - [TrojanNemo](https://github.com/trojannemo): General helping and for the creation of [Nautilus](https://github.com/trojannemo/Nautilus)!
-- [LocalH](https://github.com/LocalH): General helping and providing me the [moggulator](https://github.com/LocalH/moggulator/tree/master) python script.
-- [Emma](https://github.com/InvoxiPlayGames): General helping!
+- [Emma](https://github.com/InvoxiPlayGames): General helping and providing the RB3E ID creator for installed songs.
+- [LocalH](https://github.com/LocalH): General helping and providing the [moggulator](https://github.com/LocalH/moggulator/tree/master) python module.
 - Jnack and all the fellow contributors of MiloHax!
 
 # More Rock Band-Related Projects

@@ -10,10 +10,11 @@
     "moduleResolution": "bundler",
     "outDir": "dist",
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "lib": ["ESNext"],
     "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": true
     // "isolatedDeclarations": true
   },
   "include": ["src/**/*.ts"],
