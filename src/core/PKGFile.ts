@@ -45,7 +45,7 @@ export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, O
   /**
    * The contents of the package's DTA file.
    */
-  dta?: RB3CompatibleDTAFile[]
+  dta: RB3CompatibleDTAFile[]
   /**
    * The contents of the package's upgrades DTA file.
    */
@@ -152,9 +152,10 @@ export class PKGFile {
    * - - - -
    * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
    * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire PKG file system recursively. Default is `false`.
+   * @param {string[]} [songs] `OPTIONAL` An array of string of internal songnames to be extracted. If not provided, all songs will be extracted normally.
    * @returns {Promise<DirPath>}
    */
-  async extract(destPath: DirPathLikeTypes, extractOnRoot: boolean = false): Promise<DirPath> {
+  async extract(destPath: DirPathLikeTypes, extractOnRoot: boolean = false, songs: string[] = []): Promise<DirPath> {
     await this.checkFileIntegrity()
     const dest = pathLikeToDirPath(destPath)
     if (!dest.exists) await dest.mkDir()
@@ -163,7 +164,20 @@ export class PKGFile {
       await dest.mkDir()
     }
 
-    await BinaryAPI.ps3pPKGRipper(this.path, dest)
+    const stat = await this.toJSON()
+
+    const parser = new DTAParser(stat.dta)
+    const files: string[] = []
+    if (songs.length > 0) {
+      parser.songs = parser.songs.filter((s) => songs.includes(s.songname))
+      if (parser.songs.length === 0) throw new Error('None of the provided internal songnames were found on the provided PKG file.')
+
+      files.push(`USRDIR/${stat.folderName}/songs/songs.dta`)
+      for (const song of parser.songs) {
+        files.push(`USRDIR/${stat.folderName}/songs/${song.songname}`)
+      }
+    }
+    await BinaryAPI.ps3pPKGRipper(this.path, dest, songs.length > 0 ? files : undefined)
 
     if (extractOnRoot) {
       const paths = await dest.readDir(true)
@@ -179,6 +193,9 @@ export class PKGFile {
         if (dir.exists) await dir.deleteDir(true)
       }
     }
+
+    const newDTAPath = extractOnRoot ? dest.gotoFile('songs.dta') : dest.gotoFile(`USRDIR/${stat.folderName}/songs/songs.dta`)
+    await parser.export(newDTAPath)
     return dest
   }
 }

@@ -438,4 +438,28 @@ export class PythonAPI {
     if (stderr) throw new Error(stderr)
     return dest
   }
+
+  /**
+   * Extracts the CON file contents and returns the folder path where all contents were extracted.
+   * - - - -
+   * @param {FilePathLikeTypes} stfsFilePath The path of the CON file.
+   * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
+   * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire STFS file system recursively. Default is `false`.
+   * @param {string[]} [songs] `OPTIONAL` An array of song names to be extracted. If not provided, all songs will be extracted normally.
+   * @returns {Promise<DirPath>}
+   */
+  static async stfsExtractSelectedSongs(stfsFilePath: FilePathLikeTypes, destPath: DirPathLikeTypes, extractOnRoot: boolean = false, songs: string[] = []): Promise<DirPath> {
+    const stfs = pathLikeToFilePath(stfsFilePath)
+    const dest = pathLikeToDirPath(destPath)
+    const pythonScript = songs.length === 0 ? 'stfs_extract.py' : 'stfs_extract_selected_songs.py'
+    let command = `python "${pythonScript}" "${stfs.path}" "${dest.path}"`
+    if (extractOnRoot) command += ' --extract-on-root'
+    if (songs.length > 0) {
+      command += ` --songs ${songs.map((s) => `"${s}"`).join(' ')}`
+    }
+    // console.log('Running command:', command)
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    if (stderr) throw new Error(stderr)
+    return dest
+  }
 }

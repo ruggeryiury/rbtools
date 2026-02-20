@@ -1,26 +1,20 @@
-import { type DirPathLikeTypes, type DirPath, pathLikeToDirPath, pathLikeToFilePath } from 'node-lib'
-import { temporaryDirectory, temporaryFile } from 'tempy'
+import { DirPath, isDir, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes } from 'node-lib'
+import { BinaryAPI, DTAParser, EDATFile, MOGGFile, PythonAPI, STFSFile, TextureFile, type PKGExtractionTempFolderObject, type PKGFileJSONRepresentation, type SelectedSongForExtractionObject, type STFSExtractionTempFolderObject, type STFSFileJSONRepresentation, type SupportedRB3PackageFileType } from '../../core.exports'
 import { useDefaultOptions } from 'use-default-options'
-import { type STFSFileJSONRepresentation, type PKGFileJSONRepresentation, DTAParser, STFSFile, MOGGFile, PythonAPI, TextureFile, EDATFile, BinaryAPI, type SupportedRB3PackageFileType, type SelectedSongForExtractionObject, type PKGExtractionTempFolderObject, type STFSExtractionTempFolderObject } from '../../core.exports'
-import { getUnpackedFilesPathFromRootExtraction, isDevhdd0PathValid, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { temporaryDirectory, temporaryFile } from 'tempy'
+import { getUnpackedFilesPathFromRootExtraction, type RB3CompatibleDTAFile } from '../../lib.exports'
 
-// #region Types
-
-export interface RPCS3ExtractionOptions {
+export interface ExCONExtractionOptions {
   /**
-   * The `dev_hdd0` folder path you want to install the package.
+   * The folder where the created package will be saved.
    */
-  devhdd0Path: DirPathLikeTypes
-  /**
-   * The name of the new package folder
-   */
-  packageFolderName: string
+  destFolderPath: DirPathLikeTypes
   /**
    * Whether you want to overwrite the package found with the same folder name. Default is `true`.
    */
   overwritePackFolder?: boolean
   /**
-   * Force encryption/decryption of all possible encrypted files. Default is `"disabled"`.
+   * Force encryption/decryption of the MOGG files. Default is `"disabled"`.
    */
   forceEncryption?: 'enabled' | 'disabled'
   /**
@@ -31,7 +25,7 @@ export interface RPCS3ExtractionOptions {
   songs: (string | SelectedSongForExtractionObject)[]
 }
 
-export interface RPCS3PackageExtractionObject {
+export interface ExCONPackageExtractionObject {
   /**
    * The path to temporary folder created to ultimately gather all package files to move to the actual package folder inside the `dev_hdd0` folder.
    */
@@ -62,20 +56,10 @@ export interface RPCS3PackageExtractionObject {
   installedSongSongnames: string[]
 }
 
-/**
- * Extracts and installs the provided STFS/PKG song package files as a song package on the RPCS3's Rock Band 3 USRDIR folder .
- *
- * The `options` parameter is an object where you can tweak the extraction and package creation process, placing the `dev_hdd0` folder path, selecting the package folder name, and forcing encryption/decryption of all files for vanilla Rock Band 3 support.
- * - - - -
- * @param {SupportedRB3PackageFileType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
- * @param {RPCS3ExtractionOptions} options An object that settles and tweaks the extraction and package creation process.
- * @returns {Promise<RPCS3PackageExtractionObject>}
- */
-export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileType[], options: RPCS3ExtractionOptions): Promise<RPCS3PackageExtractionObject> => {
-  const { forceEncryption, overwritePackFolder, packageFolderName, songs } = useDefaultOptions<RPCS3ExtractionOptions>(
+export const extractPackagesForExCON = async (packages: SupportedRB3PackageFileType[], options: ExCONExtractionOptions): Promise<ExCONPackageExtractionObject> => {
+  const { forceEncryption, overwritePackFolder, songs } = useDefaultOptions<ExCONExtractionOptions>(
     {
-      devhdd0Path: '',
-      packageFolderName: '',
+      destFolderPath: '',
       forceEncryption: 'disabled',
       overwritePackFolder: true,
       songs: [],
@@ -88,17 +72,9 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
 
   if (hasSongSelection) allSelectedSongs = songs.map((song) => (typeof song === 'string' ? { type: 'songname', value: song } : song)) as SelectedSongForExtractionObject[]
 
-  const devhdd0 = pathLikeToDirPath(options.devhdd0Path)
-  if (!isDevhdd0PathValid(devhdd0)) throw new Error(`Provided dev_hdd0 path "${devhdd0.path}" is not a valid RPCS3 dev_hdd0 folder.`)
+  const dest = pathLikeToDirPath(options.destFolderPath)
 
-  if (packageFolderName.length === 0) throw new Error('Provided package folder name is blank.')
-
-  if (packageFolderName.length > 42) throw new Error(`Provided package folder name "${packageFolderName}" is too big for RPCS3 file system.`)
-
-  const usrdir = devhdd0.gotoDir('game/BLUS30463/USRDIR')
-  const newFolder = usrdir.gotoDir(packageFolderName)
-
-  if (newFolder.exists && !overwritePackFolder) throw new Error(`Provided package folder name "${packageFolderName}" already exists.`)
+  if (dest.exists && !overwritePackFolder) throw new Error(`Provided destination folder "${dest.path}" already exists.`)
 
   const parser = new DTAParser()
 
@@ -157,12 +133,13 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
         tempFolders.push({
           path: tempFolderPath,
           type: 'pkg',
-          songs: filterdSelectedSongnames.map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) })),
+          songs: stat.dta.filter((song) => allSelectedSongnames.includes(song.songname)).map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) })),
           stat: stat as PKGFileJSONRepresentation,
         })
       }
     }
   }
+
   const mainTempFolder = pathLikeToDirPath(temporaryDirectory())
 
   try {
@@ -175,20 +152,20 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
       for (const song of temp.songs) {
         // MILO
         const oldMiloPath = song.files.milo
-        const newMiloPath = mainTempFolder.gotoFile(`${song.files.milo.name}.milo_ps3`)
+        const newMiloPath = mainTempFolder.gotoFile(`${song.files.milo.name}.milo_xbox`)
         await oldMiloPath.move(newMiloPath, true)
 
         // PNG
         const oldPNGPath = song.files.png
-        const newPNGPath = mainTempFolder.gotoFile(`${song.files.png.name}.png_ps3`)
-        if (temp.type === 'pkg') await oldPNGPath.move(newPNGPath, true)
+        const newPNGPath = mainTempFolder.gotoFile(`${song.files.png.name}.png_xbox`)
+        if (temp.type === 'stfs') await oldPNGPath.move(newPNGPath, true)
         else {
-          // Xbox PNGs must be converted to PS3
+          // PS3 PNGs must be converted to Xbox
           const tempPNG = pathLikeToFilePath(temporaryFile({ extension: 'png' }))
           const tex = new TextureFile(oldPNGPath)
           const newImg = await tex.convertToImage(tempPNG, 'png')
 
-          await newImg.convertToTexture(newPNGPath, 'png_ps3')
+          await newImg.convertToTexture(newPNGPath, 'png_xbox')
           await tempPNG.delete()
         }
 
@@ -225,31 +202,25 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
 
         // MIDI
         const oldMIDIPath = song.files.mid
-        const newMIDIPath = mainTempFolder.gotoFile(`${song.songname}.mid.edat`)
+        const newMIDIPath = mainTempFolder.gotoFile(`${song.songname}.mid`)
 
-        // MIDI is decrypted, just move changing the extension to EDAT
-        if (temp.type === 'stfs' && forceEncryption === 'disabled') await oldMIDIPath.move(newMIDIPath, true)
-        else if (temp.type === 'stfs' && forceEncryption === 'enabled') {
-          const newDevkLic = EDATFile.genDevKLicHash(packageFolderName)
-          const newContentID = EDATFile.genContentID(packageFolderName.toUpperCase())
-          await BinaryAPI.edatToolEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
-        }
+        // MIDI is decrypted, just move the MIDI file to main temp
+        if (temp.type === 'stfs') await oldMIDIPath.move(newMIDIPath, true)
         // MIDI might be encrypted for PKG files
         else if (temp.type === 'pkg') {
           const oldEDAT = new EDATFile(oldMIDIPath)
           const isEDATEncrypted = await oldEDAT.isEncrypted()
 
-          if (isEDATEncrypted) {
+          if (!isEDATEncrypted) {
+            // MIDI is decrypted, just move the MIDI file to main temp
+            await oldMIDIPath.move(newMIDIPath, true)
+          } else {
             // Original MIDI must be decrypted anyway
             const tempDecEDAT = pathLikeToFilePath(temporaryFile({ extension: 'mid' }))
             const oldDevklic = EDATFile.genDevKLicHash(temp.stat.folderName)
             await BinaryAPI.edatToolDecrypt(oldMIDIPath, oldDevklic, tempDecEDAT)
-            await tempDecEDAT.move(oldMIDIPath, true)
+            await tempDecEDAT.move(newMIDIPath, true)
           }
-
-          const newDevkLic = EDATFile.genDevKLicHash(packageFolderName)
-          const newContentID = EDATFile.genContentID(packageFolderName.toUpperCase())
-          await BinaryAPI.edatToolEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
         }
       }
 
@@ -263,11 +234,11 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
     throw err
   }
 
-  if (newFolder.exists) await newFolder.deleteDir(true)
+  if (dest.exists) await dest.deleteDir(true)
 
-  const newDTAPath = newFolder.gotoFile('songs/songs.dta')
+  const newDTAPath = dest.gotoFile('songs/songs.dta')
 
-  await newFolder.gotoDir('songs').mkDir(true)
+  await dest.gotoDir('songs').mkDir(true)
 
   parser.sort('ID')
   parser.patchSongsEncodings()
@@ -281,7 +252,6 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
     await mainTempFolder.deleteDir(true)
     throw new Error(`No DTA file could be created. None of the provided internal songnames were found on the packages provided.`)
   }
-
   const dtaStat = await newDTAPath.stat()
 
   let packSize: number = dtaStat.size
@@ -293,22 +263,21 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
       }
       for (const { songname } of temp.songs) {
         const mainTempMOGG = mainTempFolder.gotoFile(`${songname}.mogg`)
-        const mainTempMIDI = mainTempFolder.gotoFile(`${songname}.mid.edat`)
-        const mainTempPNG = mainTempFolder.gotoFile(`${songname}_keep.png_ps3`)
-        const mainTempMILO = mainTempFolder.gotoFile(`${songname}.milo_ps3`)
+        const mainTempMIDI = mainTempFolder.gotoFile(`${songname}.mid`)
+        const mainTempPNG = mainTempFolder.gotoFile(`${songname}_keep.png_xbox`)
+        const mainTempMILO = mainTempFolder.gotoFile(`${songname}.milo_xbox`)
 
-        // CHECK: Maybe check all song files?
         if (!mainTempMOGG.exists) {
           await mainTempFolder.deleteDir()
           throw new Error(`Registered song on DTA with internal songname "${songname}" has no audio files linked to the song.`)
         }
 
-        const songGenFolder = newFolder.gotoDir(`songs/${songname}/gen`)
+        const songGenFolder = dest.gotoDir(`songs/${songname}/gen`)
         await songGenFolder.mkDir(true)
         const newMOGG = songGenFolder.gotoFile(`../${songname}.mogg`)
-        const newMIDI = songGenFolder.gotoFile(`../${songname}.mid.edat`)
-        const newPNG = songGenFolder.gotoFile(`${songname}_keep.png_ps3`)
-        const newMILO = songGenFolder.gotoFile(`${songname}.milo_ps3`)
+        const newMIDI = songGenFolder.gotoFile(`../${songname}.mid`)
+        const newPNG = songGenFolder.gotoFile(`${songname}_keep.png_xbox`)
+        const newMILO = songGenFolder.gotoFile(`${songname}.milo_xbox`)
 
         await mainTempMOGG.move(newMOGG)
         await mainTempMIDI.move(newMIDI)

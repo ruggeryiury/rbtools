@@ -35,7 +35,7 @@ export interface STFSFileJSONRepresentation extends FilePathJSONRepresentation, 
   /**
    * The contents of the package's DTA file.
    */
-  dta?: RB3CompatibleDTAFile[]
+  dta: RB3CompatibleDTAFile[]
   /**
    * The contents of the package's upgrades DTA file.
    */
@@ -127,15 +127,28 @@ export class STFSFile {
    * - - - -
    * @param {DirPathLikeTypes} destPath The folder path where you want the files to be extracted to.
    * @param {boolean} [extractOnRoot] `OPTIONAL` Extract all files on the root rather than recreate the entire STFS file system recursively. Default is `false`.
+   * @param {string[]} [songs] `OPTIONAL` An array of string of internal songnames to be extracted. If not provided, all songs will be extracted normally.
    * @returns {Promise<DirPath>}
    */
-  async extract(destPath: DirPathLikeTypes, extractOnRoot: boolean = false): Promise<DirPath> {
+  async extract(destPath: DirPathLikeTypes, extractOnRoot: boolean = false, songs: string[] = []): Promise<DirPath> {
     await this.checkFileIntegrity()
     const dest = pathLikeToDirPath(destPath)
     if (!dest.exists) await dest.mkDir()
     else {
       await dest.deleteDir(true)
       await dest.mkDir()
+    }
+    if (songs.length > 0) {
+      const stat = await this.stat()
+      const parser = stat.dta
+      parser.songs = parser.songs.filter((s) => songs.includes(s.songname))
+      if (parser.songs.length === 0) throw new Error('None of the provided internal songnames were found on the provided STFS file.')
+
+      const extractedFolder = await PythonAPI.stfsExtractSelectedSongs(this.path, destPath, extractOnRoot, songs)
+
+      const newDTAPath = extractOnRoot ? extractedFolder.gotoFile('songs.dta') : extractedFolder.gotoFile('songs/songs.dta')
+      await parser.export(newDTAPath)
+      return extractedFolder
     }
     return await PythonAPI.stfsExtract(this.path, destPath, extractOnRoot)
   }
