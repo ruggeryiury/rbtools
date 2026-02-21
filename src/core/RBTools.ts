@@ -50,4 +50,13 @@ export class RBTools {
   static get pyFolder(): DirPath {
     return isDev() ? this.moduleRoot.gotoDir('src/bin/python') : this.moduleRoot.gotoDir('dist/bin/python')
   }
+
+  /**
+   * Gets the root of the `res` folder, where all non-JavaScript files are found.
+   * - - - -
+   * @returns {DirPath}
+   */
+  static get resFolder(): DirPath {
+    return isDev() ? this.moduleRoot.gotoDir('src/bin/res') : this.moduleRoot.gotoDir('dist/bin/res')
+  }
 }

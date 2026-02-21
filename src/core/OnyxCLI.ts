@@ -29,7 +29,10 @@ export class OnyxCLI {
    * @throws {Error} When the main Onyx CLI executable does not exists.
    */
   checkIntegrity(): void {
-    if (!this.path.exists) throw new Error(`No Onyx CLI executable found on provided path "${this.path.path}"\n\nSTFS creation are only available using Onyx CLI.`)
+    if (!this.path.exists) throw new Error(`No Onyx CLI executable found on provided path "${this.path.path}".`)
+    for (const file of ['avcodec-60.dll', 'avfilter-9.dll', 'avformat-60.dll', 'avutil-58.dll', 'libfftw3-3.dll', 'libFLAC.dll', 'libgcc_s_seh-1.dll', 'libmp3lame-0.dll', 'libmpg123-0.dll', 'libogg-0.dll', 'libopus-0.dll', 'librubberband-2.dll', 'libsamplerate-0.dll', 'libsndfile-1.dll', 'libstdc++-6.dll', 'libvorbis-0.dll', 'libvorbisenc-2.dll', 'libvorbisfile-3.dll', 'libwinpthread-1.dll', 'swresample-4.dll', 'swscale-7.dll', 'zlib1.dll']) {
+      if (!this.path.gotoFile(file).exists) throw new Error(`Missing DLL file "${file}" on Onyx CLI folder.`)
+    }
   }
 
   /**

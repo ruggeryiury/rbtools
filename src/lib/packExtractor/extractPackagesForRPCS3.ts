@@ -1,20 +1,12 @@
 import { type DirPathLikeTypes, type DirPath, pathLikeToDirPath, pathLikeToFilePath } from 'node-lib'
 import { temporaryDirectory, temporaryFile } from 'tempy'
 import { useDefaultOptions } from 'use-default-options'
-import { type STFSFileJSONRepresentation, type PKGFileJSONRepresentation, DTAParser, STFSFile, MOGGFile, PythonAPI, TextureFile, EDATFile, BinaryAPI, type SupportedRB3PackageFileType, type SelectedSongForExtractionObject, type PKGExtractionTempFolderObject, type STFSExtractionTempFolderObject } from '../../core.exports'
-import { getUnpackedFilesPathFromRootExtraction, isDevhdd0PathValid, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { type STFSFileJSONRepresentation, type PKGFileJSONRepresentation, DTAParser, STFSFile, MOGGFile, PythonAPI, TextureFile, EDATFile, BinaryAPI, type SelectedSongForExtractionObject, type PKGExtractionTempFolderObject, type STFSExtractionTempFolderObject, type RB3PackageLikeType, PKGFile, type SupportedRB3PackageFileType } from '../../core.exports'
+import { getUnpackedFilesPathFromRootExtraction, isDevhdd0PathValid, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
 
 // #region Types
 
 export interface RPCS3ExtractionOptions {
-  /**
-   * The `dev_hdd0` folder path you want to install the package.
-   */
-  devhdd0Path: DirPathLikeTypes
-  /**
-   * The name of the new package folder
-   */
-  packageFolderName: string
   /**
    * Whether you want to overwrite the package found with the same folder name. Default is `true`.
    */
@@ -28,7 +20,15 @@ export interface RPCS3ExtractionOptions {
    *
    * If the value is a string, it will be considered as the internal songname of the song. If the value is an object, you can select the song by its internal songname, its entry ID, or its song ID. Example: `{ type: 'id', value: 'songentryid' }` or `{ type: 'songID', value: 5678 }`
    */
-  songs: (string | SelectedSongForExtractionObject)[]
+  songs?: (string | SelectedSongForExtractionObject)[]
+  /**
+   * An array with objects which will updates a specific parsed song object based on its provided entry ID.
+   */
+  updates?: PartialDTAFile[]
+  /**
+   * An object which will update all parsed song objects.
+   */
+  updateAllSongs?: Omit<PartialDTAFile, 'id'> | null
 }
 
 export interface RPCS3PackageExtractionObject {
@@ -62,48 +62,71 @@ export interface RPCS3PackageExtractionObject {
   installedSongSongnames: string[]
 }
 
+// #region Function
+
 /**
- * Extracts and installs the provided STFS/PKG song package files as a song package on the RPCS3's Rock Band 3 USRDIR folder .
+ * Extracts all provided song packages and merged them to create a new package compatible with RPCS3.
  *
- * The `options` parameter is an object where you can tweak the extraction and package creation process, placing the `dev_hdd0` folder path, selecting the package folder name, and forcing encryption/decryption of all files for vanilla Rock Band 3 support.
+ * The `options` parameter is an object where you can tweak the extraction and package creation process, selecting the package folder name, and forcing encryption/decryption of all files for vanilla Rock Band 3 support.
  * - - - -
- * @param {SupportedRB3PackageFileType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
- * @param {RPCS3ExtractionOptions} options An object that settles and tweaks the extraction and package creation process.
+ * @param {RB3PackageLikeType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
+ * @param {DirPathLikeTypes} destFolderPath The destination folder you want to place the extracted package. You can use any folder, but placing a valid `dev_hdd0` folder, this function will install the new package on Rock Band 3's USRDIR folder on RPCS3.
+ * @param {string} packageFolderName The name of the new package folder.
+ * @param {RPCS3ExtractionOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
  * @returns {Promise<RPCS3PackageExtractionObject>}
  */
-export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileType[], options: RPCS3ExtractionOptions): Promise<RPCS3PackageExtractionObject> => {
-  const { forceEncryption, overwritePackFolder, packageFolderName, songs } = useDefaultOptions<RPCS3ExtractionOptions>(
+export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], destFolderPath: DirPathLikeTypes, packageFolderName: string, options?: RPCS3ExtractionOptions): Promise<RPCS3PackageExtractionObject> => {
+  const { forceEncryption, overwritePackFolder, songs, updates, updateAllSongs } = useDefaultOptions<RPCS3ExtractionOptions>(
     {
-      devhdd0Path: '',
-      packageFolderName: '',
       forceEncryption: 'disabled',
       overwritePackFolder: true,
       songs: [],
+      updates: [],
+      updateAllSongs: null,
     },
     options
   )
+
+  if (typeof packageFolderName !== 'string') throw new Error('Provided package folder name is not a string.')
+
+  if (packageFolderName.length === 0) throw new Error('Provided package folder name is blank.')
+
+  if (packageFolderName.length > 42) throw new Error(`Provided package folder name "${packageFolderName}" is too big for RPCS3 file system.`)
 
   const hasSongSelection = songs.length > 0
   let allSelectedSongs: SelectedSongForExtractionObject[] = []
 
   if (hasSongSelection) allSelectedSongs = songs.map((song) => (typeof song === 'string' ? { type: 'songname', value: song } : song)) as SelectedSongForExtractionObject[]
 
-  const devhdd0 = pathLikeToDirPath(options.devhdd0Path)
-  if (!isDevhdd0PathValid(devhdd0)) throw new Error(`Provided dev_hdd0 path "${devhdd0.path}" is not a valid RPCS3 dev_hdd0 folder.`)
+  const dest = pathLikeToDirPath(destFolderPath)
+  let isDevhdd0 = false
+  try {
+    if (isDevhdd0PathValid(dest)) isDevhdd0 = true
+  } catch (e) {
+    if (!dest.exists) await dest.mkDir(true)
+  }
 
-  if (packageFolderName.length === 0) throw new Error('Provided package folder name is blank.')
+  const usrdir = isDevhdd0 ? dest.gotoDir('game/BLUS30463/USRDIR') : dest
+  const newFolder = isDevhdd0 ? usrdir.gotoDir(packageFolderName) : usrdir.gotoDir(`USRDIR/${packageFolderName}`)
 
-  if (packageFolderName.length > 42) throw new Error(`Provided package folder name "${packageFolderName}" is too big for RPCS3 file system.`)
-
-  const usrdir = devhdd0.gotoDir('game/BLUS30463/USRDIR')
-  const newFolder = usrdir.gotoDir(packageFolderName)
-
-  if (newFolder.exists && !overwritePackFolder) throw new Error(`Provided package folder name "${packageFolderName}" already exists.`)
+  if (newFolder.exists && !overwritePackFolder) {
+    if (!isDevhdd0 && dest.exists) await dest.deleteDir(true)
+    throw new Error(`Provided package folder name "${packageFolderName}" already exists.`)
+  }
 
   const parser = new DTAParser()
 
+  const allPackages: SupportedRB3PackageFileType[] = packages.map((pack) => {
+    if (pack instanceof STFSFile || pack instanceof PKGFile) return pack
+    else {
+      const filePath = pathLikeToFilePath(pack)
+      if (filePath.ext === '.pkg') return new PKGFile(filePath)
+      else return new STFSFile(filePath)
+    }
+  })
+
   const tempFolders: (STFSExtractionTempFolderObject | PKGExtractionTempFolderObject)[] = []
-  for (const pack of packages) {
+  for (const pack of allPackages) {
     const tempFolderPath = pathLikeToDirPath(temporaryDirectory())
     const type = pack instanceof STFSFile ? 'stfs' : 'pkg'
     const stat = await pack.toJSON()
@@ -269,9 +292,14 @@ export const extractPackagesForRPCS3 = async (packages: SupportedRB3PackageFileT
 
   await newFolder.gotoDir('songs').mkDir(true)
 
+  if (updates.length > 0) parser.addUpdates(updates)
+  if (updateAllSongs !== null) parser.addUpdatesToAllSongs(updateAllSongs)
+  if (updates.length > 0 || updateAllSongs !== null) parser.applyUpdatesToExistingSongs(true)
+
   parser.sort('ID')
   parser.patchSongsEncodings()
   parser.patchCores()
+
   try {
     await parser.export(newDTAPath)
   } catch (err) {

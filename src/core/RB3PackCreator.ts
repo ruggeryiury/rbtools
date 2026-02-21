@@ -1,10 +1,10 @@
-import { DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes } from 'node-lib'
+import { DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
 import { PKGFile, STFSFile, type PKGFileJSONRepresentation, type STFSFileJSONRepresentation } from '../core.exports'
-import { extractPackagesForExCON, extractPackagesForRPCS3, type ExCONExtractionOptions, type ExCONPackageExtractionObject, type RPCS3ExtractionOptions, type RPCS3PackageExtractionObject, type UnpackedFilePathsFromSongObject } from '../lib.exports'
+import { extractPackagesForExtractedSTFS, extractPackagesForRPCS3, extractPackagesForSTFSFile, type STFSExtractionOptions, type STFSPackageExtractionObject, type RPCS3ExtractionOptions, type RPCS3PackageExtractionObject, type STFSCreationOptions, type UnpackedFilePathsFromSongObject, type STFSCreationObject } from '../lib.exports'
 
 export type SupportedRB3PackageFileType = STFSFile | PKGFile
 export type SupportedRB3PackageFileNames = 'stfs' | 'pkg'
-export type RB3PackageLikeType = SupportedRB3PackageFileType | string
+export type RB3PackageLikeType = SupportedRB3PackageFileType | FilePathLikeTypes
 
 export interface PackageExtractionSongsObject {
   /**
@@ -77,57 +77,64 @@ export interface SelectedSongFromSongnameObject {
 }
 
 /**
- * A class that gathers Rock Band 3 package files from Xbox 360 and PS3 for different format extractions.
+ * A class that gathers Rock Band 3 package files from Xbox 360 and PS3 systems to different package formats and extraction types.
  */
 export class RB3PackCreator {
   /**
-   * The path of the user's `dev_hdd0` folder.
-   */
-  devhdd0Path: DirPath
-  /**
    * An array with package files to be extracted.
    */
-  packages: SupportedRB3PackageFileType[]
+  packages: RB3PackageLikeType[]
 
   /**
-   * A class that gathers Rock Band 3 package files from Xbox 360 and PS3 for different format extractions.
+   * A class that gathers Rock Band 3 package files from Xbox 360 and PS3 systems to different package formats and extraction types.
    * - - - -
    * @param {RB3PackageLikeType[] | undefined} packages An array with Xbox 360 and PS3 package files to be extracted.
    */
-  constructor(devhdd0Path: DirPathLikeTypes, packages?: RB3PackageLikeType[]) {
-    this.devhdd0Path = pathLikeToDirPath(devhdd0Path)
+  constructor(packages?: RB3PackageLikeType[]) {
     this.packages = []
-    if (packages) {
-      for (const packagesPath of packages) {
-        if (packagesPath instanceof STFSFile || packagesPath instanceof PKGFile) {
-          this.packages.push(packagesPath)
-          continue
-        } else {
-          const filePath = pathLikeToFilePath(packagesPath)
-          if (filePath.ext === '.pkg') this.packages.push(new PKGFile(filePath))
-          else this.packages.push(new STFSFile(filePath))
-        }
-      }
-    }
+    if (packages) this.packages = packages
   }
 
   /**
-   * Extracts and installs the provided STFS/PKG song package files as a song package on the RPCS3's Rock Band 3 USRDIR folder .
+   * Extracts all provided song packages and merged them to create a new package compatible with RPCS3.
    *
-   * The `options` parameter is an object where you can tweak the extraction and package creation process, placing the `dev_hdd0` folder path, selecting the package folder name, and forcing encryption/decryption of all files for vanilla Rock Band 3 support.
+   * The `options` parameter is an object where you can tweak the extraction and package creation process, selecting the package folder name, and forcing encryption/decryption of all files for vanilla Rock Band 3 support.
    * - - - -
-   * @param {Omit<RPCS3ExtractionOptions, 'devhdd0Path'>} options An object that settles and tweaks the extraction and package creation process.
+   * @param {DirPathLikeTypes} destFolderPath The destination folder you want to place the extracted package. You can use any folder, but placing a valid `dev_hdd0` folder, this function will install the new package on Rock Band 3's USRDIR folder on RPCS3.
+   * @param {string} packageFolderName The name of the new package folder.
+   * @param {RPCS3ExtractionOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
    * @returns {Promise<RPCS3PackageExtractionObject>}
    */
-  async toRPCS3(options: Omit<RPCS3ExtractionOptions, 'devhdd0Path'>): Promise<RPCS3PackageExtractionObject> {
-    return await extractPackagesForRPCS3(this.packages, { ...options, devhdd0Path: this.devhdd0Path.path })
+  async toRPCS3(destFolderPath: DirPathLikeTypes, packageFolderName: string, options?: RPCS3ExtractionOptions): Promise<RPCS3PackageExtractionObject> {
+    return await extractPackagesForRPCS3(this.packages, destFolderPath, packageFolderName, options)
   }
 
-  async toExtractedCON(options: ExCONExtractionOptions): Promise<ExCONPackageExtractionObject> {
-    return await extractPackagesForExCON(this.packages, options)
+  /**
+   * Extracts all provided song packages and merged them to create a new package formatted as an extracted STFS package.
+   *
+   * The `options` parameter is an object where you can tweak the extraction and package creation process, like forcing encryption/decryption of all MOGG files.
+   * - - - -
+   * @param {DirPathLikeTypes} destFolderPath The destination folder you want to place the extracted package.
+   * @param {STFSExtractionOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
+   * @returns {Promise<STFSPackageExtractionObject>}
+   */
+  async toExtractedSTFS(destFolderPath: DirPathLikeTypes, options?: STFSExtractionOptions): Promise<STFSPackageExtractionObject> {
+    return await extractPackagesForExtractedSTFS(this.packages, destFolderPath, options)
   }
 
-  async toSTFSPackage() {}
-
-  async toPKGPackage() {}
+  /**
+   * Extracts all provided song packages and merged them to create a new STFS package file.
+   *
+   * The `options` parameter is an object where you can tweak the extraction and package creation process, like forcing encryption/decryption of all MOGG files, change the package name and description, as well as selecting images for both thumbnail and title thumbnail.
+   *
+   * _NOTE: This function requires Onyx CLI. You can download the CLI version of Onyx [here](https://github.com/mtolly/onyx)._
+   * - - - -
+   * @param {FilePathLikeTypes} destSTFSFile The destination STFS file you want to create.
+   * @param {FilePathLikeTypes} onyxCLIEXEPath The path to the Onyx CLI executable.
+   * @param {STFSCreationOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
+   * @returns {Promise<STFSCreationObject>}
+   */
+  async toSTFSFile(destSTFSFile: FilePathLikeTypes, onyxCLIEXEPath: FilePathLikeTypes, options?: STFSCreationOptions): Promise<STFSCreationObject> {
+    return await extractPackagesForSTFSFile(this.packages, destSTFSFile, onyxCLIEXEPath, options)
+  }
 }

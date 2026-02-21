@@ -20,8 +20,9 @@ export * from './lib/imagetex/imageToTex'
 export * from './lib/imagetex/texStat'
 export * from './lib/imagetex/texToImage'
 
-export * from './lib/packExtractor/extractPackagesForExCON'
+export * from './lib/packExtractor/extractPackagesForExtractedSTFS'
 export * from './lib/packExtractor/extractPackagesForRPCS3'
+export * from './lib/packExtractor/extractPackagesForSTFSFile'
 export * from './lib/packExtractor/getUnpackedFilesPathFromRootExtraction'
 
 export * from './lib/path/buildOSCommand'

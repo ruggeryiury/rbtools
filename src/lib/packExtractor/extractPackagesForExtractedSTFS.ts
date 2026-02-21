@@ -1,14 +1,10 @@
-import { DirPath, isDir, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes } from 'node-lib'
-import { BinaryAPI, DTAParser, EDATFile, MOGGFile, PythonAPI, STFSFile, TextureFile, type PKGExtractionTempFolderObject, type PKGFileJSONRepresentation, type SelectedSongForExtractionObject, type STFSExtractionTempFolderObject, type STFSFileJSONRepresentation, type SupportedRB3PackageFileType } from '../../core.exports'
+import { DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes } from 'node-lib'
+import { BinaryAPI, DTAParser, EDATFile, MOGGFile, PKGFile, PythonAPI, STFSFile, TextureFile, type PKGExtractionTempFolderObject, type PKGFileJSONRepresentation, type RB3PackageLikeType, type SelectedSongForExtractionObject, type STFSExtractionTempFolderObject, type STFSFileJSONRepresentation, type SupportedRB3PackageFileType } from '../../core.exports'
 import { useDefaultOptions } from 'use-default-options'
 import { temporaryDirectory, temporaryFile } from 'tempy'
-import { getUnpackedFilesPathFromRootExtraction, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { getUnpackedFilesPathFromRootExtraction, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
 
-export interface ExCONExtractionOptions {
-  /**
-   * The folder where the created package will be saved.
-   */
-  destFolderPath: DirPathLikeTypes
+export interface STFSExtractionOptions {
   /**
    * Whether you want to overwrite the package found with the same folder name. Default is `true`.
    */
@@ -22,12 +18,20 @@ export interface ExCONExtractionOptions {
    *
    * If the value is a string, it will be considered as the internal songname of the song. If the value is an object, you can select the song by its internal songname, its entry ID, or its song ID. Example: `{ type: 'id', value: 'songentryid' }` or `{ type: 'songID', value: 5678 }`
    */
-  songs: (string | SelectedSongForExtractionObject)[]
+  songs?: (string | SelectedSongForExtractionObject)[]
+  /**
+   * An array with objects which will updates a specific parsed song object based on its provided entry ID.
+   */
+  updates?: PartialDTAFile[]
+  /**
+   * An object which will update all parsed song objects.
+   */
+  updateAllSongs?: Omit<PartialDTAFile, 'id'> | null
 }
 
-export interface ExCONPackageExtractionObject {
+export interface STFSPackageExtractionObject {
   /**
-   * The path to temporary folder created to ultimately gather all package files to move to the actual package folder inside the `dev_hdd0` folder.
+   * The path to temporary folder created to ultimately gather all package files to move to the actual extracted STFS package folder.
    */
   mainTempFolder: DirPath
   /**
@@ -56,13 +60,24 @@ export interface ExCONPackageExtractionObject {
   installedSongSongnames: string[]
 }
 
-export const extractPackagesForExCON = async (packages: SupportedRB3PackageFileType[], options: ExCONExtractionOptions): Promise<ExCONPackageExtractionObject> => {
-  const { forceEncryption, overwritePackFolder, songs } = useDefaultOptions<ExCONExtractionOptions>(
+/**
+ * Extracts all provided song packages and merged them to create a new package formatted as an extracted STFS package.
+ *
+ * The `options` parameter is an object where you can tweak the extraction and package creation process, like forcing encryption/decryption of all MOGG files.
+ * - - - -
+ * @param {RB3PackageLikeType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
+ * @param {DirPathLikeTypes} destFolderPath The destination folder you want to place the extracted package.
+ * @param {STFSExtractionOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
+ * @returns {Promise<RPCS3PackageExtractionObject>}
+ */
+export const extractPackagesForExtractedSTFS = async (packages: RB3PackageLikeType[], destFolderPath: DirPathLikeTypes, options?: STFSExtractionOptions): Promise<STFSPackageExtractionObject> => {
+  const { forceEncryption, overwritePackFolder, songs, updates, updateAllSongs } = useDefaultOptions<STFSExtractionOptions>(
     {
-      destFolderPath: '',
       forceEncryption: 'disabled',
       overwritePackFolder: true,
       songs: [],
+      updates: [],
+      updateAllSongs: null,
     },
     options
   )
@@ -72,14 +87,23 @@ export const extractPackagesForExCON = async (packages: SupportedRB3PackageFileT
 
   if (hasSongSelection) allSelectedSongs = songs.map((song) => (typeof song === 'string' ? { type: 'songname', value: song } : song)) as SelectedSongForExtractionObject[]
 
-  const dest = pathLikeToDirPath(options.destFolderPath)
+  const dest = pathLikeToDirPath(destFolderPath)
 
   if (dest.exists && !overwritePackFolder) throw new Error(`Provided destination folder "${dest.path}" already exists.`)
 
   const parser = new DTAParser()
 
+  const allPackages: SupportedRB3PackageFileType[] = packages.map((pack) => {
+    if (pack instanceof STFSFile || pack instanceof PKGFile) return pack
+    else {
+      const filePath = pathLikeToFilePath(pack)
+      if (filePath.ext === '.pkg') return new PKGFile(filePath)
+      else return new STFSFile(filePath)
+    }
+  })
+
   const tempFolders: (STFSExtractionTempFolderObject | PKGExtractionTempFolderObject)[] = []
-  for (const pack of packages) {
+  for (const pack of allPackages) {
     const tempFolderPath = pathLikeToDirPath(temporaryDirectory())
     const type = pack instanceof STFSFile ? 'stfs' : 'pkg'
     const stat = await pack.toJSON()
@@ -133,7 +157,7 @@ export const extractPackagesForExCON = async (packages: SupportedRB3PackageFileT
         tempFolders.push({
           path: tempFolderPath,
           type: 'pkg',
-          songs: stat.dta.filter((song) => allSelectedSongnames.includes(song.songname)).map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) })),
+          songs: filterdSelectedSongnames.map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) })),
           stat: stat as PKGFileJSONRepresentation,
         })
       }
@@ -240,9 +264,14 @@ export const extractPackagesForExCON = async (packages: SupportedRB3PackageFileT
 
   await dest.gotoDir('songs').mkDir(true)
 
+  if (updates.length > 0) parser.addUpdates(updates)
+  if (updateAllSongs !== null) parser.addUpdatesToAllSongs(updateAllSongs)
+  if (updates.length > 0 || updateAllSongs !== null) parser.applyUpdatesToExistingSongs(true)
+
   parser.sort('ID')
   parser.patchSongsEncodings()
   parser.patchCores()
+
   try {
     await parser.export(newDTAPath)
   } catch (err) {
