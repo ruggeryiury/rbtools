@@ -20,10 +20,10 @@ export * from './lib/imagetex/imageToTex'
 export * from './lib/imagetex/texStat'
 export * from './lib/imagetex/texToImage'
 
-export * from './lib/packExtractor/extractPackagesForExtractedSTFS'
-export * from './lib/packExtractor/extractPackagesForRPCS3'
-export * from './lib/packExtractor/extractPackagesForSTFSFile'
-export * from './lib/packExtractor/getUnpackedFilesPathFromRootExtraction'
+export * from './lib/packages/extractPackagesForExtractedSTFS'
+export * from './lib/packages/extractPackagesForRPCS3'
+export * from './lib/packages/extractPackagesForSTFSFile'
+export * from './lib/packages/getUnpackedFilesPathFromRootExtraction'
 
 export * from './lib/path/buildOSCommand'
 export * from './lib/path/thisFilePath'
@@ -43,7 +43,7 @@ export * from './lib/rb3savedata/getScoresListBytesWii'
 export * from './lib/rb3savedata/getScoresListBytesXboxPS3'
 export * from './lib/rb3savedata/getXboxPS3BandName'
 
-export * from './lib/rpcs3/isDevhdd0PathValid'
+export * from './lib/rpcs3/isRPCS3Devhdd0PathValid'
 export * from './lib/rpcs3/isRPCS3ExePathValid'
 
 export * from './lib/u8/parseU8ArchiveHeader'
