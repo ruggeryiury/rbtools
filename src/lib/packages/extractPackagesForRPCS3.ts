@@ -2,7 +2,7 @@ import { type DirPathLikeTypes, type DirPath, pathLikeToDirPath, pathLikeToFileP
 import { temporaryDirectory, temporaryFile } from 'tempy'
 import { useDefaultOptions } from 'use-default-options'
 import { type STFSFileJSONRepresentation, type PKGFileJSONRepresentation, DTAParser, STFSFile, MOGGFile, PythonAPI, TextureFile, EDATFile, BinaryAPI, type SelectedSongForExtractionObject, type PKGExtractionTempFolderObject, type STFSExtractionTempFolderObject, type RB3PackageLikeType, PKGFile, type SupportedRB3PackageFileType } from '../../core.exports'
-import { getUnpackedFilesPathFromRootExtraction, isDevhdd0PathValid, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { getUnpackedFilesPathFromRootExtraction, isRPCS3Devhdd0PathValid, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
 
 // #region Types
 
@@ -101,9 +101,11 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
   const dest = pathLikeToDirPath(destFolderPath)
   let isDevhdd0 = false
   try {
-    if (isDevhdd0PathValid(dest)) isDevhdd0 = true
-  } catch (e) {
+    isRPCS3Devhdd0PathValid(dest)
+    isDevhdd0 = true
+  } catch (err) {
     if (!dest.exists) await dest.mkDir(true)
+    throw err
   }
 
   const usrdir = isDevhdd0 ? dest.gotoDir('game/BLUS30463/USRDIR') : dest
