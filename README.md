@@ -15,7 +15,6 @@
   - [Python](#python)
 - [Package Resources](#package-resources)
 - [Special Thanks](#special-thanks)
-- [More Rock Band-Related Projects](#more-rock-band-related-projects)
 
 # About
 
@@ -60,14 +59,9 @@ At last, **_RBTools_** comes with a few special Node packages made by myself, su
 
 # Special Thanks
 
-- [raphaelgoulart](https://github.com/raphaelgoulart): Close friend and always helping me in some sort.
-- [Onyxite](https://github.com/mtolly): General helping and for the creation of [Onyx Toolkit](https://github.com/mtolly/onyx)!
+- [raphaelgoulart](https://github.com/raphaelgoulart), [CarlMylo](https://github.com/carlmylo), and Ganso: Close friends, always helping me in some sort.
 - [TrojanNemo](https://github.com/trojannemo): General helping and for the creation of [Nautilus](https://github.com/trojannemo/Nautilus)!
+- [Onyxite](https://github.com/mtolly): General helping and for the creation of [Onyx Toolkit](https://github.com/mtolly/onyx)!
 - [Emma](https://github.com/InvoxiPlayGames): General helping and providing the RB3E ID creator for installed songs.
 - [LocalH](https://github.com/LocalH): General helping and providing the [moggulator](https://github.com/LocalH/moggulator/tree/master) python module.
-- Jnack and all the fellow contributors of MiloHax!
-
-# More Rock Band-Related Projects
-
-- [My Customs Projects](https://github.com/ruggeryiury/ruggy-customs-projects): All my customs projects.
-- [PRO Guitar/Bass Guide](https://ruggeryiury.github.io/proguitarbass-guide/): My famous PRO Guitar/Bass guide.
+- [Jnack](https://github.com/jnackmclain) and all the fellow friends and contributors of MiloHax!

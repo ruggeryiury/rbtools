@@ -105,7 +105,6 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
     isDevhdd0 = true
   } catch (err) {
     if (!dest.exists) await dest.mkDir(true)
-    throw err
   }
 
   const usrdir = isDevhdd0 ? dest.gotoDir('game/BLUS30463/USRDIR') : dest
