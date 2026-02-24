@@ -88,14 +88,30 @@ export interface PKGItemEntriesMap {
 }
 
 export interface PKGData {
+  /**
+   * The path of the processed PKG file. This value is `null` if the provided parsing object was a PKG file `Buffer`.
+   */
   pkgFilePath: string | null
+  /**
+   * An object containing parsed data from the PKG file header.
+   */
   header: PKGHeaderData
+  /**
+   * An object containing parsed data from the PKG file entries.
+   */
   entries: PKGItemEntriesData
+  /**
+   * An object containing parsed data from the PKG's SFO file.
+   */
   sfo: SFOData
   /**
    * The size of the PKG file.
    */
   fileSize: number
+  /**
+   * The header contents SHA256 hash of the STFS file.
+   */
+  contentHash: string
 }
 
 // #region Functions
@@ -492,5 +508,6 @@ export const parsePKGFileOrBuffer = async (pkgFilePathOrBuffer: FilePathLikeType
     entries,
     sfo,
     fileSize,
+    contentHash: entries.sha256,
   }
 }

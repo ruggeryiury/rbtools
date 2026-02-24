@@ -29,6 +29,10 @@ export type STFSFileStatObject = Omit<STFSFileStatRawObject, 'dta' | 'upgrades'>
    * The title thumbnail encoded in Data URL string.
    */
   titleThumbnail: string
+  /**
+   * The header contents SHA1 hash of the STFS file.
+   */
+  contentHash: string
 }
 
 export interface STFSFileJSONRepresentation extends FilePathJSONRepresentation, Omit<STFSFileStatObject, 'dta' | 'upgrades'> {

@@ -37,7 +37,8 @@ def stfs_file_stat(file_path: str) -> STFSFileStat:
         "dta": "",
         "fileSize": os.path.getsize(file_path),
         "thumbnail": f"data:image/png;base64,{base64.b64encode(con.thumbnail).decode()}",
-        "titleThumbnail": f"data:image/png;base64,{base64.b64encode(con.titleimage).decode()}"
+        "titleThumbnail": f"data:image/png;base64,{base64.b64encode(con.titleimage).decode()}",
+        "contentHash": con.content_id.hex(),
     }
 
     all_files = con.allfiles.keys()

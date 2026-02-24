@@ -39,6 +39,10 @@ export interface PKGFileSongPackageStatObject {
    * The size of the PKG file.
    */
   fileSize: number
+  /**
+   * The header contents SHA1 hash of the STFS file.
+   */
+  contentHash: string
 }
 
 export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, Omit<PKGFileSongPackageStatObject, 'dta' | 'upgrades'> {
@@ -88,21 +92,12 @@ export class PKGFile {
   }
 
   /**
-   * Returns an object with stats of the PS3 PKG file.
-   * - - - -
-   * @returns {Promise<PKGData>}
-   */
-  async stat(): Promise<PKGData> {
-    return await parsePKGFileOrBuffer(this.path)
-  }
-
-  /**
    * Returns an object with stats of the PS3 PKG file. This method only works for song packages PKG files, otherwise will return an error.
    * - - - -
    * @returns {Promise<PKGFileSongPackageStatObject>}
    * @throws {Error} When the provided PKG file is not a song package file.
    */
-  async songPackageStat(): Promise<PKGFileSongPackageStatObject> {
+  async stat(): Promise<PKGFileSongPackageStatObject> {
     await this.checkFileIntegrity()
     const data = await parsePKGFileOrBuffer(this.path)
     let isPack = false
@@ -127,6 +122,7 @@ export class PKGFile {
       isPack,
       hasUpgrades,
       fileSize: data.fileSize,
+      contentHash: data.entries.sha256,
     }
   }
 
@@ -138,7 +134,7 @@ export class PKGFile {
    * @returns {Promise<PKGFileJSONRepresentation>}
    */
   async toJSON(): Promise<PKGFileJSONRepresentation> {
-    const songPackageStat = await this.songPackageStat()
+    const songPackageStat = await this.stat()
     return {
       ...this.path.toJSON(),
       ...songPackageStat,
