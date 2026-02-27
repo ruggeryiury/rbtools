@@ -118,6 +118,13 @@ export const officialPackages: SongPackageDatabaseObject[] = [
   },
 ]
 
+/**
+ * Returns an object with known properties of a specific official song package based on the song package contents hash. Returns `undefined` if the provided hash does not match any known official song package hashes.
+ * - - - -
+ * @param {OfficialPackagesHashTypes} type The type of the contents hash you want to search to.
+ * @param {string} hash The actual hash string you want to search to.
+ * @returns {ParsedSongPackageDatabaseObject | undefined}
+ */
 export const getOfficialPkgFromHash = (type: OfficialPackagesHashTypes, hash: string): ParsedSongPackageDatabaseObject | undefined => {
   for (const pack of officialPackages) {
     if (pack.hashes[type] === hash)
@@ -128,6 +135,12 @@ export const getOfficialPkgFromHash = (type: OfficialPackagesHashTypes, hash: st
   }
 }
 
+/**
+ * Returns an object with known properties of a specific official song package based on its installed folder name. Returns `undefined` if the provided folder name does not match any known official song package folder names.
+ * - - - -
+ * @param {string} folderName The folder name you want to search to.
+ * @returns {ParsedSongPackageDatabaseObject | undefined}
+ */
 export const getOfficialPkgFromFolderName = (folderName: string): ParsedSongPackageDatabaseObject | undefined => {
   for (const pack of officialPackages) {
     if (pack.folderName === folderName)
@@ -139,6 +152,13 @@ export const getOfficialPkgFromFolderName = (folderName: string): ParsedSongPack
   return
 }
 
+/**
+ * Checks if the provided folder name is available to be used on the Rock Band 3's USRDIR folder without merging/overwriting an existing package.
+ * - - - -
+ * @param {DirPathLikeTypes} devhdd0Path The path to the `dev_hdd0` folder of your RPCS3 installation.
+ * @param {string} folderName The folder name you want to check availability.
+ * @returns {Promise<boolean>}
+ */
 export const isRB3FolderNameFreeOnRPCS3 = async (devhdd0Path: DirPathLikeTypes, folderName: string): Promise<boolean> => {
   let proof = true
   const devhdd0 = isRPCS3Devhdd0PathValid(devhdd0Path)

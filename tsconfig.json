@@ -17,6 +17,6 @@
     "verbatimModuleSyntax": true
     // "isolatedDeclarations": true
   },
-  "include": ["src/**/*.ts", "dev/old/SongPackageDB.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }

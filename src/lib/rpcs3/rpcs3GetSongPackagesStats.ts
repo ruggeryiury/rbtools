@@ -4,33 +4,101 @@ import { getOfficialPkgFromHash, isRPCS3Devhdd0PathValid, type ParsedSongPackage
 import { useDefaultOptions } from 'use-default-options'
 
 export interface RPCS3SongPackagesObject {
+  /**
+   * The folder name of the song package.
+   */
   name: string
+  /**
+   * The path to the song package folder name.
+   */
   path: string
+  /**
+   * The game where the song package is installed.
+   */
   packageType: 'rb3' | 'rb1'
+  /**
+   * The path to the song package DTA file.
+   */
   dtaFilePath: string
+  /**
+   * An object with known properties of the official song package where the installed song package belongs to. The value might be `undefined` if the song package contents hash does not match any official song package contents hash.
+   */
   isOfficial: ParsedSongPackageDatabaseObject | undefined
+  /**
+   * The size of the song package.
+   */
   packageSize: number
+  /**
+   * The amount of songs available on the song package.
+   */
   songsCount: number
+  /**
+   * A 16-bytes hash used to decrypt the song package's EDAT files.
+   */
   devklic: string
+  /**
+   * A SHA256 hash of the song package contents.
+   */
   contentsHash: string
+  /**
+   * An array with all song's entry IDs.
+   */
   entriesIDs: string[]
+  /**
+   * An array with all song's internal names.
+   */
   songnames: string[]
+  /**
+   * An array with all song's IDs (can have non-numerical IDs).
+   */
   songIDs: (string | number)[]
   // manifest: string
+  /**
+   * An array with relative paths of all package files (excluding the song package's DTA file itself).
+   */
   packageFiles: string[]
-  rsdat?: {}
 }
 
 export interface RPCS3SongPackagesData {
+  /**
+   * The amount of songs from the Rock Band 3 alone. Always `83`.
+   */
   rb3SongsCount: number
+  /**
+   * The amount of song packages installed on the Rock Band 1's USRDIR folder.
+   */
   rb1PackagesCount: number
+  /**
+   * The amount of songs installed on the Rock Band 1's USRDIR folder.
+   */
   rb1PackagesSongsCount: number
+  /**
+   * The amount of song packages installed on the Rock Band 3's USRDIR folder.
+   */
   rb3PackagesCount: number
+  /**
+   * The amount of songs installed on the Rock Band 3's USRDIR folder.
+   */
   rb3PackagesSongsCount: number
+  /**
+   * The amount of song packages installed on all Rock Band title's USRDIR folders.
+   */
   allPackagesCount: number
+  /**
+   * The amount of songs installed on all Rock Band title's USRDIR folders.
+   */
   allSongsCount: number
+  /**
+   * The amount of songs installed on all Rock Band title's USRDIR folders, including the 83 songs from Rock Band 3.
+   */
   allSongsPlusRB3: number
+  /**
+   * The amount of stars that can be earned from all songs.
+   */
   starsCount: number
+  /**
+   * An array with objects that represents an installed song package and its properties.
+   */
   packages: RPCS3SongPackagesObject[]
 }
 
@@ -44,14 +112,20 @@ export interface RPCS3PackageFilesManifestData {
    */
   packageSize: number
   /**
-   *
+   * An array with relative paths of all package files (excluding the song package's DTA file itself).
    */
   packageFiles: string[]
 }
 
 const RB1_RAP_FOLDER = 'CCF0099'
 
-export const rpcs3GetPackageFilesManifest = async (packageDirPath: DirPathLikeTypes): Promise<RPCS3PackageFilesManifestData> => {
+/**
+ * Generates a manifest string with name and size of all files from an installed song package.
+ * - - - -
+ * @param {DirPathLikeTypes} packageDirPath The path to the installed song package to generate the manifest string from.
+ * @returns {Promise<RPCS3PackageFilesManifestData>}
+ */
+export const rpcs3GenSongPackageManifest = async (packageDirPath: DirPathLikeTypes): Promise<RPCS3PackageFilesManifestData> => {
   const packagePath = pathLikeToDirPath(packageDirPath)
   const insideSongsFolderPath = packagePath.gotoDir('songs').path
   const files = (await packagePath.gotoDir('songs').readDir(true))
@@ -151,7 +225,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
         rb3PackagesSongsCount += parsedData.songs.length
 
         const devklic = EDATFile.genDevKLicHash(packagePath.name)
-        const { manifest, packageSize, packageFiles } = await rpcs3GetPackageFilesManifest(packagePath)
+        const { manifest, packageSize, packageFiles } = await rpcs3GenSongPackageManifest(packagePath)
         // const dtaHash = createHashFromBuffer(Buffer.from(parsedData.stringify()))
         const contentsHash = createHashFromBuffer(Buffer.from(manifest))
         const isOfficial = getOfficialPkgFromHash('extractedRPCS3', contentsHash)
@@ -202,7 +276,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
         rb1PackagesSongsCount += parsedData.songs.length
 
         const devklic = EDATFile.genDevKLicHash(packagePath.name)
-        const { manifest, packageSize, packageFiles } = await rpcs3GetPackageFilesManifest(packagePath)
+        const { manifest, packageSize, packageFiles } = await rpcs3GenSongPackageManifest(packagePath)
         // const dtaHash = createHashFromBuffer(Buffer.from(parsedData.stringify()))
         const contentsHash = createHashFromBuffer(Buffer.from(manifest))
         const isOfficial = getOfficialPkgFromHash('extractedRPCS3', contentsHash)
