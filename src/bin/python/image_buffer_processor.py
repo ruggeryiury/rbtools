@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import sys, json, base64
+import sys
+import json
+import base64
 from io import BytesIO
 from typing import Literal
 from PIL import Image
@@ -7,12 +9,11 @@ from PIL import Image
 
 def image_buffer_processor(
     img_base64: str,
-    format: str,
+    format: Literal['png', 'bmp', 'jpg', 'webp', 'tga', 'jpeg'] = 'png',
     width: int = 256,
     height: int = 256,
-    interpolation: Literal[
-        "NEAREST", "BOX", "BILINEAR", "HAMMING", "BICUBIC", "LANCZOS"
-    ] = "LANCZOS",
+    interpolation: Literal["NEAREST", "BOX", "BILINEAR",
+                           "HAMMING", "BICUBIC", "LANCZOS"] = "LANCZOS",
     quality: int = 100,
 ) -> str:
     """
@@ -36,10 +37,15 @@ def image_buffer_processor(
                 img = img.convert("RGB")
 
             if img.width == width and img.height == height:
+                desired_format = 'jpeg'
+                if format.lower() != 'jpg':
+                    desired_format = format.lower()
+
                 with BytesIO() as output:
-                    img.save(output, format=format.upper(), quality=quality)
+                    img.save(output, format=desired_format, quality=quality)
                     img_data = output.getvalue()
-                    img_base64_data = base64.b64encode(img_data).decode("utf-8")
+                    img_base64_data = base64.b64encode(
+                        img_data).decode("utf-8")
                     return img_base64_data
             else:
                 x, y = img.size
@@ -50,9 +56,13 @@ def image_buffer_processor(
                     (width, height), resample=Image.Resampling[interpolation]
                 )
                 with BytesIO() as output:
-                    new_im.save(output, format=format.upper(), quality=quality)
+                    desired_format = 'jpeg'
+                    if format.lower() != 'jpg':
+                        desired_format = format.lower()
+                    new_im.save(output, format=desired_format, quality=quality)
                     img_data = output.getvalue()
-                    img_base64_data = base64.b64encode(img_data).decode("utf-8")
+                    img_base64_data = base64.b64encode(
+                        img_data).decode("utf-8")
                     return img_base64_data
     except Exception as e:
         raise e

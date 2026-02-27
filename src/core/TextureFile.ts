@@ -79,7 +79,7 @@ export class TextureFile {
    * - - - -
    * @param {FilePathLikeTypes} destPath The destination path of the new converted image. The new image extension is automatically placed based on the `toFormat` argument.
    * @param {ImageFormatTypes} toFormat The format of the new converted image.
-   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
+   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the image processing and converting.
    * @returns {Promise<ImageFile>}
    */
   async convertToImage(destPath: FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<ImageFile> {

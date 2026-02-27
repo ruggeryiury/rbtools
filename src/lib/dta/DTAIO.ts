@@ -285,7 +285,7 @@ export interface DTAIOFormattingOptions {
    */
   array?: ArrayFormattingOptions
   /**
-   * An object that changes the behavior of the DTA script rendering.
+   * An object with properties that modifies the default behavior of the DTA script rendering.
    */
   dta?: DTADocumentFormattionOptions
 }

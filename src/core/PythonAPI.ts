@@ -108,7 +108,7 @@ export interface STFSFileStatRawObject {
   /**
    * The header contents SHA1 hash of the STFS file.
    */
-  contentHash: string
+  contentsHash: string
 }
 
 export type PreviewAudioFormatTypes = 'wav' | 'flac' | 'ogg' | 'mp3'
@@ -142,7 +142,7 @@ export class PythonAPI {
    * @param {FilePathLikeTypes} srcFilePath The source image file to be converted.
    * @param {FilePathLikeTypes} destFilePath The destination path of the new converted image. The new image extension is automatically placed based on the `toFormat` argument.
    * @param {ImageFormatTypes} toFormat The format of the new converted image.
-   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
+   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the image processing and converting.
    * @returns {ImageFile}
    */
   static async imageConverter(srcFilePath: FilePathLikeTypes, destFilePath: FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<ImageFile> {
@@ -168,7 +168,7 @@ export class PythonAPI {
    * - - - -
    * @param {Buffer | FilePathLikeTypes} imgPathOrBuffer The path or buffer of an image file.
    * @param {ImageFormatTypes} toFormat The format of the new converted image.
-   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
+   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the image processing and converting.
    * @returns {Promise<Buffer>}
    */
   static async imageBufferProcessor(imgPathOrBuffer: Buffer | FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<Buffer> {
@@ -182,6 +182,7 @@ export class PythonAPI {
         },
         options
       )
+
       const pythonScript = 'image_buffer_processor.py'
       const process = spawn('python', [pythonScript], { cwd: RBTools.pyFolder.path, windowsHide: true })
       const imgBase64 = Buffer.isBuffer(imgPathOrBuffer) ? imgPathOrBuffer.toString('base64') : pathLikeToFilePath(imgPathOrBuffer).readSync().toString('base64')

@@ -79,7 +79,7 @@ export class ImageFile {
    * - - - -
    * @param {Buffer | FilePathLikeTypes} imgPathOrBuffer The path or buffer of an image file.
    * @param {ImageFormatTypes} toFormat The format of the new converted image.
-   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
+   * @param {ImageConvertingOptions} [options]  `OPTIONAL` An object with properties that modifies the default behavior of the image processing and converting.
    * @returns {Promise<Buffer>}
    */
   static async process(imgPathOrBuffer: Buffer | FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<Buffer> {
@@ -164,7 +164,7 @@ export class ImageFile {
    * - - - -
    * @param {FilePathLikeTypes} destPath The destination path of the new converted image. The new image extension is automatically placed based on the `toFormat` argument.
    * @param {ImageFormatTypes} toFormat The format of the new converted image.
-   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object that tweaks the behavior of the image processing and converting.
+   * @param {ImageConvertingOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the image processing and converting.
    * @returns {Promise<ImageFile>}
    */
   async convertToImage(destPath: FilePathLikeTypes, toFormat: ImageFormatTypes, options?: ImageConvertingOptions): Promise<ImageFile> {

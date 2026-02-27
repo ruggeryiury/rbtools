@@ -111,7 +111,7 @@ export interface PKGData {
   /**
    * The header contents SHA256 hash of the STFS file.
    */
-  contentHash: string
+  contentsHash: string
 }
 
 // #region Functions
@@ -508,6 +508,6 @@ export const parsePKGFileOrBuffer = async (pkgFilePathOrBuffer: FilePathLikeType
     entries,
     sfo,
     fileSize,
-    contentHash: entries.sha256,
+    contentsHash: entries.sha256,
   }
 }

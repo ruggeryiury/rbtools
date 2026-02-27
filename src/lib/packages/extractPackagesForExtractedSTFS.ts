@@ -67,7 +67,7 @@ export interface STFSPackageExtractionObject {
  * - - - -
  * @param {RB3PackageLikeType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
  * @param {DirPathLikeTypes} destFolderPath The destination folder you want to place the extracted package.
- * @param {STFSExtractionOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
+ * @param {STFSExtractionOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the extraction and package creation process.
  * @returns {Promise<RPCS3PackageExtractionObject>}
  */
 export const extractPackagesForExtractedSTFS = async (packages: RB3PackageLikeType[], destFolderPath: DirPathLikeTypes, options?: STFSExtractionOptions): Promise<STFSPackageExtractionObject> => {

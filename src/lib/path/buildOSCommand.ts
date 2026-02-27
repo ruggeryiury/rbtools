@@ -12,7 +12,7 @@ export interface OSCommandBuiltOptions {
  * Builds a command configured to specific operational systems.
  * - - - -
  * @param {string} command The command you want to process.
- * @param {OSCommandBuiltOptions} [options] An object that changes the behavior of the building process.
+ * @param {OSCommandBuiltOptions} [options] An object with properties that modifies the default behavior of the building process.
  * @returns {string}
  */
 export const buildOSCommand = (command: string, options?: OSCommandBuiltOptions): string => {

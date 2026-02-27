@@ -37,7 +37,7 @@ export interface DTAStringifyOptions {
    */
   omitUnusedValues?: boolean
   /**
-   * An object that changes the behavior of the DTA rendering process.
+   * An object with properties that modifies the default behavior of the DTA rendering process.
    *
    * RB3 and MAGMA formatting options are available as static property on `DTAIO.formatOptions`. Default is `DTAIO.formatOptions.defaultRB3`.
    */
@@ -52,7 +52,7 @@ export interface DTAStringifyOptions {
  * Stringify songs and updates entries back to DTA format.
  * - - - -
  * @param {SongsAndUpdatesObject} songsAndUpdates
- * @param {DTAStringifyOptions} [options] `OPTIONAL` An object that changes the behavior of the stringify process.
+ * @param {DTAStringifyOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the stringify process.
  * @returns {string}
  */
 export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: DTAStringifyOptions): string => {

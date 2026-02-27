@@ -354,7 +354,7 @@ export class RhythmverseAPI {
    * Searchs a text through the Rhythmverse database.
    * - - - -
    * @param {string} text The text you want to be used as searching parameter.
-   * @param {RhythmverseFetchingOptions | undefined} options `OPTIONAL` An object that changes the behavior of the fetching process.
+   * @param {RhythmverseFetchingOptions | undefined} options `OPTIONAL` An object with properties that modifies the default behavior of the fetching process.
    * @returns {Promise<RawRhythmverseResponse>}
    */
   static async searchText(text: string, options?: RhythmverseFetchingOptions): Promise<RawRhythmverseResponse> {
@@ -407,7 +407,7 @@ export class RhythmverseAPI {
    * Searchs an artist/band through the Rhythmverse database.
    * - - - -
    * @param {string} artist The text you want to be used as searching parameter.
-   * @param {RhythmverseFetchingOptions | undefined} options `OPTIONAL` An object that changes the behavior of the fetching process.
+   * @param {RhythmverseFetchingOptions | undefined} options `OPTIONAL` An object with properties that modifies the default behavior of the fetching process.
    * @returns {Promise<RawRhythmverseResponse>}
    */
   static async searchArtist(artist: string, options?: RhythmverseFetchingOptions): Promise<RawRhythmverseResponse> {
@@ -460,7 +460,7 @@ export class RhythmverseAPI {
    * Searchs an author through the Rhythmverse database.
    * - - - -
    * @param {string} author The text you want to be used as searching parameter.
-   * @param {RhythmverseFetchingOptions | undefined} options `OPTIONAL` An object that changes the behavior of the fetching process.
+   * @param {RhythmverseFetchingOptions | undefined} options `OPTIONAL` An object with properties that modifies the default behavior of the fetching process.
    * @returns {Promise<RawRhythmverseResponse>}
    */
   static async searchAuthor(author: string, options?: RhythmverseFetchingOptions): Promise<RawRhythmverseResponse> {

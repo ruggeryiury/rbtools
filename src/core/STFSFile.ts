@@ -32,7 +32,7 @@ export type STFSFileStatObject = Omit<STFSFileStatRawObject, 'dta' | 'upgrades'>
   /**
    * The header contents SHA1 hash of the STFS file.
    */
-  contentHash: string
+  contentsHash: string
 }
 
 export interface STFSFileJSONRepresentation extends FilePathJSONRepresentation, Omit<STFSFileStatObject, 'dta' | 'upgrades'> {

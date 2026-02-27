@@ -72,7 +72,7 @@ export interface RPCS3PackageExtractionObject {
  * @param {RB3PackageLikeType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
  * @param {DirPathLikeTypes} destFolderPath The destination folder you want to place the extracted package. You can use any folder, but placing a valid `dev_hdd0` folder, this function will install the new package on Rock Band 3's USRDIR folder on RPCS3.
  * @param {string} packageFolderName The name of the new package folder.
- * @param {RPCS3ExtractionOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
+ * @param {RPCS3ExtractionOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the extraction and package creation process.
  * @returns {Promise<RPCS3PackageExtractionObject>}
  */
 export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], destFolderPath: DirPathLikeTypes, packageFolderName: string, options?: RPCS3ExtractionOptions): Promise<RPCS3PackageExtractionObject> => {

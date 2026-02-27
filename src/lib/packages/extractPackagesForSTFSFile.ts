@@ -82,7 +82,7 @@ export interface STFSCreationObject {
  * @param {RB3PackageLikeType[]} packages An array with paths to STFS or PKG files to be installed. You can select individual song or multiple songs package.
  * @param {FilePathLikeTypes} destSTFSFile The destination STFS file you want to create.
  * @param {FilePathLikeTypes} onyxCLIEXEPath The path to the Onyx CLI executable.
- * @param {STFSCreationOptions} [options] `OPTIONAL` An object that settles and tweaks the extraction and package creation process.
+ * @param {STFSCreationOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the extraction and package creation process.
  * @returns {Promise<STFSCreationObject>}
  */
 export const extractPackagesForSTFSFile = async (packages: RB3PackageLikeType[], destSTFSFile: FilePathLikeTypes, onyxCLIEXEPath: FilePathLikeTypes, options?: STFSCreationOptions): Promise<STFSCreationObject> => {

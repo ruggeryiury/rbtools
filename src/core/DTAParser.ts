@@ -393,7 +393,7 @@ export class DTAParser {
   /**
    * Stringify songs and updates entries back to DTA format.
    * - - - -
-   * @param {DTAStringifyOptions} [options] `OPTIONAL` An object that changes the behavior of the stringify process.
+   * @param {DTAStringifyOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the stringify process.
    * @returns {string}
    */
   stringify(options?: DTAStringifyOptions): string {
@@ -424,7 +424,7 @@ export class DTAParser {
    * Stringify songs and updates entries back to DTA format and writes the stringified contents into a file.
    * - - - -
    * @param destPath The file path where you want to save the DTA contents.
-   * @param {DTAStringifyOptions} [options] `OPTIONAL` An object that changes the behavior of the stringify process.
+   * @param {DTAStringifyOptions} [options] `OPTIONAL` An object with properties that modifies the default behavior of the stringify process.
    * @returns {Promise<FilePath>}
    */
   async export(destPath: FilePathLikeTypes, options?: DTAStringifyOptions): Promise<FilePath> {

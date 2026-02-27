@@ -37,7 +37,7 @@ export type StringFormatterSpecificOptionTypes = 'id' | 'id_with_space'
  * configuration that is placed on the `options` object, acting as a simple string
  * formatter rather than rely on a `DTAFile` object.
  * @param {string} format The formatted string.
- * @param {StringFormatterOptions | StringFormatterSpecificOptionTypes | undefined} options `OPTIONAL` An object that changes the behavior of the formatting process.
+ * @param {StringFormatterOptions | StringFormatterSpecificOptionTypes | undefined} options `OPTIONAL` An object with properties that modifies the default behavior of the formatting process.
  * @returns {string} The string with format flags replaced to actual values from the provided `DTAFile` object.
  */
 export const formatStringFromDTA = (song: RB3CompatibleDTAFile | null, format: string, options?: StringFormatterOptions | StringFormatterSpecificOptionTypes): string => {

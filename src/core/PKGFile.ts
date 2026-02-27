@@ -42,7 +42,7 @@ export interface PKGFileSongPackageStatObject {
   /**
    * The header contents SHA1 hash of the STFS file.
    */
-  contentHash: string
+  contentsHash: string
 }
 
 export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, Omit<PKGFileSongPackageStatObject, 'dta' | 'upgrades'> {
@@ -122,7 +122,7 @@ export class PKGFile {
       isPack,
       hasUpgrades,
       fileSize: data.fileSize,
-      contentHash: data.entries.sha256,
+      contentsHash: data.entries.sha256,
     }
   }
 
