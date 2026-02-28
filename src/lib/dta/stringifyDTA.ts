@@ -1,6 +1,7 @@
 import { useDefaultOptions } from 'use-default-options'
-import { DTAIO, genTracksCountArray, quoteToSlashQ, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
+import { DTAIO, genTracksCountArray, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
 import { MyObject } from 'node-lib'
+import { quoteToSlashQ } from '../../utils.exports'
 
 export interface SongsAndUpdatesObject {
   /**

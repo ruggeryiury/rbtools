@@ -4,7 +4,8 @@ import { finished } from 'node:stream/promises'
 import axios, { AxiosError } from 'axios'
 import { type FilePath, getReadableBytesSize, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
-import { isValidURL, normalizeString, type PartialDTAFile } from '../lib.exports'
+import { type PartialDTAFile } from '../lib.exports'
+import { isValidURL, normalizeString } from '../utils.exports'
 
 // #region Types
 

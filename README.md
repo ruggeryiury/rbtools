@@ -18,7 +18,7 @@
 
 # About
 
-**_RBTools_** is a NodeJS module with classes to manipulate several Rock Band-related files on all available systems. **_RBTools_** also uses _Python_ to manipulate many kinds of files, like image and texture files. The main exports of this package consists on classes that represents a file type to be processed. All secondary methods used on these classes is also available to import from `rbtools/lib`.
+**_RBTools_** is a NodeJS module with classes to manipulate several Rock Band-related files on all available systems. **_RBTools_** also uses _Python_ to manipulate many kinds of files, like image and texture files. The main exports of this package consists on classes that represents a file type to be processed. All secondary methods used on these classes is also available to import from `rbtools/lib`, utilities being available to import from `rbtools/utils`.
 
 # Dependencies
 

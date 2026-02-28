@@ -4,7 +4,8 @@ import { type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, typ
 import { useDefaultOptions } from 'use-default-options'
 import { temporaryFile } from 'tempy'
 import { PythonAPI, type TextureFile, type ImageFileStatPythonObject, type TextureFormatTypes, type TextureSizeTypes } from '../core.exports'
-import { imageToTexWii, imageToTexXboxPs3, isValidURL } from '../lib.exports'
+import { imageToTexWii, imageToTexXboxPs3 } from '../lib.exports'
+import { isValidURL } from '../utils.exports'
 
 // #region Types
 

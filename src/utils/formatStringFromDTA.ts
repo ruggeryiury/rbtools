@@ -1,5 +1,6 @@
 import { useDefaultOptions } from 'use-default-options'
-import { leadingArticleToTrailing, omitLeadingArticle, type RB3CompatibleDTAFile } from '../../lib.exports'
+import type { RB3CompatibleDTAFile } from '../lib.exports'
+import { leadingArticleToTrailing, omitLeadingArticle } from '../utils.exports'
 
 export interface StringFormatterOptions {
   /**

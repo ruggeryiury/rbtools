@@ -1,5 +1,6 @@
 import { MyObject } from 'node-lib'
-import { customSourceIfdefDeconstructor, isTracksCountEmpty, slashQToQuote, sortDTAMap, type DTAFileKeys, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { customSourceIfdefDeconstructor, isTracksCountEmpty, sortDTAMap, type DTAFileKeys, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { slashQToQuote } from '../../utils.exports'
 
 /**
  * Parses a DTA song content to a `RB3CompatibleDTAFile` or `PartialDTAFile` object.

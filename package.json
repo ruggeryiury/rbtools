@@ -61,6 +61,10 @@
     "./lib": {
       "types": "./dist/lib.exports.d.ts",
       "import": "./dist/lib.exports.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.exports.d.ts",
+      "import": "./dist/utils.exports.js"
     }
   }
 }

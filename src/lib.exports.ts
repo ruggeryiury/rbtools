@@ -52,8 +52,3 @@ export * from './lib/rpcs3/rpcs3GetRB3Stats'
 export * from './lib/rpcs3/rpcs3GetSongPackagesStats'
 
 export * from './lib/u8/parseU8ArchiveHeader'
-
-export * from './lib/utils/formatStringFromDTA'
-export * from './lib/utils/getKeyFromMapValue'
-export * from './lib/utils/isValidURL'
-export * from './lib/utils/textMethods'

@@ -1,4 +1,5 @@
-import { omitLeadingArticle, type PartialDTAFile, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
+import { type PartialDTAFile, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
+import { omitLeadingArticle } from '../../utils.exports'
 
 export type AnyDTAType = RB3CompatibleDTAFile | PartialDTAFile
 export type AnyDTATypeArray = RB3CompatibleDTAFile[] | PartialDTAFile[]

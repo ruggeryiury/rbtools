@@ -1,7 +1,8 @@
 import { BinaryWriter } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
 import type { RequiredDeep } from 'type-fest'
-import { DTAIO, quoteToSlashQ, type ArrayValueObject, type BooleanFormattingOptions, type BooleanValueObject, type DTAIOAddValueTypes, type DTAIOFormattingOptions, type FloatValueObject, type IfDefValueObject, type NumberAndFloatFormattingOptions, type NumberValueObject, type ObjectValueObject, type StringFormattingOptions, type StringValueObject, type StringVariableFormattingOptions, type StringVariableValueObject } from '../../lib.exports'
+import { DTAIO, type ArrayValueObject, type BooleanFormattingOptions, type BooleanValueObject, type DTAIOAddValueTypes, type DTAIOFormattingOptions, type FloatValueObject, type IfDefValueObject, type NumberAndFloatFormattingOptions, type NumberValueObject, type ObjectValueObject, type StringFormattingOptions, type StringValueObject, type StringVariableFormattingOptions, type StringVariableValueObject } from '../../lib.exports'
+import { quoteToSlashQ } from '../../utils.exports'
 
 /**
  * Replaces `{n}` to new line characters and `{t}` to tab characters on a string.
