@@ -1,4 +1,4 @@
-import { BinaryReader, HexStr, pathLikeToString, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, HexStr, type FilePathLikeTypes } from 'node-lib'
 
 export interface SFODataObject {
   /**

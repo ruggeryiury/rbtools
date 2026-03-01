@@ -103,6 +103,7 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
   try {
     isRPCS3Devhdd0PathValid(dest)
     isDevhdd0 = true
+    // eslint-disable-next-line no-unused-vars
   } catch (err) {
     if (!dest.exists) await dest.mkDir(true)
   }

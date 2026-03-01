@@ -1,4 +1,4 @@
-import { MyObject, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
+import { MyObject, pathLikeToDirPath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
 import { parse as parseYAML } from 'yaml'
 import { isRPCS3Devhdd0PathValid } from './isRPCS3Devhdd0PathValid'
 import { isRPCS3ExePathValid } from './isRPCS3ExePathValid'

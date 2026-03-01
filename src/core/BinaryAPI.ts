@@ -29,7 +29,7 @@ export class BinaryAPI {
    * @param {FilePathLikeTypes} destPath The destination path of the new, encrypted MOGG file.
    * @returns {MOGGFile} A `MOGGFile` instance pointing to the new MOGG file path.
    */
-  static async makeMoggEncrypt(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes, encrypt: boolean = false): Promise<MOGGFile> {
+  static async makeMoggEncrypt(srcPath: FilePathLikeTypes, destPath: FilePathLikeTypes): Promise<MOGGFile> {
     const exeName = RBTools.binFolder.gotoFile('makemogg.exe').name
     const command = buildOSCommand(`${exeName} "${pathLikeToString(srcPath)}" -e "${pathLikeToString(destPath)}"`)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.binFolder.path })

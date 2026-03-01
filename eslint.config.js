@@ -7,8 +7,8 @@ import jsdoc from 'eslint-plugin-jsdoc'
 
 export default defineConfig(
   {
-    ignores: ['dist/**'],
     files: ['src/**/*.ts'],
+    ignores: ['dist/**'],
     plugins: {
       '@typescript-eslint': tseslint.plugin,
       import: importPlugin,
@@ -28,5 +28,5 @@ export default defineConfig(
   },
   eslint.configs.recommended,
   tseslint.configs.recommendedTypeCheckedOnly,
-  { rules: { 'no-unused-vars': 'off', 'no-useless-assignment': 'off' } }
+  { rules: { 'no-useless-assignment': 'off' } }
 )

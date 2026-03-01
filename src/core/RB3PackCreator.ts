@@ -1,4 +1,4 @@
-import { DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
+import { DirPath, type DirPathLikeTypes, type FilePathLikeTypes } from 'node-lib'
 import { PKGFile, STFSFile, type PKGFileJSONRepresentation, type STFSFileJSONRepresentation } from '../core.exports'
 import { extractPackagesForExtractedSTFS, extractPackagesForRPCS3, extractPackagesForSTFSFile, type STFSExtractionOptions, type STFSPackageExtractionObject, type RPCS3ExtractionOptions, type RPCS3PackageExtractionObject, type STFSCreationOptions, type UnpackedFilePathsFromSongObject, type STFSCreationObject } from '../lib.exports'
 

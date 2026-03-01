@@ -1,6 +1,6 @@
 import { BinaryReader, DirPath, FilePath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { BinaryAPI, DTAParser } from '../core.exports'
-import { parsePKGFileOrBuffer, processPKGItemEntries, type PartialDTAFile, type PKGData, type RB3CompatibleDTAFile } from '../lib.exports'
+import { parsePKGFileOrBuffer, processPKGItemEntries, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export interface PKGFileSongPackageStatObject {
   /**
