@@ -7,5 +7,7 @@ export default defineConfig({
   minify: true,
   unbundle: true,
   copy: { from: 'src/bin', to: 'dist' },
-  external: ['type-fest'],
+  deps: {
+    neverBundle: ['type-fest'],
+  },
 })

@@ -308,7 +308,7 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
       await temp.path.deleteDir(true)
     }
     await mainTempFolder.deleteDir(true)
-    throw new Error(`No DTA file could be created. None of the provided internal songnames were found on the packages provided.`)
+    throw new Error(`No DTA file could be created. None of the provided internal songnames were found on the packages provided.`, { cause: err })
   }
 
   const dtaStat = await newDTAPath.stat()

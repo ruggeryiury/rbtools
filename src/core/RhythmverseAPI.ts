@@ -400,7 +400,7 @@ export class RhythmverseAPI {
 
       return res.data
     } catch (err) {
-      if (err instanceof AxiosError) throw new Error(err.message)
+      if (err instanceof AxiosError) throw new Error(err.message, { cause: err })
       else throw err
     }
   }
@@ -453,7 +453,7 @@ export class RhythmverseAPI {
 
       return res.data
     } catch (err) {
-      if (err instanceof AxiosError) throw new Error(err.message)
+      if (err instanceof AxiosError) throw new Error(err.message, { cause: err })
       else throw err
     }
   }
@@ -506,7 +506,7 @@ export class RhythmverseAPI {
 
       return res.data
     } catch (err) {
-      if (err instanceof AxiosError) throw new Error(err.message)
+      if (err instanceof AxiosError) throw new Error(err.message, { cause: err })
       else throw err
     }
   }

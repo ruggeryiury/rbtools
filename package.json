@@ -1,6 +1,6 @@
 {
   "name": "rbtools",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "private": true,
   "description": "A module package to manipulate several Rock Band game files.",
   "homepage": "https://github.com/ruggeryiury/rbtools#readme",
@@ -21,30 +21,30 @@
     "node": ">=22.17.0"
   },
   "dependencies": {
-    "axios": "^1.13.2",
+    "axios": "^1.13.6",
     "crc": "^4.3.2",
     "file-type": "^21.3.0",
     "jschardet": "^3.1.4",
     "node-lib": "link:..\\node-lib",
-    "tempy": "^3.1.1",
+    "tempy": "^3.2.0",
     "use-default-options": "link:..\\use-default-options",
     "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@types/node": "^25.0.10",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.3",
     "copyfiles": "^2.4.1",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.2",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsdoc": "^62.3.0",
-    "globals": "^17.0.0",
+    "eslint-plugin-jsdoc": "^62.7.1",
+    "globals": "^17.4.0",
     "prettier": "^3.8.1",
-    "tsdown": "^0.20.0",
+    "tsdown": "0.21.0-beta.2",
     "tsx": "^4.21.0",
-    "type-fest": "^5.4.1",
+    "type-fest": "^5.4.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.1"
+    "typescript-eslint": "^8.56.1"
   },
   "scripts": {
     "build": "tsdown",

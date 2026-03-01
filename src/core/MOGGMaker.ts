@@ -83,7 +83,7 @@ export class MOGGMaker {
    * @param {boolean} [encrypt] `OPTIONAL` Encrypts the MOGG file using `0B` encryption. The encryption works on all systems. Default is `false`.
    * @returns {Promise<MOGGFile>}
    */
-  async create(destPath: FilePathLikeTypes, encrypt = false): Promise<MOGGFile> {
+  async create(destPath: FilePathLikeTypes, encrypt: boolean = false): Promise<MOGGFile> {
     if (this.channelsCount === 6) throw new Error('Tried to create a MOGG file with six channels, which is known to cause glitches on the audio due to surround processing for OGG files.')
     const dest = pathLikeToFilePath(destPath).changeFileExt('.mogg')
     return await PythonAPI.moggCreator(this.tracks, dest, encrypt)

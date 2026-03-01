@@ -28,5 +28,5 @@ export default defineConfig(
   },
   eslint.configs.recommended,
   tseslint.configs.recommendedTypeCheckedOnly,
-  { rules: { 'no-unused-vars': 'off' } }
+  { rules: { 'no-unused-vars': 'off', 'no-useless-assignment': 'off' } }
 )
