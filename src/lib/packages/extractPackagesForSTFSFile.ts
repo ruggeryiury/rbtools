@@ -24,7 +24,7 @@ export interface STFSCreationOptions {
   /**
    * An object which will update all parsed song objects.
    */
-  updateAllSongs?: Omit<PartialDTAFile, 'id'> | null
+  updateAllSongs?: Omit<PartialDTAFile, 'id' | 'songname' | 'song_id'> | null
   /**
    * `"magma"`: Default MAGMA package name `{artist} - {name}` (Only works with single song package, with multiple song packages it will put the first song's artist and song title).
    */

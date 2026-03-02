@@ -28,7 +28,7 @@ export interface RPCS3ExtractionOptions {
   /**
    * An object which will update all parsed song objects.
    */
-  updateAllSongs?: Omit<PartialDTAFile, 'id'> | null
+  updateAllSongs?: Omit<PartialDTAFile, 'id' | 'songname' | 'song_id'> | null
 }
 
 export interface RPCS3PackageExtractionObject {
@@ -141,14 +141,28 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
         tempFolders.push({
           path: tempFolderPath,
           type: 'stfs',
-          songs: stat.dta.map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('stfs', tempFolderPath, song.songname) })),
+          songs: stat.dta.map((song) => {
+            let newSongname = ''
+            const hasUpdates = updates.find((val) => val.id.toString() === song.id.toString())
+            if (updates.length > 0 && hasUpdates) {
+              newSongname = hasUpdates.songname
+            }
+            return { songname: song.songname, newSongname, files: getUnpackedFilesPathFromRootExtraction('stfs', tempFolderPath, song.songname) }
+          }),
           stat: stat as STFSFileJSONRepresentation,
         })
       } else {
         tempFolders.push({
           path: tempFolderPath,
           type: 'pkg',
-          songs: stat.dta.map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) })),
+          songs: stat.dta.map((song) => {
+            let newSongname = ''
+            const hasUpdates = updates.find((val) => val.id.toString() === song.id.toString())
+            if (updates.length > 0 && hasUpdates) {
+              newSongname = hasUpdates.songname
+            }
+            return { songname: song.songname, newSongname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) }
+          }),
           stat: stat as PKGFileJSONRepresentation,
         })
       }
@@ -175,14 +189,28 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
         tempFolders.push({
           path: tempFolderPath,
           type: 'stfs',
-          songs: filterdSelectedSongnames.map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('stfs', tempFolderPath, song.songname) })),
+          songs: filterdSelectedSongnames.map((song) => {
+            let newSongname = ''
+            const hasUpdates = updates.find((val) => val.id.toString() === song.id.toString())
+            if (updates.length > 0 && hasUpdates) {
+              newSongname = hasUpdates.songname
+            }
+            return { songname: song.songname, newSongname, files: getUnpackedFilesPathFromRootExtraction('stfs', tempFolderPath, song.songname) }
+          }),
           stat: stat as STFSFileJSONRepresentation,
         })
       } else {
         tempFolders.push({
           path: tempFolderPath,
           type: 'pkg',
-          songs: filterdSelectedSongnames.map((song) => ({ songname: song.songname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) })),
+          songs: filterdSelectedSongnames.map((song) => {
+            let newSongname = ''
+            const hasUpdates = updates.find((val) => val.id.toString() === song.id.toString())
+            if (updates.length > 0 && hasUpdates) {
+              newSongname = hasUpdates.songname
+            }
+            return { songname: song.songname, newSongname, files: getUnpackedFilesPathFromRootExtraction('pkg', tempFolderPath, song.songname) }
+          }),
           stat: stat as PKGFileJSONRepresentation,
         })
       }
@@ -321,7 +349,8 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
       if (temp.songs.length === 0) {
         continue
       }
-      for (const { songname } of temp.songs) {
+      for (const { songname, newSongname } of temp.songs) {
+        const newUsedSongname = newSongname ?? songname
         const mainTempMOGG = mainTempFolder.gotoFile(`${songname}.mogg`)
         const mainTempMIDI = mainTempFolder.gotoFile(`${songname}.mid.edat`)
         const mainTempPNG = mainTempFolder.gotoFile(`${songname}_keep.png_ps3`)
@@ -330,15 +359,15 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
         // CHECK: Maybe check all song files?
         if (!mainTempMOGG.exists) {
           await mainTempFolder.deleteDir()
-          throw new Error(`Registered song on DTA with internal songname "${songname}" has no audio files linked to the song.`)
+          throw new Error(`Registered song on DTA with internal songname "${songname}" ${newSongname.length > 0 && `(with new internal songname "${newSongname}") `}has no audio files linked to the song.`)
         }
 
-        const songGenFolder = newFolder.gotoDir(`songs/${songname}/gen`)
+        const songGenFolder = newFolder.gotoDir(`songs/${newUsedSongname}/gen`)
         await songGenFolder.mkDir(true)
-        const newMOGG = songGenFolder.gotoFile(`../${songname}.mogg`)
-        const newMIDI = songGenFolder.gotoFile(`../${songname}.mid.edat`)
-        const newPNG = songGenFolder.gotoFile(`${songname}_keep.png_ps3`)
-        const newMILO = songGenFolder.gotoFile(`${songname}.milo_ps3`)
+        const newMOGG = songGenFolder.gotoFile(`../${newUsedSongname}.mogg`)
+        const newMIDI = songGenFolder.gotoFile(`../${newUsedSongname}.mid.edat`)
+        const newPNG = songGenFolder.gotoFile(`${newUsedSongname}_keep.png_ps3`)
+        const newMILO = songGenFolder.gotoFile(`${newUsedSongname}.milo_ps3`)
 
         await mainTempMOGG.move(newMOGG)
         await mainTempMIDI.move(newMIDI)

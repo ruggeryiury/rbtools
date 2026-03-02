@@ -12,6 +12,10 @@ export interface PackageExtractionSongsObject {
    */
   songname: string
   /**
+   * The internal songname used by the song and all its files after the metadata update.
+   */
+  newSongname: string
+  /**
    * An object with the path of all files from the extracted song.
    */
   files: UnpackedFilePathsFromSongObject
