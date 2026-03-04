@@ -716,6 +716,14 @@ export type PartialDTAFile = Partial<RB3CompatibleDTAFile> & {
    */
   id: string
 }
+export type DTAFileUpdateObject = PartialDTAFile & {
+  /**
+   * An unique shortname ID to replace the old ID of the song.
+   */
+  newID?: string
+}
+
+export type DTAFileBatchUpdateObject = Omit<PartialDTAFile, 'id' | 'songname' | 'song_id'>
 
 export type DTAObjectTypes = RB3CompatibleDTAFile | PartialDTAFile | PartialDTAFile[]
 

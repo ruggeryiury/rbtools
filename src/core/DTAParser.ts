@@ -1,7 +1,7 @@
 import type { BinaryToTextEncoding } from 'node:crypto'
 import axios from 'axios'
 import { createHashFromBuffer, type FilePath, pathLikeToFilePath, type AllHashAlgorithms, type FilePathLikeTypes } from 'node-lib'
-import { createDTA, depackDTAContents, detectDTABufferEncoding, genNumericSongID, genTracksCountArray, isRB3CompatibleDTA, parseDTA, patchDTAEncodingFromDTAFileObject, sortDTA, stringifyDTA, type PartialDTAFile, type RB3CompatibleDTAFile, type SongDataCreationObject, type DTAStringifyOptions, type SongSortingTypes } from '../lib.exports'
+import { createDTA, depackDTAContents, detectDTABufferEncoding, genNumericSongID, genTracksCountArray, isRB3CompatibleDTA, parseDTA, patchDTAEncodingFromDTAFileObject, sortDTA, stringifyDTA, type RB3CompatibleDTAFile, type SongDataCreationObject, type DTAStringifyOptions, type SongSortingTypes, type DTAFileUpdateObject, type DTAFileBatchUpdateObject } from '../lib.exports'
 import { RBTools } from './RBTools'
 import { inspect } from 'node:util'
 import { isValidURL } from '../utils.exports'
@@ -106,9 +106,9 @@ export class DTAParser {
    *
    * Updates are only stringified directly when there's no entries on `this.songs`.
    */
-  updates: PartialDTAFile[]
+  updates: DTAFileUpdateObject[]
 
-  constructor(songs?: RB3CompatibleDTAFile | PartialDTAFile | (RB3CompatibleDTAFile | PartialDTAFile)[]) {
+  constructor(songs?: RB3CompatibleDTAFile | DTAFileUpdateObject | (RB3CompatibleDTAFile | DTAFileUpdateObject)[]) {
     this.songs = []
     this.updates = []
     if (songs) {
@@ -203,10 +203,10 @@ export class DTAParser {
   /**
    * Adds update entries to the `updates` array and returns the updated length of the `updates` array.
    * - - - -
-   * @param {PartialDTAFile | PartialDTAFile[]} updates The updates' data that you want to add.
+   * @param {DTAFileUpdateObject | DTAFileUpdateObject[]} updates The updates' data that you want to add.
    * @returns {number}
    */
-  addUpdates(updates: PartialDTAFile | PartialDTAFile[]): number {
+  addUpdates(updates: DTAFileUpdateObject | DTAFileUpdateObject[]): number {
     if (Array.isArray(updates)) {
       for (const update of updates) {
         const i = this.updates.findIndex((val) => val.id === update.id)
@@ -228,7 +228,7 @@ export class DTAParser {
    * @param {boolean} [fetchUpdates] `OPTIONAL` If true, the function will fetch all updates from the Rock Band 3 Deluxe repository even if there's a local update file and save the new content. Default is `false`.
    * @returns {Promise<string[]>}
    */
-  async applyDXUpdatesOnSongs(deleteNonAppliedUpdates = true, fetchUpdates = false): Promise<string[]> {
+  async applyDXUpdatesOnSongs(deleteNonAppliedUpdates: boolean = true, fetchUpdates: boolean = false): Promise<string[]> {
     const localUpdates = RBTools.dbFolder.gotoFile('updates.json')
     if (!localUpdates.exists) fetchUpdates = true
     if (fetchUpdates) {
@@ -239,7 +239,7 @@ export class DTAParser {
       await localUpdates.write(JSON.stringify(dta.updates))
     }
     if (localUpdates.exists) {
-      const json = await localUpdates.readJSON<PartialDTAFile>()
+      const json = await localUpdates.readJSON<DTAFileUpdateObject>()
       this.addUpdates(json)
     }
 
@@ -249,10 +249,10 @@ export class DTAParser {
   /**
    * Adds update values to all songs inside the `songs` array and returns an array with IDs of songs where the updated imformations were applied.
    * - - - -
-   * @param {Omit<PartialDTAFile, 'id'>} update An object with updated values to be applied on all songs from the `songs` array.
+   * @param {DTAFileBatchUpdateObject} update An object with updated values to be applied on all songs from the `songs` array.
    * @returns {string[]}
    */
-  addUpdatesToAllSongs(update: Omit<PartialDTAFile, 'id'>): string[] {
+  addUpdatesToAllSongs(update: DTAFileBatchUpdateObject): string[] {
     const allIDs = this.songs.map((song) => song.id)
     for (const id of allIDs) this.addUpdates({ id, ...update })
     return this.applyUpdatesToExistingSongs()
@@ -266,22 +266,27 @@ export class DTAParser {
   applyUpdatesToExistingSongs(deleteNonAppliedUpdates = true): string[] {
     if (this.updates.length === 0) return [] as string[]
     const appliedUpdSongsIDs: string[] = []
-    const unusedUpdates: PartialDTAFile[] = []
+    const unusedUpdates: DTAFileUpdateObject[] = []
     const newSongs: RB3CompatibleDTAFile[] = []
 
     for (const upd of this.updates) {
       const songIndex = this.songs.findIndex((val) => val.id === upd.id)
       if (songIndex === -1 && isRB3CompatibleDTA(upd)) {
-        this.songs.push(upd)
+        const { newID, ...u } = upd as DTAFileUpdateObject
+        this.songs.push({ ...u, id: newID ?? u.id } as RB3CompatibleDTAFile)
         appliedUpdSongsIDs.push(upd.id)
       } else if (songIndex === -1) unusedUpdates.push(upd)
       else appliedUpdSongsIDs.push(upd.id)
     }
     for (const song of this.songs) {
       const upd = this.updates.find((update) => song.id === update.id)
-      if (upd && isRB3CompatibleDTA(upd)) newSongs.push(song)
-      else if (upd) newSongs.push({ ...song, ...upd })
-      else newSongs.push(song)
+      if (upd && isRB3CompatibleDTA(upd)) {
+        const { newID, ...u } = upd as DTAFileUpdateObject
+        newSongs.push({ ...u, id: newID ?? u.id } as RB3CompatibleDTAFile)
+      } else if (upd) {
+        const { newID, ...u } = upd
+        newSongs.push({ ...song, ...u, id: newID ?? u.id })
+      } else newSongs.push(song)
     }
 
     // Patching some update errors while parsing

@@ -2,7 +2,7 @@ import { DirPath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes }
 import { BinaryAPI, DTAParser, EDATFile, MOGGFile, PKGFile, PythonAPI, STFSFile, TextureFile, type PKGExtractionTempFolderObject, type PKGFileJSONRepresentation, type RB3PackageLikeType, type SelectedSongForExtractionObject, type STFSExtractionTempFolderObject, type STFSFileJSONRepresentation, type SupportedRB3PackageFileType } from '../../core.exports'
 import { useDefaultOptions } from 'use-default-options'
 import { temporaryDirectory, temporaryFile } from 'tempy'
-import { getUnpackedFilesPathFromRootExtraction, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { getUnpackedFilesPathFromRootExtraction, type DTAFileBatchUpdateObject, type DTAFileUpdateObject, type RB3CompatibleDTAFile } from '../../lib.exports'
 
 export interface STFSExtractionOptions {
   /**
@@ -22,11 +22,11 @@ export interface STFSExtractionOptions {
   /**
    * An array with objects which will updates a specific parsed song object based on its provided entry ID.
    */
-  updates?: PartialDTAFile[]
+  updates?: DTAFileUpdateObject[]
   /**
    * An object which will update all parsed song objects.
    */
-  updateAllSongs?: Omit<PartialDTAFile, 'id' | 'songname' | 'song_id'> | null
+  updateAllSongs?: DTAFileBatchUpdateObject | null
 }
 
 export interface STFSPackageExtractionObject {
@@ -319,7 +319,7 @@ export const extractPackagesForExtractedSTFS = async (packages: RB3PackageLikeTy
         continue
       }
       for (const { songname, newSongname } of temp.songs) {
-        const newUsedSongname = newSongname ?? songname
+        const newUsedSongname = newSongname.length > 0 ? newSongname : songname
         const mainTempMOGG = mainTempFolder.gotoFile(`${songname}.mogg`)
         const mainTempMIDI = mainTempFolder.gotoFile(`${songname}.mid`)
         const mainTempPNG = mainTempFolder.gotoFile(`${songname}_keep.png_xbox`)

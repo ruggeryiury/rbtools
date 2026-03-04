@@ -2,7 +2,7 @@ import { DirPath, pathLikeToDirPath, pathLikeToFilePath, type FilePathLikeTypes 
 import { ImageFile, OnyxCLI, PythonAPI, RBTools, STFSFile, TextureFile, type RB3PackageLikeType, type SelectedSongForExtractionObject } from '../../core.exports'
 import { useDefaultOptions } from 'use-default-options'
 import { temporaryDirectory, temporaryFile } from 'tempy'
-import { extractPackagesForExtractedSTFS, type STFSPackageExtractionObject, type PartialDTAFile } from '../../lib.exports'
+import { extractPackagesForExtractedSTFS, type STFSPackageExtractionObject, type DTAFileUpdateObject, type DTAFileBatchUpdateObject } from '../../lib.exports'
 import { stringify as stringifyYAML } from 'yaml'
 import type { LiteralUnion } from 'type-fest'
 
@@ -20,11 +20,11 @@ export interface STFSCreationOptions {
   /**
    * An array with objects which will updates a specific parsed song object based on its provided entry ID.
    */
-  updates?: PartialDTAFile[]
+  updates?: DTAFileUpdateObject[]
   /**
    * An object which will update all parsed song objects.
    */
-  updateAllSongs?: Omit<PartialDTAFile, 'id' | 'songname' | 'song_id'> | null
+  updateAllSongs?: DTAFileBatchUpdateObject | null
   /**
    * `"magma"`: Default MAGMA package name `{artist} - {name}` (Only works with single song package, with multiple song packages it will put the first song's artist and song title).
    */

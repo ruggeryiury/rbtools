@@ -2,7 +2,7 @@ import { type DirPathLikeTypes, type DirPath, pathLikeToDirPath, pathLikeToFileP
 import { temporaryDirectory, temporaryFile } from 'tempy'
 import { useDefaultOptions } from 'use-default-options'
 import { type STFSFileJSONRepresentation, type PKGFileJSONRepresentation, DTAParser, STFSFile, MOGGFile, PythonAPI, TextureFile, EDATFile, BinaryAPI, type SelectedSongForExtractionObject, type PKGExtractionTempFolderObject, type STFSExtractionTempFolderObject, type RB3PackageLikeType, PKGFile, type SupportedRB3PackageFileType } from '../../core.exports'
-import { getUnpackedFilesPathFromRootExtraction, isRPCS3Devhdd0PathValid, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { getUnpackedFilesPathFromRootExtraction, isRPCS3Devhdd0PathValid, type DTAFileBatchUpdateObject, type DTAFileUpdateObject, type RB3CompatibleDTAFile } from '../../lib.exports'
 
 // #region Types
 
@@ -24,11 +24,11 @@ export interface RPCS3ExtractionOptions {
   /**
    * An array with objects which will updates a specific parsed song object based on its provided entry ID.
    */
-  updates?: PartialDTAFile[]
+  updates?: DTAFileUpdateObject[]
   /**
    * An object which will update all parsed song objects.
    */
-  updateAllSongs?: Omit<PartialDTAFile, 'id' | 'songname' | 'song_id'> | null
+  updateAllSongs?: DTAFileBatchUpdateObject | null
 }
 
 export interface RPCS3PackageExtractionObject {
@@ -109,7 +109,7 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
   }
 
   const usrdir = isDevhdd0 ? dest.gotoDir('game/BLUS30463/USRDIR') : dest
-  const newFolder = isDevhdd0 ? usrdir.gotoDir(packageFolderName) : usrdir.gotoDir(`USRDIR/${packageFolderName}`)
+  const newFolder = usrdir.gotoDir(packageFolderName)
 
   if (newFolder.exists && !overwritePackFolder) {
     if (!isDevhdd0 && dest.exists) await dest.deleteDir(true)
@@ -350,7 +350,7 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
         continue
       }
       for (const { songname, newSongname } of temp.songs) {
-        const newUsedSongname = newSongname ?? songname
+        const newUsedSongname = newSongname.length > 0 ? newSongname : songname
         const mainTempMOGG = mainTempFolder.gotoFile(`${songname}.mogg`)
         const mainTempMIDI = mainTempFolder.gotoFile(`${songname}.mid.edat`)
         const mainTempPNG = mainTempFolder.gotoFile(`${songname}_keep.png_ps3`)

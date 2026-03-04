@@ -16,7 +16,7 @@ export type STFSFileStatObject = Omit<STFSFileStatRawObject, 'dta' | 'upgrades'>
   /**
    * A boolean value that tells if the package has two or more songs.
    */
-  isPack: boolean
+  isSongPackage: boolean
   /**
    * A boolean value that tells if the package has PRO Guitar/Bass upgrades.
    */
@@ -94,20 +94,23 @@ export class STFSFile {
     await this.checkFileIntegrity()
     const stat = await PythonAPI.stfsFileStat(this.path)
 
-    let isPack = false
+    let isSongPackage = false
     const hasUpgrades = stat.files.includes('/songs_upgrades/upgrades.dta')
 
-    let upgrades: DTAParser | undefined
-    if (!stat.dta) throw new Error(`Provided STFS file "${this.path.path}" doesn't have a songs.dta file.`)
-    const enc = detectDTABufferEncoding(stat.dta)
-    const dta = DTAParser.fromBuffer(Buffer.from(stat.dta, enc))
-    if (dta.songs.length > 1) isPack = true
+    let upgrades = new DTAParser()
+    let dta = new DTAParser()
+    if (stat.dta) {
+      const enc = detectDTABufferEncoding(stat.dta)
+      dta = DTAParser.fromBuffer(Buffer.from(stat.dta, enc))
+    }
+
+    if (dta.songs.length > 1) isSongPackage = true
     if (stat.upgrades) {
       const enc = detectDTABufferEncoding(stat.upgrades)
       upgrades = DTAParser.fromBuffer(Buffer.from(stat.upgrades, enc))
     }
 
-    return { ...stat, dta, upgrades, isPack, hasUpgrades }
+    return { ...stat, dta, upgrades, isSongPackage, hasUpgrades }
   }
 
   /**

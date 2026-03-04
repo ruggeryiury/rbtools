@@ -1,6 +1,6 @@
 import { createHashFromBuffer, DirPath, FilePath, MyObject, parseReadableBytesSize, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
 import { DTAParser, EDATFile, RBTools } from '../../core.exports'
-import { getOfficialPkgFromHash, isRPCS3Devhdd0PathValid, type ParsedSongPackageDatabaseObject, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { getOfficialSongPackageStatsFromHash, isRPCS3Devhdd0PathValid, type OfficialSongPackageStatsJSON, type RB3CompatibleDTAFile } from '../../lib.exports'
 import { useDefaultOptions } from 'use-default-options'
 
 export interface RPCS3SongPackagesObject {
@@ -37,6 +37,10 @@ export interface RPCS3SongPackagesObject {
    */
   contentsHash: string
   /**
+   * An array with parsed songs objects of the song package.
+   */
+  songs: RB3CompatibleDTAFile[]
+  /**
    * An array with all song's entry IDs.
    */
   entriesIDs: string[]
@@ -56,7 +60,7 @@ export interface RPCS3SongPackagesObject {
   /**
    * An object with known properties of the official song package where the installed song package belongs to. The value might be `undefined` if the song package contents hash does not match any official song package contents hash.
    */
-  official: ParsedSongPackageDatabaseObject | undefined
+  official: OfficialSongPackageStatsJSON | undefined
 }
 
 export interface RPCS3SongPackagesData {
@@ -150,9 +154,9 @@ export const rpcs3GenSongPackageManifest = async (packageDirPath: DirPathLikeTyp
 
 export interface RPCS3SongPackageStatsOptions {
   /**
-   * Includes the Rock Band 3 on-disc song package. Default is `true`.
+   * Excludes the Rock Band 3 on-disc song package. Default is `false`.
    */
-  includeRB3Songs: boolean
+  excludeRB3Songs?: boolean
 }
 
 /**
@@ -163,12 +167,12 @@ export interface RPCS3SongPackageStatsOptions {
  * @returns {Promise<RPCS3SongPackagesData>}
  */
 export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, options?: RPCS3SongPackageStatsOptions): Promise<RPCS3SongPackagesData> => {
-  const { includeRB3Songs } = useDefaultOptions<RPCS3SongPackageStatsOptions>({ includeRB3Songs: true }, options)
+  const { excludeRB3Songs } = useDefaultOptions<RPCS3SongPackageStatsOptions>({ excludeRB3Songs: false }, options)
   const devhdd0 = isRPCS3Devhdd0PathValid(devhdd0Path)
 
   const packages: RPCS3SongPackagesObject[] = []
 
-  if (includeRB3Songs) {
+  if (!excludeRB3Songs) {
     const rb3SongsJSON = await RBTools.dbFolder.gotoFile('rb3.json').readJSON<RB3CompatibleDTAFile[]>()
     const rb3Pack = new MyObject<RPCS3SongPackagesObject>({
       name: 'Rock Band 3',
@@ -177,25 +181,23 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
       dtaFilePath: '_ark/songs/songs.dta',
       packageSize: parseReadableBytesSize('2.38GB'),
       songsCount: rb3SongsJSON.length,
-      devklic: EDATFile.genDevKLicHash('RB3-Rock-Band-3-Export'),
-      // dtaHash: Buffer.alloc(28).toString('hex'),
+      devklic: EDATFile.genDevKLicHash('_ark/songs'),
       contentsHash: Buffer.alloc(28).toString('hex'),
+      songs: rb3SongsJSON,
       entriesIDs: rb3SongsJSON.map((song) => song.id).toSorted(),
       songnames: rb3SongsJSON.map((song) => song.songname).toSorted(),
       songIDs: rb3SongsJSON.map((song) => song.song_id).toSorted(),
-      // manifest: '',
       packageFiles: [],
       official: {
         name: 'Rock Band 3',
         code: 'rb3',
-        version: 1,
         outdated: false,
-        folderName: '',
+        folderName: '_ark/songs',
         packageType: 'rb3',
         thumbnailPath: RBTools.resFolder.gotoFile('icons/rb3.png').path,
         hashes: {
           extractedRPCS3: '',
-          pkg: 'cba38dc92d6b7327e0a4c6efb014f3269d183ba475fce6d863b33d2178d28778',
+          pkg: '',
           stfs: '',
         },
       },
@@ -221,13 +223,15 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
 
         const parsedData = await DTAParser.fromFile(dtaFilePath)
         parsedData.sort('ID')
-        rb3PackagesCount++
-        rb3PackagesSongsCount += parsedData.songs.length
 
         const devklic = EDATFile.genDevKLicHash(packagePath.name)
         const { manifest, packageSize, packageFiles } = await rpcs3GenSongPackageManifest(packagePath)
         const contentsHash = createHashFromBuffer(Buffer.from(manifest))
-        const official = getOfficialPkgFromHash('extractedRPCS3', contentsHash)
+        const official = getOfficialSongPackageStatsFromHash('extractedRPCS3', contentsHash)
+        if (official?.isDuplicatedForRB3) continue
+        rb3PackagesCount++
+        rb3PackagesSongsCount += parsedData.songs.length
+
         const songsCount = parsedData.songs.length
         const entriesIDs = parsedData.songs.map((song) => song.id).toSorted()
         const songnames = parsedData.songs.map((song) => song.songname).toSorted()
@@ -242,6 +246,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
           songsCount,
           devklic,
           contentsHash,
+          songs: parsedData.songs,
           entriesIDs,
           songnames,
           songIDs,
@@ -269,13 +274,19 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
 
         if (parsedData.songs.length === 0) continue
         parsedData.sort('ID')
-        rb1PackagesCount++
-        rb1PackagesSongsCount += parsedData.songs.length
 
         const devklic = EDATFile.genDevKLicHash(packagePath.name)
         const { manifest, packageSize, packageFiles } = await rpcs3GenSongPackageManifest(packagePath)
         const contentsHash = createHashFromBuffer(Buffer.from(manifest))
-        const official = getOfficialPkgFromHash('extractedRPCS3', contentsHash)
+        const official = getOfficialSongPackageStatsFromHash('extractedRPCS3', contentsHash)
+
+        // Comment the next line if you want to see the extracted RPCS3 of unknown RB1 packages
+        if (!official) continue
+        if (official?.isDuplicatedForRB3) continue
+
+        rb1PackagesCount++
+        rb1PackagesSongsCount += parsedData.songs.length
+
         const songsCount = parsedData.songs.length
         const entriesIDs = parsedData.songs.map((song) => song.id).toSorted()
         const songnames = parsedData.songs.map((song) => song.songname).toSorted()
@@ -290,6 +301,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
           songsCount,
           devklic,
           contentsHash,
+          songs: parsedData.songs,
           entriesIDs,
           songnames,
           songIDs,

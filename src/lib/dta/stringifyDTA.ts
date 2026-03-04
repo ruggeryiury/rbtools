@@ -1,5 +1,5 @@
 import { useDefaultOptions } from 'use-default-options'
-import { DTAIO, genTracksCountArray, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAIOFormattingOptions, type FloatValueObject, type PartialDTAFile, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
+import { DTAIO, genTracksCountArray, sortDTA, tabNewLineFormatter, type DTAFileKeys, type DTAFileUpdateObject, type DTAIOFormattingOptions, type FloatValueObject, type RB3CompatibleDTAFile, type SongSortingTypes } from '../../lib.exports'
 import { MyObject } from 'node-lib'
 import { quoteToSlashQ } from '../../utils.exports'
 
@@ -13,7 +13,7 @@ export interface SongsAndUpdatesObject {
    *
    * Updates are only stringified directly when there's no entries on `this.songs`.
    */
-  updates: PartialDTAFile[]
+  updates: DTAFileUpdateObject[]
 }
 
 export interface DTAStringifyOptions {
@@ -79,7 +79,7 @@ export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: D
     io.options = { ...io.options, object: { ...io.options.object, closeParenthesisInline: true } }
 
     for (const upd of updates) {
-      const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, cores, customsource, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, loading_phrase, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, upgrade_version, version, vocal_tonic_note, vols, year_recorded } = upd
+      const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, cores, customsource, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, loading_phrase, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, upgrade_version, version, vocal_tonic_note, vols, year_recorded, newID } = upd
       const map = new MyObject()
 
       const allValuesKeys = Object.keys(upd) as DTAFileKeys[]
@@ -240,14 +240,14 @@ export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: D
       if (loading_phrase !== undefined) map.set('loading_phrase', DTAIO.useString(quoteToSlashQ(loading_phrase), io.options.string))
       if (pack_name !== undefined) map.set('pack_name', DTAIO.useString(quoteToSlashQ(pack_name), io.options.string))
 
-      io.addValue(id, map.toJSON())
+      io.addValue(newID ?? id, map.toJSON())
     }
   }
   if (songs.length > 0) {
     // Songs only
     if (sortBy) songs = sortDTA(songs, sortBy)
     for (const song of songs) {
-      const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, convert, cores, customsource, doubleKick, emh, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, languages, loading_phrase, multitrack, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, rhythmOn, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, unpitchedVocals, upgrade_version, version, vocal_tonic_note, vols, year_recorded, original_id } = song as PartialDTAFile
+      const { album_art, anim_tempo, artist, bank, drum_bank, game_origin, genre, id, master, name, preview, rank_band, rating, song_id, song_length, songname, tracks_count, vocal_gender, vocal_parts, year_released, album_name, album_track_number, alternate_path, author, band_fail_cue, base_points, context, convert, cores, customsource, doubleKick, emh, encoding, extra_authoring, fake, format, guide_pitch_volume, hopo_threshold, keys_author, languages, loading_phrase, multitrack, mute_volume, mute_volume_vocals, pack_name, pans, rank_bass, rank_drum, rank_guitar, rank_keys, rank_real_bass, rank_real_guitar, rank_real_keys, rank_vocals, real_bass_tuning, real_guitar_tuning, rhythmOn, solo, song_key, song_scroll_speed, song_tonality, strings_author, sub_genre, tuning_offset_cents, unpitchedVocals, upgrade_version, version, vocal_tonic_note, vols, year_recorded, original_id, newID } = song as DTAFileUpdateObject
       const map = new MyObject()
 
       if (fake && ignoreFakeSongs) continue
@@ -487,7 +487,7 @@ export const stringifyDTA = (songsAndUpdates: SongsAndUpdatesObject, options?: D
         if (map.get('guide_pitch_volume') && (map.get('guide_pitch_volume') as FloatValueObject).__value === -3) map.delete('guide_pitch_volume')
       }
 
-      io.addValue(id, map.toJSON())
+      io.addValue(newID ?? id, map.toJSON())
     }
   }
 

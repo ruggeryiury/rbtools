@@ -1,6 +1,6 @@
-import { BinaryReader, DirPath, FilePath, pathLikeToDirPath, pathLikeToFilePath, type DirPathLikeTypes, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, DirPath, FilePath, pathLikeToDirPath, pathLikeToFilePath, StreamWriter, type DirPathLikeTypes, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { BinaryAPI, DTAParser } from '../core.exports'
-import { parsePKGFileOrBuffer, processPKGItemEntries, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
+import { isRPCS3Devhdd0PathValid, parsePKGFileOrBuffer, processPKGItemEntries, type PartialDTAFile, type RB3CompatibleDTAFile } from '../lib.exports'
 
 export interface PKGFileSongPackageStatObject {
   /**
@@ -30,7 +30,7 @@ export interface PKGFileSongPackageStatObject {
   /**
    * A boolean value that tells if the package has two or more songs.
    */
-  isPack: boolean
+  isSongPackage: boolean
   /**
    * A boolean value that tells if the package has PRO Guitar/Bass upgrades.
    */
@@ -40,7 +40,7 @@ export interface PKGFileSongPackageStatObject {
    */
   fileSize: number
   /**
-   * The header contents SHA1 hash of the STFS file.
+   * The header contents SHA256 hash of the PKG file.
    */
   contentsHash: string
 }
@@ -95,18 +95,18 @@ export class PKGFile {
    * Returns an object with stats of the PS3 PKG file. This method only works for song packages PKG files, otherwise will return an error.
    * - - - -
    * @returns {Promise<PKGFileSongPackageStatObject>}
-   * @throws {Error} When the provided PKG file is not a song package file.
    */
   async stat(): Promise<PKGFileSongPackageStatObject> {
     await this.checkFileIntegrity()
     const data = await parsePKGFileOrBuffer(this.path)
-    let isPack = false
+    data.header.cidTitle1
+    let isSongPackage = false
     let hasUpgrades = false
     const dtaEntry = (await processPKGItemEntries(data.header, data.entries, this.path, /songs\.(dta|DTA)$/))[0] as Buffer | undefined
     const upgradesEntry = (await processPKGItemEntries(data.header, data.entries, this.path, /upgrades\.(dta|DTA)$/))[0] as Buffer | undefined
-    if (!dtaEntry) throw new Error(`Provided PS3 PKG file "${this.path.path}" doesn't have a songs.dta file.`)
-    const dta = DTAParser.fromBuffer(dtaEntry)
-    if (dta.songs.length > 1) isPack = true
+    let dta = new DTAParser()
+    if (dtaEntry) dta = DTAParser.fromBuffer(dtaEntry)
+    if (dta.songs.length > 1) isSongPackage = true
     let upgrades: DTAParser | undefined
     if (upgradesEntry) {
       hasUpgrades = true
@@ -119,7 +119,7 @@ export class PKGFile {
       files: data.entries.items.map((item) => item.name),
       dta,
       upgrades,
-      isPack,
+      isSongPackage,
       hasUpgrades,
       fileSize: data.fileSize,
       contentsHash: data.entries.sha256,
@@ -134,12 +134,13 @@ export class PKGFile {
    * @returns {Promise<PKGFileJSONRepresentation>}
    */
   async toJSON(): Promise<PKGFileJSONRepresentation> {
-    const songPackageStat = await this.stat()
+    const pkgJSON = this.path.toJSON()
+    const pkgStat = await this.stat()
     return {
-      ...this.path.toJSON(),
-      ...songPackageStat,
-      dta: songPackageStat.dta.songs,
-      upgrades: songPackageStat.upgrades ? songPackageStat.upgrades.updates : undefined,
+      ...pkgJSON,
+      ...pkgStat,
+      dta: pkgStat.dta.songs,
+      upgrades: pkgStat.upgrades ? pkgStat.upgrades.updates : undefined,
     }
   }
 
@@ -193,5 +194,26 @@ export class PKGFile {
     const newDTAPath = extractOnRoot ? dest.gotoFile('songs.dta') : dest.gotoFile(`USRDIR/${stat.folderName}/songs/songs.dta`)
     await parser.export(newDTAPath)
     return dest
+  }
+
+  /**
+   * Installs the PKG file on the provided RPCS3's `dev_hdd0` folder and returns a `DirPath` object of the provided `devhdd0Path` argument.
+   * - - - -
+   * @param devhdd0Path The path to the `dev_hdd0` folder of your RPCS3 installation.
+   * @returns {Promise<DirPath>}
+   */
+  async installOnRPCS3(devhdd0Path: DirPathLikeTypes): Promise<DirPath> {
+    const devhdd0 = isRPCS3Devhdd0PathValid(devhdd0Path)
+    const stat = await this.toJSON()
+    if (stat.contentsHash.toLowerCase() === 'e386b8ab41e844ff087400533920cccca99c4fe3d455756bab35223592b0e683') {
+      // Is Rock Band 1 Song Package, install RAP file as well
+      const user0ExdataFolder = devhdd0.gotoDir('home/00000001/exdata')
+      if (!user0ExdataFolder.exists) await user0ExdataFolder.mkDir(true)
+      const rapFilePath = user0ExdataFolder.gotoFile('UP0006-BLUS30050_00-RB1EXPORTCCF0099.rap')
+      const writer = await StreamWriter.toFile(rapFilePath)
+      writer.writeHex('0xCDC040B4F45B247FC71ADA455F423850')
+      await writer.close()
+    }
+    return await BinaryAPI.ps3pPKGRipper(this.path, devhdd0.gotoDir(`game/${stat.titleID}`))
   }
 }
