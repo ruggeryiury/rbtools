@@ -10,7 +10,7 @@ export interface OfficialSongPackageStats {
   /**
    * A string code that can be used as a package identifier.
    */
-  code: 'tu5' | 'rb1' | 'rb2' | 'rb3' | 'lrb' | 'tbrb' | 'gdrb' | 'rb3_to_rb2' | 'rb3_to_blitz' | 'rb3beta' | 'rbb' | 'rbvr'
+  code: 'tu5' | 'rb1' | 'rb2' | 'rb3' | 'lrb' | 'tbrb' | 'gdrb' | 'rb3_to_rb2' | 'rb3_to_blitz' | 'rb3beta' | 'rbb' | 'rb4' | 'rb4r' | 'rbvr' | 'rbdlc1' | 'rbdlc2' | 'rbdlc3' | 'rbdlc4' | 'rbdlc5' | 'rbdlc6' | 'rbdlc7' | 'rbdlc8' | 'rbdlc9' | 'rbdlc10'
   /**
    * Tells if the package is outdated.
    */
@@ -195,6 +195,32 @@ export const officialPackages: OfficialSongPackageStats[] = [
     },
   },
   {
+    name: 'Rock Band 4',
+    code: 'rb4',
+    outdated: false,
+    folderName: 'RB4-to-RB2-DISC',
+    packageType: 'rb3',
+    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4.jpg'),
+    hashes: {
+      extractedRPCS3: '95042a20e3533c245567a9a83116e40fa76f512cd0e82bc0fe2dbe1c45e8595e',
+      pkg: 'bcec0a387334d58ca23c7048bc7be99c02fb00bd68230d0c61bed79299743539',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band 4 Rivals',
+    code: 'rb4r',
+    outdated: false,
+    folderName: 'RB4-to-RB2-RIVALS',
+    packageType: 'rb3',
+    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4r.jpg'),
+    hashes: {
+      extractedRPCS3: 'bca83294fb5a5f95d484b6918932cc049d07018e460fcb4611b8ca1fc12df1b8',
+      pkg: '94a1da8caf9006771c87b14d9d6412a676293a9c80c01d55723d3378d09a0e36',
+      stfs: '',
+    },
+  },
+  {
     name: 'Rock Band VR',
     code: 'rbvr',
     outdated: false,
@@ -204,6 +230,19 @@ export const officialPackages: OfficialSongPackageStats[] = [
     hashes: {
       extractedRPCS3: '834f26860ab0892d47d3c2a32b54a06997f3efe88efe7770e10cf6cee2c3a0c6',
       pkg: '028efbc1af4972b2df6bda1dafdfd7c6079ef18ae736fb4a15d8870e3b6408a6',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band DLC Pack 01',
+    code: 'rbdlc1',
+    outdated: false,
+    folderName: 'RB1DLCPACK01OF10',
+    packageType: 'rb1',
+    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc1.jpg'),
+    hashes: {
+      extractedRPCS3: 'fdfd08204608b155c919bf48cb3079733bdb74aaf4c93edebf32f36219becd21',
+      pkg: '09b366ffd83d1952ceb0bb45a27e990773109ffeffc590118075a43d786a65f6',
       stfs: '',
     },
   },

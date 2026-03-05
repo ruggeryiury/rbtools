@@ -101,6 +101,10 @@ export interface RPCS3SongPackagesData {
    */
   starsCount: number
   /**
+   * The size in bytes of all song packages combined.
+   */
+  allPackagesSize: number
+  /**
    * An array with objects that represents an installed song package and its properties.
    */
   packages: RPCS3SongPackagesObject[]
@@ -209,7 +213,8 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
   let rb1PackagesSongsCount = 0,
     rb1PackagesCount = 0,
     rb3PackagesSongsCount = 0,
-    rb3PackagesCount = 0
+    rb3PackagesCount = 0,
+    allPackagesSize = 0
 
   const rb3UsrDir = devhdd0.gotoDir('game/BLUS30463/USRDIR')
   if (rb3UsrDir.exists) {
@@ -231,6 +236,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
         if (official?.isDuplicatedForRB3) continue
         rb3PackagesCount++
         rb3PackagesSongsCount += parsedData.songs.length
+        allPackagesSize += packageSize
 
         const songsCount = parsedData.songs.length
         const entriesIDs = parsedData.songs.map((song) => song.id).toSorted()
@@ -281,11 +287,12 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
         const official = getOfficialSongPackageStatsFromHash('extractedRPCS3', contentsHash)
 
         // Comment the next line if you want to see the extracted RPCS3 of unknown RB1 packages
-        if (!official) continue
-        if (official?.isDuplicatedForRB3) continue
+        // if (!official) continue
+        // if (official?.isDuplicatedForRB3) continue
 
         rb1PackagesCount++
         rb1PackagesSongsCount += parsedData.songs.length
+        allPackagesSize += packageSize
 
         const songsCount = parsedData.songs.length
         const entriesIDs = parsedData.songs.map((song) => song.id).toSorted()
@@ -330,6 +337,8 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
     allSongsCount,
     allSongsPlusRB3,
     starsCount,
+
+    allPackagesSize,
     packages,
   })
 

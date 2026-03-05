@@ -99,7 +99,6 @@ export class PKGFile {
   async stat(): Promise<PKGFileSongPackageStatObject> {
     await this.checkFileIntegrity()
     const data = await parsePKGFileOrBuffer(this.path)
-    data.header.cidTitle1
     let isSongPackage = false
     let hasUpgrades = false
     const dtaEntry = (await processPKGItemEntries(data.header, data.entries, this.path, /songs\.(dta|DTA)$/))[0] as Buffer | undefined
