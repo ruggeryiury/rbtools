@@ -103,7 +103,7 @@ export interface PKGData {
   /**
    * An object containing parsed data from the PKG's SFO file.
    */
-  sfo: SFOData
+  sfo?: SFOData
   /**
    * The size of the PKG file.
    */
@@ -501,8 +501,8 @@ export const parsePKGFileOrBuffer = async (pkgFilePathOrBuffer: FilePathLikeType
   const header = await parsePKGHeader(pkgFilePathOrBuffer)
   const entries = await parsePKGItemEntries(pkgFilePathOrBuffer)
   const sfoArray = await processPKGItemEntries(header, entries, pkgFilePathOrBuffer, /\.(sfo|SFO)$/)
-  if (sfoArray.length === 0) throw new Error(`No SFO file was found on ${!Buffer.isBuffer(pkgFilePathOrBuffer) ? `provided PKG path "${pathLikeToString(pkgFilePathOrBuffer)}".` : 'provided PKG file buffer.'}`)
-  const sfo = await parseSFOFileOrBuffer(sfoArray[0])
+  let sfo: SFOData | undefined
+  if (sfoArray.length > 0) sfo = await parseSFOFileOrBuffer(sfoArray[0])
   const fileSize = Buffer.isBuffer(pkgFilePathOrBuffer) ? pkgFilePathOrBuffer.length : (await pathLikeToFilePath(pkgFilePathOrBuffer).stat()).size
   return {
     pkgFilePath: !Buffer.isBuffer(pkgFilePathOrBuffer) ? pathLikeToString(pkgFilePathOrBuffer) : null,
