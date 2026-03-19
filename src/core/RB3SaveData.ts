@@ -247,6 +247,7 @@ export class RB3SaveData {
   static async parseFromFile(filePath: FilePathLikeTypes): Promise<ParsedRB3SaveData> {
     const reader = await BinaryReader.fromFile(filePath)
     const content = await this.parseBuffer(reader, filePath)
+    await reader.close()
     return content
   }
 

@@ -12,6 +12,10 @@ export interface PKGFileSongPackageStatObject {
    */
   titleID: string
   /**
+   * The Code ID of the PKG file.
+   */
+  pkgCodeID: string
+  /**
    * The folder name where the PKG contents will be installed.
    */
   folderName: string
@@ -114,6 +118,7 @@ export class PKGFile {
     return {
       contentID: data.header.contentID,
       titleID: data.header.cidTitle1,
+      pkgCodeID: data.header.cidTitle2,
       folderName: data.entries.dlcFolderName,
       files: data.entries.items.map((item) => item.name),
       dta,
@@ -133,10 +138,10 @@ export class PKGFile {
    * @returns {Promise<PKGFileJSONRepresentation>}
    */
   async toJSON(): Promise<PKGFileJSONRepresentation> {
-    const pkgJSON = this.path.toJSON()
+    const pathJSON = this.path.toJSON()
     const pkgStat = await this.stat()
     return {
-      ...pkgJSON,
+      ...pathJSON,
       ...pkgStat,
       dta: pkgStat.dta.songs,
       upgrades: pkgStat.upgrades ? pkgStat.upgrades.updates : undefined,

@@ -127,7 +127,7 @@ export const rpcs3GetRB3Stats = async (devhdd0Path: DirPathLikeTypes, rpcs3ExePa
       const dxVersionFile = usrdir.gotoFile('dx_version.dta')
       if (dxVersionFile.exists) {
         const hash = (await dxVersionFile.readLines())[4].trim().replace(/"/g, '').split('-')[0]
-        if (hash.length === 9) map.set('deluxeVersionHash', hash)
+        if (hash.length === 7) map.set('deluxeVersionHash', hash)
       }
     }
 

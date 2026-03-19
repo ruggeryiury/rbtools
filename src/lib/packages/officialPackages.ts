@@ -1,5 +1,4 @@
-import { DirPath, type DirPathLikeTypes, type FilePath } from 'node-lib'
-import { RBTools } from '../../core.exports'
+import { DirPath, type DirPathLikeTypes } from 'node-lib'
 import { isRPCS3Devhdd0PathValid } from '../../lib.exports'
 
 export interface OfficialSongPackageStats {
@@ -10,7 +9,7 @@ export interface OfficialSongPackageStats {
   /**
    * A string code that can be used as a package identifier.
    */
-  code: 'tu5' | 'rb1' | 'rb2' | 'rb3' | 'lrb' | 'tbrb' | 'gdrb' | 'rb3_to_rb2' | 'rb3_to_blitz' | 'rb3beta' | 'rbb' | 'rb4' | 'rb4r' | 'rbvr' | 'rbdlc1' | 'rbdlc2' | 'rbdlc3' | 'rbdlc4' | 'rbdlc5' | 'rbdlc6' | 'rbdlc7' | 'rbdlc8' | 'rbdlc9' | 'rbdlc10' | 'rb3dlc1' | 'rb3dlc2' | 'rb3dlc3' | 'rb3dlc4' | 'rb3dlc5' | 'rb4dlc1' | 'rb4dlc2' | 'rb4dlc3' | 'rb4dlc4' | 'rb4dlc5' | 'rb4dlc6'
+  code: 'tu5' | 'rb1' | 'rb2' | 'rb3' | 'lrb' | 'tbrb' | 'gdrb' | 'rb3ToRB2' | 'rb3ToBlitz' | 'rb3Beta' | 'rbb' | 'rb4' | 'rb4r' | 'rbvr' | 'rbdlc1' | 'rbdlc2' | 'rbdlc3' | 'rbdlc4' | 'rbdlc5' | 'rbdlc6' | 'rbdlc7' | 'rbdlc8' | 'rbdlc9' | 'rbdlc10' | 'rb3dlc1' | 'rb3dlc2' | 'rb3dlc3' | 'rb3dlc4' | 'rb3dlc5' | 'rb4dlc1' | 'rb4dlc2' | 'rb4dlc3' | 'rb4dlc4' | 'rb4dlc5' | 'rb4dlc6' | 'tbrbDLC' | 'lostRBDLC' | 'rbnPack1' | 'rbnPack2' | 'rbnPack3' | 'rbnPack4' | 'rbnPack5' | 'rbnPack6' | 'rbnPack7' | 'rbn2Pack1' | 'rbn2Pack2' | 'rbn2Pack3' | 'rbn2Pack4' | 'rbn2Pack5' | 'rbn2Pack6' | 'rbn2Pack7' | 'rbn2Pack8' | 'rbn2Pack9' | 'lostRBN1' | 'lostRBN2'
   /**
    * Tells if the package is outdated.
    */
@@ -21,8 +20,12 @@ export interface OfficialSongPackageStats {
   folderName: string
   /**
    * The game where the contents must be extracted.
+   *
+   * - `"rb1"` - BLUS-30050
+   * - `"rb3"` - BLUS-30463
+   * - `"tbrb"` - BLUS-30282
    */
-  packageType: 'rb1' | 'rb3'
+  packageType: 'rb1' | 'rb3' | 'tbrb'
   /**
    * An object with known hashes of specific packages.
    */
@@ -46,22 +49,9 @@ export interface OfficialSongPackageStats {
    * If `true`, this package is a port of Rock Band 3 on-disc songs to any other Rock Band titles.
    */
   isDuplicatedForRB3?: boolean
-
-  // Paths
-  /**
-   * A function that evaluates to the path to the official package thumbnail.
-   */
-  thumbnailPath: () => FilePath
 }
 
 export type OfficialPackagesHashTypes = keyof OfficialSongPackageStats['hashes']
-
-export interface OfficialSongPackageStatsJSON extends Omit<OfficialSongPackageStats, 'thumbnailPath'> {
-  /**
-   * The path to the official package thumbnail.
-   */
-  thumbnailPath: string
-}
 
 export const officialPackages: OfficialSongPackageStats[] = [
   {
@@ -75,7 +65,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'cba38dc92d6b7327e0a4c6efb014f3269d183ba475fce6d863b33d2178d28778',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/tu5.jpg'),
   },
   {
     name: 'Rock Band 1',
@@ -88,7 +77,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'e386b8ab41e844ff087400533920cccca99c4fe3d455756bab35223592b0e683',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb1.jpg'),
   },
   {
     name: 'Rock Band 2',
@@ -101,7 +89,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '92462fe7347aa14446b5b38409c7a91c48564fd4932d76e0b4e83a52fb3ca5ce',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb2.jpg'),
   },
   {
     name: 'LEGO Rock Band',
@@ -114,7 +101,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '7b76d701a8513dd7a2a50065d34d0eb0b10aee4980e0ae6814baeb43f3caae87',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/lrb.jpg'),
   },
   {
     name: 'The Beatles: Rock Band',
@@ -127,7 +113,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'e9dc7c631ab5abeb9acdc8d5314a5c40c9cf81402e007378a4a32043058cc03c',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/tbrb.jpg'),
   },
   {
     name: 'Green Day: Rock Band',
@@ -140,11 +125,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'c4d8ecfb9a192c3bdba390f1bac799260a0cf5fcdededceb059abea23ad6fbca',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/gdrb.jpg'),
   },
   {
     name: 'Rock Band 3 (to RB2)',
-    code: 'rb3_to_rb2',
+    code: 'rb3ToRB2',
     outdated: false,
     folderName: 'RB3-to-RB2-DISC',
     packageType: 'rb1',
@@ -154,11 +138,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
       stfs: '',
     },
     isDuplicatedForRB3: true,
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3.jpg'),
   },
   {
     name: 'Rock Band 3 (to Blitz)',
-    code: 'rb3_to_blitz',
+    code: 'rb3ToBlitz',
     outdated: false,
     folderName: 'RB3-Rock-Band-3-Export',
     packageType: 'rb3',
@@ -168,11 +151,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
       stfs: '',
     },
     isDuplicatedForRB3: true,
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3.jpg'),
   },
   {
     name: 'Rock Band 3 Beta Songs',
-    code: 'rb3beta',
+    code: 'rb3Beta',
     outdated: false,
     folderName: 'RB3BetaSongs',
     packageType: 'rb3',
@@ -181,7 +163,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'df60d01b226d3d94ebc78fed44199040e551fbb96280ddd964b59d88bc0e077b',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3beta.jpg'),
   },
   {
     name: 'Rock Band Blitz',
@@ -194,8 +175,9 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'e10d0362d06128ba7111a4bc16369c6c2c8044c4ec2a298bf78a45d30e7c6c0e',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbb.jpg'),
   },
+
+  // #region RB4
   {
     name: 'Rock Band 4',
     code: 'rb4',
@@ -207,7 +189,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'bcec0a387334d58ca23c7048bc7be99c02fb00bd68230d0c61bed79299743539',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4.jpg'),
   },
   {
     name: 'Rock Band 4 Rivals',
@@ -220,8 +201,9 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '94a1da8caf9006771c87b14d9d6412a676293a9c80c01d55723d3378d09a0e36',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4r.jpg'),
   },
+
+  // #region Rock Band VR
   {
     name: 'Rock Band VR',
     code: 'rbvr',
@@ -233,8 +215,9 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '028efbc1af4972b2df6bda1dafdfd7c6079ef18ae736fb4a15d8870e3b6408a6',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbvr.jpg'),
   },
+
+  // #region RB DLC
   {
     name: 'Rock Band DLC Pack 01',
     code: 'rbdlc1',
@@ -246,7 +229,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '09b366ffd83d1952ceb0bb45a27e990773109ffeffc590118075a43d786a65f6',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc1.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 02',
@@ -259,7 +241,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'c7759d3d82d396e393e627db77a6622f295e32533740ec9f12f76f82fcd346d0',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc2.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 03',
@@ -272,7 +253,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '523d2ed8ea9844f33fb2a8eff6ea46763262b075b279a14048551f66826f036d',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc3.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 04',
@@ -285,7 +265,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '663694ac425f4c63729258d8f2bbfa3486ee5c2dbf9ead8e98bdec6e70769bb6',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc4.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 05',
@@ -298,7 +277,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '6e72d18e8df87a435a0adaecb962a4948f1c4b2b3249839082016b1a77c19c40',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc5.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 06',
@@ -311,7 +289,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '7eea3b38eed30405c59075e8ddbb0aec9625946ce32a47f061cca8d89ea15eb3',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc6.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 07',
@@ -324,7 +301,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '3c39a7433e9d5475382c7f1f09bbd1d20062fcdeed503c7153a2af3d588e5470',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc7.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 08',
@@ -337,7 +313,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'e6615d2bf62527faf0ac6afc123462bfcbab1a6d5a0671f51cd2cb63db7cf936',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc8.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 09',
@@ -350,7 +325,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '48acc7f212aa3460647846ad31899948649817ea7c48c421914a93c23e69feee',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc9.jpg'),
   },
   {
     name: 'Rock Band DLC Pack 10',
@@ -363,8 +337,9 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '8bed8148d3882dcde72403d90cbf56371bda267698608729695cc1417a6fdec2',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rbdlc10.jpg'),
   },
+
+  // #region RB3 DLC
   {
     name: 'Rock Band 3 DLC Pack 01',
     code: 'rb3dlc1',
@@ -376,7 +351,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '4ff83da2b9e1e7e045894f1c8573538782d6315f2d4de12804e5c7b811c4d28f',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3dlc1.jpg'),
   },
   {
     name: 'Rock Band 3 DLC Pack 02',
@@ -389,7 +363,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '81cfbad95157af8b1ea2f0ee46d4ecf70125c29a47f38778cd4cf3927fd4ba42',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3dlc2.jpg'),
   },
   {
     name: 'Rock Band 3 DLC Pack 03',
@@ -402,7 +375,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'a5bb6f17ab9239a1eb78e07bf5b2b66bccf5bba28920a3c6b1ec75feef89b231',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3dlc3.jpg'),
   },
   {
     name: 'Rock Band 3 DLC Pack 04',
@@ -415,7 +387,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '5357d7690c56c61752c55006898201652b5c455893957374507fa73dc0f63ab5',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3dlc4.jpg'),
   },
   {
     name: 'Rock Band 3 DLC Pack 05',
@@ -428,8 +399,9 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'b2f715fb7ebe8b893cac9c13c8b1ec7da8803395c879f48299086465d84ca47d',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb3dlc5.jpg'),
   },
+
+  // #region RB4 DLC
   {
     name: 'Rock Band 4 DLC Pack 01',
     code: 'rb4dlc1',
@@ -441,7 +413,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'ad5e6f3a03152ccb0dddd2a78a68cb240ef3985880a8252ec54fa1da4e00dbe4',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4dlc1.jpg'),
   },
   {
     name: 'Rock Band 4 DLC Pack 02',
@@ -454,7 +425,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '68bfc0fe61a8961780c5b65ff05f8ee894391ffe07ecf0781375cd2dd6d9227d',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4dlc2.jpg'),
   },
   {
     name: 'Rock Band 4 DLC Pack 03',
@@ -467,7 +437,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '6b07dc4a812c26e71120ce62c41ecd6cc77b5781300b6051f83d52bcb361a802',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4dlc3.jpg'),
   },
   {
     name: 'Rock Band 4 DLC Pack 04',
@@ -480,7 +449,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '16a9ff93b938ae95d2397dbd2b645a9d10808dc528481373a299da249c3b77f2',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4dlc4.jpg'),
   },
   {
     name: 'Rock Band 4 DLC Pack 05',
@@ -493,7 +461,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: 'eb8d1d89f3cd7e349865199a69666c7ce4c6186d40aab1f277a0b043f975667d',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4dlc5.jpg'),
   },
   {
     name: 'Rock Band 4 DLC Pack 06',
@@ -506,7 +473,257 @@ export const officialPackages: OfficialSongPackageStats[] = [
       pkg: '141d10d08fe7e789455f9726a06aa6edb4f1c023e390bd80b4e378ea7cd10876',
       stfs: '',
     },
-    thumbnailPath: () => RBTools.resFolder.gotoFile('icons/rb4dlc6.jpg'),
+  },
+
+  // #region The Beatles DLC
+  {
+    name: 'The Beatles: Rock Band DLC',
+    code: 'tbrbDLC',
+    outdated: false,
+    folderName: 'The-Beatles-Rock-Band-DLC',
+    packageType: 'tbrb',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '742b327ad99b560ba5780bac5aa6c93fa38305cfcaf84d0bd26f79ed160993c8',
+      stfs: '',
+    },
+  },
+
+  // #region Lost RB DLC
+  {
+    name: 'Lost Rock Band DLC',
+    code: 'lostRBDLC',
+    outdated: false,
+    folderName: 'LostRBDLC',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '88c1ba98be08eeee7c8adcd88014a3d3adbe3569c34ed966f4f7d9b5b8d9ca6c',
+      stfs: '',
+    },
+  },
+
+  // #region RBN 1.0
+  {
+    name: 'Rock Band Network 1.0 Pack 01',
+    code: 'rbnPack1',
+    outdated: false,
+    folderName: 'O591465RB2RBNPACK01OF07',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '43e978baa70aaa7bd0befdff3f1fabfe7428a8c5934d96cad2ad0b51d46b53ec',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 1.0 Pack 02',
+    code: 'rbnPack2',
+    outdated: false,
+    folderName: 'O304373RB2RBNPACK02OF07',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'ea70b034626c5566330b118c6bba44a69d74e4e3e9215eaa79b14fe476a7044e',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 1.0 Pack 03',
+    code: 'rbnPack3',
+    outdated: false,
+    folderName: 'O72268RB2RBNPACK03OF07',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'ad809c2d057e678f143fdc33d7c87b48d95eafebb7c3881aafb5f8a969e20b2a',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 1.0 Pack 04',
+    code: 'rbnPack4',
+    outdated: false,
+    folderName: 'O53521RB2RBNPACK04OF07',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '163e7f4c5cf4a29e5616d606e8e79ea4ca7733f259408dce09e25205fd6ba3e8',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 1.0 Pack 05',
+    code: 'rbnPack5',
+    outdated: false,
+    folderName: 'O822331RB2RBNPACK05OF07',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'f98f69ff41fbbe1c5a3ee664af56a00a90e6368a97c0e062698d25ed23465fb0',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 1.0 Pack 06',
+    code: 'rbnPack6',
+    outdated: false,
+    folderName: 'O75476RB2RBNPACK06OF07',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '633d6140f8704717823a481cc1231998ceb69a4b77dea9fff141d5c5de44c29e',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 1.0 Pack 07',
+    code: 'rbnPack7',
+    outdated: false,
+    folderName: 'O280249RB2RBNPACK07OF07',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '44e9f15cee6e5bc1b7bd505264e9ce9561f8d1cd75c202bee56bd39102097958',
+      stfs: '',
+    },
+  },
+
+  // #region RBN 2.0
+  {
+    name: 'Rock Band Network 2.0 Pack 01',
+    code: 'rbn2Pack1',
+    outdated: false,
+    folderName: 'RB3RBNPACK01OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '3b627a7157c6854f04ad85a6c7adc0289395b912144ac7ccf5e3bfec4749e9cf',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 02',
+    code: 'rbn2Pack2',
+    outdated: false,
+    folderName: 'RB3RBNPACK02OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '90210c01dc451e99425456961312601e303a70cc2abc1714670ee08be4c73720',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 03',
+    code: 'rbn2Pack3',
+    outdated: false,
+    folderName: 'RB3RBNPACK03OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'c4f77b6f79da4775458699a71def37a2727859640e09b9faf7c63080004a8dee',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 04',
+    code: 'rbn2Pack4',
+    outdated: false,
+    folderName: 'RB3RBNPACK04OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'c38624edc5462e1b6c8b555462c54dd35ea7866b5f8d8d4720383070c740b393',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 05',
+    code: 'rbn2Pack5',
+    outdated: false,
+    folderName: 'RB3RBNPACK05OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'e88267596e92175efa764ff884bb43b3ffdcfb65242db1e66d0d3f65ea43d50a',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 06',
+    code: 'rbn2Pack6',
+    outdated: false,
+    folderName: 'RB3RBNPACK06OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '3cbc9e3e255012c94396d75c6e54fc3c20a883ff227e48746a2885a0e3e24e4e',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 07',
+    code: 'rbn2Pack7',
+    outdated: false,
+    folderName: 'RB3RBNPACK07OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '89f4becec2c67db2e17eca6c93b6091028b6d72281608e25868cc6428ebd258f',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 08',
+    code: 'rbn2Pack8',
+    outdated: false,
+    folderName: 'RB3RBNPACK08OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'd69fd319c71b3c226191741df858d4de050cfc538700716ec0d45f3bb464951a',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Rock Band Network 2.0 Pack 09',
+    code: 'rbn2Pack9',
+    outdated: false,
+    folderName: 'RB3RBNPACK09OF09',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: 'e474ef401569ca940295691ddb6f892c2cbd8c6c64682d59283a86fd8550b113',
+      stfs: '',
+    },
+  },
+
+  // #region Lost RBN
+
+  {
+    name: 'Lost Rock Band Network 1.0',
+    code: 'lostRBN1',
+    outdated: false,
+    folderName: 'LostRBN1',
+    packageType: 'rb1',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '56d285faa2e1d4d450dac92311e2c7d884910813da5587f398f79a636b39f6d9',
+      stfs: '',
+    },
+  },
+  {
+    name: 'Lost Rock Band Network 2.0',
+    code: 'lostRBN2',
+    outdated: false,
+    folderName: 'O839301LOSTRBNPACK01',
+    packageType: 'rb3',
+    hashes: {
+      extractedRPCS3: '',
+      pkg: '87c2b20161d07d254bd856c60631324c0d44ccc177e77042990799b9a6fbe959',
+      stfs: '',
+    },
   },
 ]
 
@@ -515,15 +732,11 @@ export const officialPackages: OfficialSongPackageStats[] = [
  * - - - -
  * @param {OfficialPackagesHashTypes} type The type of the contents hash you want to search to.
  * @param {string} hash The actual hash string you want to search to.
- * @returns {ParsedSongPackageDatabaseObject | undefined}
+ * @returns {OfficialSongPackageStats | undefined}
  */
-export const getOfficialSongPackageStatsFromHash = (type: OfficialPackagesHashTypes, hash: string): OfficialSongPackageStatsJSON | undefined => {
+export const getOfficialSongPackageStatsFromHash = (type: OfficialPackagesHashTypes, hash: string): OfficialSongPackageStats | undefined => {
   for (const pack of officialPackages) {
-    if (pack.hashes[type].toLowerCase() === hash.toLowerCase())
-      return {
-        ...pack,
-        thumbnailPath: pack.thumbnailPath().path,
-      }
+    if (pack.hashes[type].toLowerCase() === hash.toLowerCase()) return pack
   }
 }
 
@@ -531,15 +744,11 @@ export const getOfficialSongPackageStatsFromHash = (type: OfficialPackagesHashTy
  * Returns an object with known properties of a specific official song package based on its installed folder name. Returns `undefined` if the provided folder name does not match any known official song package folder names.
  * - - - -
  * @param {string} folderName The folder name you want to search to.
- * @returns {ParsedSongPackageDatabaseObject | undefined}
+ * @returns {OfficialSongPackageStats | undefined}
  */
-export const getOfficialSongPackageStatsFromPKGFolderName = (folderName: string): OfficialSongPackageStatsJSON | undefined => {
+export const getOfficialSongPackageStatsFromPKGFolderName = (folderName: string): OfficialSongPackageStats | undefined => {
   for (const pack of officialPackages) {
-    if (pack.folderName === folderName)
-      return {
-        ...pack,
-        thumbnailPath: pack.thumbnailPath().path,
-      }
+    if (pack.folderName === folderName) return pack
   }
   return
 }

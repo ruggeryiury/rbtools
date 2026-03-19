@@ -2,7 +2,6 @@ import { defineConfig } from 'eslint/config'
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import globals from 'globals'
-import importPlugin from 'eslint-plugin-import'
 import jsdoc from 'eslint-plugin-jsdoc'
 
 export default defineConfig(
@@ -11,7 +10,6 @@ export default defineConfig(
     ignores: ['dist/**'],
     plugins: {
       '@typescript-eslint': tseslint.plugin,
-      import: importPlugin,
       jsdoc: jsdoc,
     },
     languageOptions: {

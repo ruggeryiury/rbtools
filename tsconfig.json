@@ -17,6 +17,6 @@
     "verbatimModuleSyntax": true
     // "isolatedDeclarations": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "dev/diagnoseRPCS3PackageFolder.ts"],
   "exclude": ["node_modules"]
 }

@@ -1,6 +1,6 @@
 import { createHashFromBuffer, DirPath, FilePath, MyObject, parseReadableBytesSize, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
 import { DTAParser, EDATFile, RBTools } from '../../core.exports'
-import { getOfficialSongPackageStatsFromHash, isRPCS3Devhdd0PathValid, type OfficialSongPackageStatsJSON, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { getOfficialSongPackageStatsFromHash, isRPCS3Devhdd0PathValid, type OfficialSongPackageStats, type RB3CompatibleDTAFile } from '../../lib.exports'
 import { useDefaultOptions } from 'use-default-options'
 
 export interface RPCS3SongPackagesObject {
@@ -60,7 +60,7 @@ export interface RPCS3SongPackagesObject {
   /**
    * An object with known properties of the official song package where the installed song package belongs to. The value might be `undefined` if the song package contents hash does not match any official song package contents hash.
    */
-  official: OfficialSongPackageStatsJSON | undefined
+  official: OfficialSongPackageStats | undefined
 }
 
 export interface RPCS3SongPackagesData {
@@ -140,7 +140,7 @@ export const rpcs3GenSongPackageManifest = async (packageDirPath: DirPathLikeTyp
     .filter((entry) => entry instanceof FilePath)
     .map((entry) => entry.path.slice(packagePath.gotoDir('songs').path.length + 1).replace(/\\/g, '/'))
     .toReversed()
-    .filter((val) => val !== 'songs.dta')
+    .filter((val) => val !== 'songs.dta' && val !== 'folder.jpg')
     .map((file) => FilePath.of(insideSongsFolderPath, file))
   let manifest = ''
   let packageSize = 0
@@ -198,7 +198,6 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
         outdated: false,
         folderName: '_ark/songs',
         packageType: 'rb3',
-        thumbnailPath: RBTools.resFolder.gotoFile('icons/rb3.png').path,
         hashes: {
           extractedRPCS3: '',
           pkg: '',
