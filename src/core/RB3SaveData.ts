@@ -157,7 +157,7 @@ export class RB3SaveData {
    * @param {number} [wiiProfile] `OPTIONAL` The index of the desired profile. This is only used on Wii save data files. Default is `0`.
    * @returns {Promise<ParsedRB3SaveData>}
    */
-  static async parseBuffer(bufferOrReader: Buffer | BinaryReader, file?: FilePathLikeTypes, wiiProfile = 0): Promise<ParsedRB3SaveData> {
+  static async parseBuffer(bufferOrReader: Buffer | BinaryReader, file?: FilePathLikeTypes, wiiProfile: number = 0): Promise<ParsedRB3SaveData> {
     let reader: BinaryReader
     if (Buffer.isBuffer(bufferOrReader)) reader = BinaryReader.fromBuffer(bufferOrReader)
     else if (file && bufferOrReader instanceof BinaryReader) reader = bufferOrReader

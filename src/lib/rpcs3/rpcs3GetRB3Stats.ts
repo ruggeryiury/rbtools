@@ -5,9 +5,9 @@ import { isRPCS3ExePathValid } from './isRPCS3ExePathValid'
 
 export interface RockBand3Data {
   /**
-   * Your profile name on the PS3 system.
+   * Your profile name on the PS3 system. The value is `null` when no username home folder's found on the RPCS3's `dev_hdd0` folder.
    */
-  userName: string
+  userName: string | null
   /**
    * The path to the Rock Band 3 game files. The value is `null` when the game is not installed and recognized on RPCS3.
    */
@@ -97,7 +97,7 @@ export const rpcs3GetRB3Stats = async (devhdd0Path: DirPathLikeTypes, rpcs3ExePa
   // const contents: string[] = []
 
   map.setMany({
-    userName: await userNameFilePath.read('utf8'),
+    userName: userNameFilePath.exists ? await userNameFilePath.read('utf8') : null,
     path: games.BLUS30463 ? pathLikeToDirPath(games.BLUS30463).path : null,
     gameName: 'Rock Band 3',
     gameSerial: 'BLUS30463',
