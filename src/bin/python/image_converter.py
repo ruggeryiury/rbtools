@@ -41,7 +41,8 @@ def image_converter(
         )
 
     if not src_path.is_file():
-        raise TypeError(f'Provided path "{str(src_path)}" is not a valid file path.')
+        raise TypeError(
+            f'Provided path "{str(src_path)}" is not a valid file path.')
 
     try:
         with Image.open(src_path) as img:

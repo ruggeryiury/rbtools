@@ -125,8 +125,6 @@ export interface RPCS3PackageFilesManifestData {
   packageFiles: string[]
 }
 
-const RB1_RAP_FOLDER = 'CCF0099'
-
 /**
  * Generates a manifest string with name and size of all files from an installed song package.
  * - - - -
@@ -217,7 +215,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
 
   const rb3UsrDir = devhdd0.gotoDir('game/BLUS30463/USRDIR')
   if (rb3UsrDir.exists) {
-    const allRB3PackagesFolder = (await rb3UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen') as DirPath[]
+    const allRB3PackagesFolder = (await rb3UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== 'custom_textures') as DirPath[]
 
     if (allRB3PackagesFolder.length > 0) {
       for (const packagePath of allRB3PackagesFolder) {
@@ -266,7 +264,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
 
   const rb1UsrDir = devhdd0.gotoDir('game/BLUS30050/USRDIR')
   if (rb1UsrDir.exists) {
-    const allRB1PackagesFolder = (await rb1UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== RB1_RAP_FOLDER) as DirPath[]
+    const allRB1PackagesFolder = (await rb1UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== 'CCF0099') as DirPath[]
 
     if (allRB1PackagesFolder.length > 0) {
       for (const packagePath of allRB1PackagesFolder) {

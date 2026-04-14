@@ -134,12 +134,33 @@ export interface ParsedRB3SaveData {
 }
 
 export interface InstrumentScoreData {
+  /**
+   * The instrument selected to gather scores from.
+   */
   instrument: ScoreDataInstrumentTypes
+  /**
+   * The difficulty selected to gather scores from.
+   */
   difficulty: DifficultyTypes
+  /**
+   * The amount of songs played.
+   */
   songsPlayed: number
+  /**
+   * An array with the song ID of every song played.
+   */
   playedSongIDs: number[]
+  /**
+   * The total amount of score the player's won with the selected instrument.
+   */
   scoreCount: number
+  /**
+   * The amount of stars the player's won with the selected instrument.
+   */
   starsCount: number
+  /**
+   * The amount of golden stars the player's won with the selected instrument.
+   */
   goldStars: number
 }
 

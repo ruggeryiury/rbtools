@@ -1,6 +1,8 @@
 import { DirPath, type DirPathLikeTypes } from 'node-lib'
 import { isRPCS3Devhdd0PathValid } from '../../lib.exports'
 
+export type SongPackageCodeTypes = 'tu5' | 'rb1' | 'rb2' | 'rb3' | 'lego' | 'tbrb' | 'gdrb' | 'rb3ToRB2' | 'rb3ToBlitz' | 'rb3Beta' | 'rbb' | 'rb4' | 'rb4r' | 'rbvr' | 'rbdlc1' | 'rbdlc2' | 'rbdlc3' | 'rbdlc4' | 'rbdlc5' | 'rbdlc6' | 'rbdlc7' | 'rbdlc8' | 'rbdlc9' | 'rbdlc10' | 'rb3dlc1' | 'rb3dlc2' | 'rb3dlc3' | 'rb3dlc4' | 'rb3dlc5' | 'rb4dlc1' | 'rb4dlc2' | 'rb4dlc3' | 'rb4dlc4' | 'rb4dlc5' | 'rb4dlc6' | 'tbrbDLC' | 'lostRBDLC' | 'rbnPack1' | 'rbnPack2' | 'rbnPack3' | 'rbnPack4' | 'rbnPack5' | 'rbnPack6' | 'rbnPack7' | 'rbn2Pack1' | 'rbn2Pack2' | 'rbn2Pack3' | 'rbn2Pack4' | 'rbn2Pack5' | 'rbn2Pack6' | 'rbn2Pack7' | 'rbn2Pack8' | 'rbn2Pack9' | 'lostRBN1' | 'lostRBN2'
+
 export interface OfficialSongPackageStats {
   /**
    * The name of the package (in English).
@@ -9,11 +11,11 @@ export interface OfficialSongPackageStats {
   /**
    * A string code that can be used as a package identifier.
    */
-  code: 'tu5' | 'rb1' | 'rb2' | 'rb3' | 'lrb' | 'tbrb' | 'gdrb' | 'rb3ToRB2' | 'rb3ToBlitz' | 'rb3Beta' | 'rbb' | 'rb4' | 'rb4r' | 'rbvr' | 'rbdlc1' | 'rbdlc2' | 'rbdlc3' | 'rbdlc4' | 'rbdlc5' | 'rbdlc6' | 'rbdlc7' | 'rbdlc8' | 'rbdlc9' | 'rbdlc10' | 'rb3dlc1' | 'rb3dlc2' | 'rb3dlc3' | 'rb3dlc4' | 'rb3dlc5' | 'rb4dlc1' | 'rb4dlc2' | 'rb4dlc3' | 'rb4dlc4' | 'rb4dlc5' | 'rb4dlc6' | 'tbrbDLC' | 'lostRBDLC' | 'rbnPack1' | 'rbnPack2' | 'rbnPack3' | 'rbnPack4' | 'rbnPack5' | 'rbnPack6' | 'rbnPack7' | 'rbn2Pack1' | 'rbn2Pack2' | 'rbn2Pack3' | 'rbn2Pack4' | 'rbn2Pack5' | 'rbn2Pack6' | 'rbn2Pack7' | 'rbn2Pack8' | 'rbn2Pack9' | 'lostRBN1' | 'lostRBN2'
+  code: SongPackageCodeTypes
   /**
    * Tells if the package is outdated.
    */
-  outdated: boolean
+  outdated?: boolean
   /**
    * The original folder name in the USRDIR folder.
    */
@@ -57,7 +59,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Title Update 5',
     code: 'tu5',
-    outdated: false,
     folderName: 'gen',
     packageType: 'rb3',
     hashes: {
@@ -69,7 +70,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 1',
     code: 'rb1',
-    outdated: false,
     folderName: 'RB1FULLEXPORTPS3',
     packageType: 'rb1',
     hashes: {
@@ -81,7 +81,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 2',
     code: 'rb2',
-    outdated: false,
     folderName: 'RB2-Rock-Band-2-Export',
     packageType: 'rb3',
     hashes: {
@@ -92,8 +91,7 @@ export const officialPackages: OfficialSongPackageStats[] = [
   },
   {
     name: 'LEGO Rock Band',
-    code: 'lrb',
-    outdated: false,
+    code: 'lego',
     folderName: 'LEGO-Rock-Band-Export',
     packageType: 'rb1',
     hashes: {
@@ -105,7 +103,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'The Beatles: Rock Band',
     code: 'tbrb',
-    outdated: false,
     folderName: 'TheBeatlesRockBand',
     packageType: 'rb3',
     hashes: {
@@ -117,7 +114,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Green Day: Rock Band',
     code: 'gdrb',
-    outdated: false,
     folderName: 'Green-Day-Rock-Band-Export',
     packageType: 'rb1',
     hashes: {
@@ -129,7 +125,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 (to RB2)',
     code: 'rb3ToRB2',
-    outdated: false,
     folderName: 'RB3-to-RB2-DISC',
     packageType: 'rb1',
     hashes: {
@@ -142,7 +137,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 (to Blitz)',
     code: 'rb3ToBlitz',
-    outdated: false,
     folderName: 'RB3-Rock-Band-3-Export',
     packageType: 'rb3',
     hashes: {
@@ -155,7 +149,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 Beta Songs',
     code: 'rb3Beta',
-    outdated: false,
     folderName: 'RB3BetaSongs',
     packageType: 'rb3',
     hashes: {
@@ -167,7 +160,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Blitz',
     code: 'rbb',
-    outdated: false,
     folderName: 'Rock-Band-Bltz-Export',
     packageType: 'rb3',
     hashes: {
@@ -181,7 +173,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4',
     code: 'rb4',
-    outdated: false,
     folderName: 'RB4-to-RB2-DISC',
     packageType: 'rb3',
     hashes: {
@@ -193,7 +184,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4 Rivals',
     code: 'rb4r',
-    outdated: false,
     folderName: 'RB4-to-RB2-RIVALS',
     packageType: 'rb3',
     hashes: {
@@ -207,7 +197,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band VR',
     code: 'rbvr',
-    outdated: false,
     folderName: 'RBVREXCLUSIVES-to-RB2',
     packageType: 'rb1',
     hashes: {
@@ -221,7 +210,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 01',
     code: 'rbdlc1',
-    outdated: false,
     folderName: 'RB1DLCPACK01OF10',
     packageType: 'rb1',
     hashes: {
@@ -233,7 +221,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 02',
     code: 'rbdlc2',
-    outdated: false,
     folderName: 'RB1DLCPACK02OF10',
     packageType: 'rb1',
     hashes: {
@@ -245,7 +232,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 03',
     code: 'rbdlc3',
-    outdated: false,
     folderName: 'RB1DLCPACK03OF10',
     packageType: 'rb1',
     hashes: {
@@ -257,7 +243,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 04',
     code: 'rbdlc4',
-    outdated: false,
     folderName: 'RB1DLCPACK04OF10',
     packageType: 'rb1',
     hashes: {
@@ -269,7 +254,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 05',
     code: 'rbdlc5',
-    outdated: false,
     folderName: 'RB1DLCPACK05OF10',
     packageType: 'rb1',
     hashes: {
@@ -281,7 +265,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 06',
     code: 'rbdlc6',
-    outdated: false,
     folderName: 'RB1DLCPACK06OF10',
     packageType: 'rb1',
     hashes: {
@@ -293,7 +276,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 07',
     code: 'rbdlc7',
-    outdated: false,
     folderName: 'RB1DLCPACK07OF10',
     packageType: 'rb1',
     hashes: {
@@ -305,7 +287,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 08',
     code: 'rbdlc8',
-    outdated: false,
     folderName: 'RB1DLCPACK08OF10',
     packageType: 'rb1',
     hashes: {
@@ -317,7 +298,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 09',
     code: 'rbdlc9',
-    outdated: false,
     folderName: 'RB1DLCPACK09OF10',
     packageType: 'rb1',
     hashes: {
@@ -329,7 +309,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band DLC Pack 10',
     code: 'rbdlc10',
-    outdated: false,
     folderName: 'RB1DLCPACK10OF10',
     packageType: 'rb1',
     hashes: {
@@ -343,7 +322,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 DLC Pack 01',
     code: 'rb3dlc1',
-    outdated: false,
     folderName: 'RB3DLCPACK01OF05',
     packageType: 'rb3',
     hashes: {
@@ -355,7 +333,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 DLC Pack 02',
     code: 'rb3dlc2',
-    outdated: false,
     folderName: 'RB3DLCPACK02OF05',
     packageType: 'rb3',
     hashes: {
@@ -367,7 +344,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 DLC Pack 03',
     code: 'rb3dlc3',
-    outdated: false,
     folderName: 'RB3DLCPACK03OF05',
     packageType: 'rb3',
     hashes: {
@@ -379,7 +355,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 DLC Pack 04',
     code: 'rb3dlc4',
-    outdated: false,
     folderName: 'RB3DLCPACK04OF05',
     packageType: 'rb3',
     hashes: {
@@ -391,7 +366,6 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 3 DLC Pack 05',
     code: 'rb3dlc5',
-    outdated: false,
     folderName: 'RB3DLCPACK05OF05',
     packageType: 'rb3',
     hashes: {
@@ -405,11 +379,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4 DLC Pack 01',
     code: 'rb4dlc1',
-    outdated: false,
     folderName: 'RB4-to-RB2-DLC-1',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '54e12c7a116b6879d38c202223c406e40f1877d36f574764b3eaada7b28980ba',
       pkg: 'ad5e6f3a03152ccb0dddd2a78a68cb240ef3985880a8252ec54fa1da4e00dbe4',
       stfs: '',
     },
@@ -417,11 +390,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4 DLC Pack 02',
     code: 'rb4dlc2',
-    outdated: false,
     folderName: 'RB4-to-RB2-DLC-2',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '89d844ad39199d33d05f08a8085cc82797cc0e7bdc99cae6ec7cd74e7bd788c0',
       pkg: '68bfc0fe61a8961780c5b65ff05f8ee894391ffe07ecf0781375cd2dd6d9227d',
       stfs: '',
     },
@@ -429,11 +401,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4 DLC Pack 03',
     code: 'rb4dlc3',
-    outdated: false,
     folderName: 'RB4-to-RB2-DLC-3',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '77b4deb8119592eda4af908910dc0d4c944514cb9adaadf2b97d7b997f6184e1',
       pkg: '6b07dc4a812c26e71120ce62c41ecd6cc77b5781300b6051f83d52bcb361a802',
       stfs: '',
     },
@@ -441,11 +412,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4 DLC Pack 04',
     code: 'rb4dlc4',
-    outdated: false,
     folderName: 'RB4-to-RB2-DLC-4',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '4c0d31fd1c94d325ae31659cd62fe02e2fc890fa764b69e714c3f4e57edc6e6b',
       pkg: '16a9ff93b938ae95d2397dbd2b645a9d10808dc528481373a299da249c3b77f2',
       stfs: '',
     },
@@ -453,11 +423,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4 DLC Pack 05',
     code: 'rb4dlc5',
-    outdated: false,
     folderName: 'RB4-to-RB2-DLC-5',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: 'a2072784a716eec438f54813c7078018379e7c3442226a6334cebe5bf360592a',
       pkg: 'eb8d1d89f3cd7e349865199a69666c7ce4c6186d40aab1f277a0b043f975667d',
       stfs: '',
     },
@@ -465,39 +434,36 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band 4 DLC Pack 06',
     code: 'rb4dlc6',
-    outdated: false,
     folderName: 'RB4-to-RB2-DLC-6',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '84410d128030566821f82191b76bd14c0b12eba04685550de2c92becb0177c0f',
       pkg: '141d10d08fe7e789455f9726a06aa6edb4f1c023e390bd80b4e378ea7cd10876',
       stfs: '',
     },
   },
 
-  // #region The Beatles DLC
-  {
-    name: 'The Beatles: Rock Band DLC',
-    code: 'tbrbDLC',
-    outdated: false,
-    folderName: 'The-Beatles-Rock-Band-DLC',
-    packageType: 'tbrb',
-    hashes: {
-      extractedRPCS3: '',
-      pkg: '742b327ad99b560ba5780bac5aa6c93fa38305cfcaf84d0bd26f79ed160993c8',
-      stfs: '',
-    },
-  },
+  // // #region The Beatles DLC
+  // {
+  //   name: 'The Beatles: Rock Band DLC',
+  //   code: 'tbrbDLC',
+  //   folderName: 'The-Beatles-Rock-Band-DLC',
+  //   packageType: 'tbrb',
+  //   hashes: {
+  //     extractedRPCS3: '',
+  //     pkg: '742b327ad99b560ba5780bac5aa6c93fa38305cfcaf84d0bd26f79ed160993c8',
+  //     stfs: '',
+  //   },
+  // },
 
   // #region Lost RB DLC
   {
     name: 'Lost Rock Band DLC',
     code: 'lostRBDLC',
-    outdated: false,
     folderName: 'LostRBDLC',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: 'b4dc19c15e2d13dec7a3aa95e3051dc96014822bdcd74fb8c0263a11fbc43d0a',
       pkg: '88c1ba98be08eeee7c8adcd88014a3d3adbe3569c34ed966f4f7d9b5b8d9ca6c',
       stfs: '',
     },
@@ -507,11 +473,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 1.0 Pack 01',
     code: 'rbnPack1',
-    outdated: false,
     folderName: 'O591465RB2RBNPACK01OF07',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: 'a34f1cb68e3320dc3104e28668e747db43d7f015b8b262e420e02e0011066784',
       pkg: '43e978baa70aaa7bd0befdff3f1fabfe7428a8c5934d96cad2ad0b51d46b53ec',
       stfs: '',
     },
@@ -519,11 +484,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 1.0 Pack 02',
     code: 'rbnPack2',
-    outdated: false,
     folderName: 'O304373RB2RBNPACK02OF07',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '3dddd9660d6f68e0b38ef513c1dde4c1e8ef4e047dfd4ffee7f3f76df62245eb',
       pkg: 'ea70b034626c5566330b118c6bba44a69d74e4e3e9215eaa79b14fe476a7044e',
       stfs: '',
     },
@@ -531,11 +495,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 1.0 Pack 03',
     code: 'rbnPack3',
-    outdated: false,
     folderName: 'O72268RB2RBNPACK03OF07',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: 'f9c6a26585013f5b14f64c5e439308d034f7588b17b2c021078b9846c756bbcb',
       pkg: 'ad809c2d057e678f143fdc33d7c87b48d95eafebb7c3881aafb5f8a969e20b2a',
       stfs: '',
     },
@@ -543,11 +506,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 1.0 Pack 04',
     code: 'rbnPack4',
-    outdated: false,
     folderName: 'O53521RB2RBNPACK04OF07',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '4f99abd705699d358e092aac85528276da4335b7cd2457ec72a5798e5fbf8d7c',
       pkg: '163e7f4c5cf4a29e5616d606e8e79ea4ca7733f259408dce09e25205fd6ba3e8',
       stfs: '',
     },
@@ -555,11 +517,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 1.0 Pack 05',
     code: 'rbnPack5',
-    outdated: false,
     folderName: 'O822331RB2RBNPACK05OF07',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '61c2d007a97386f94067634af4dc3c89f42dc097a724f21caedca95beb29f8d6',
       pkg: 'f98f69ff41fbbe1c5a3ee664af56a00a90e6368a97c0e062698d25ed23465fb0',
       stfs: '',
     },
@@ -567,11 +528,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 1.0 Pack 06',
     code: 'rbnPack6',
-    outdated: false,
     folderName: 'O75476RB2RBNPACK06OF07',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '1661e3195c0661eca3dd5fb6506688c376f936a6dc096f80a067ce0036a75ae0',
       pkg: '633d6140f8704717823a481cc1231998ceb69a4b77dea9fff141d5c5de44c29e',
       stfs: '',
     },
@@ -579,11 +539,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 1.0 Pack 07',
     code: 'rbnPack7',
-    outdated: false,
     folderName: 'O280249RB2RBNPACK07OF07',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '0355550732445e7d7465280b88dfb40fc54ed9d1d25f86d0cabc0ec38efb1b36',
       pkg: '44e9f15cee6e5bc1b7bd505264e9ce9561f8d1cd75c202bee56bd39102097958',
       stfs: '',
     },
@@ -593,11 +552,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 01',
     code: 'rbn2Pack1',
-    outdated: false,
     folderName: 'RB3RBNPACK01OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '10bcedefb76a20221c0b522b56324dfaeb62abd782834a2e9a1b898bdaa3ea47',
       pkg: '3b627a7157c6854f04ad85a6c7adc0289395b912144ac7ccf5e3bfec4749e9cf',
       stfs: '',
     },
@@ -605,11 +563,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 02',
     code: 'rbn2Pack2',
-    outdated: false,
     folderName: 'RB3RBNPACK02OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '3f4c1f1fe5ca7245344599995e6a099fd9db1ee94821a5cc85ebe371ff71f9e0',
       pkg: '90210c01dc451e99425456961312601e303a70cc2abc1714670ee08be4c73720',
       stfs: '',
     },
@@ -617,11 +574,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 03',
     code: 'rbn2Pack3',
-    outdated: false,
     folderName: 'RB3RBNPACK03OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: 'd4696ad68c016390917f6ec59ce8d713ec855a2541293f2b0e8d0802b6941ab4',
       pkg: 'c4f77b6f79da4775458699a71def37a2727859640e09b9faf7c63080004a8dee',
       stfs: '',
     },
@@ -629,11 +585,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 04',
     code: 'rbn2Pack4',
-    outdated: false,
     folderName: 'RB3RBNPACK04OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '09eea418d18e1b4e2f34cd2919208be38c4d6236729a8f16cee9f40ba91fa134',
       pkg: 'c38624edc5462e1b6c8b555462c54dd35ea7866b5f8d8d4720383070c740b393',
       stfs: '',
     },
@@ -641,11 +596,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 05',
     code: 'rbn2Pack5',
-    outdated: false,
     folderName: 'RB3RBNPACK05OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '8fbbfb5d18705c5cf0ac141739c415d2b4e17dfdeefd17e07cbf46ffab6410af',
       pkg: 'e88267596e92175efa764ff884bb43b3ffdcfb65242db1e66d0d3f65ea43d50a',
       stfs: '',
     },
@@ -653,11 +607,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 06',
     code: 'rbn2Pack6',
-    outdated: false,
     folderName: 'RB3RBNPACK06OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '793482eef067423aa04345b8d893f2d1247b20158de044759c4fc6cce2c81988',
       pkg: '3cbc9e3e255012c94396d75c6e54fc3c20a883ff227e48746a2885a0e3e24e4e',
       stfs: '',
     },
@@ -665,11 +618,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 07',
     code: 'rbn2Pack7',
-    outdated: false,
     folderName: 'RB3RBNPACK07OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '89259b288840560c75326d3ef76afeb6b19b535674f5e0dd46db7063ab910367',
       pkg: '89f4becec2c67db2e17eca6c93b6091028b6d72281608e25868cc6428ebd258f',
       stfs: '',
     },
@@ -677,11 +629,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 08',
     code: 'rbn2Pack8',
-    outdated: false,
     folderName: 'RB3RBNPACK08OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: 'a458c3bbbdcca9d840787bb4561015368dcf2c94f352f7edc1be178ffb224d6b',
       pkg: 'd69fd319c71b3c226191741df858d4de050cfc538700716ec0d45f3bb464951a',
       stfs: '',
     },
@@ -689,11 +640,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Rock Band Network 2.0 Pack 09',
     code: 'rbn2Pack9',
-    outdated: false,
     folderName: 'RB3RBNPACK09OF09',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '3ec645d6baf87c9e234c2456732e7f1489725c0f58d9f91babd3e2b769558b93',
       pkg: 'e474ef401569ca940295691ddb6f892c2cbd8c6c64682d59283a86fd8550b113',
       stfs: '',
     },
@@ -704,11 +654,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Lost Rock Band Network 1.0',
     code: 'lostRBN1',
-    outdated: false,
     folderName: 'LostRBN1',
     packageType: 'rb1',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: '133749bab82a88ca3e0a4ae1ae7418ca99e544d329c952b249046c7edf7faaa2',
       pkg: '56d285faa2e1d4d450dac92311e2c7d884910813da5587f398f79a636b39f6d9',
       stfs: '',
     },
@@ -716,11 +665,10 @@ export const officialPackages: OfficialSongPackageStats[] = [
   {
     name: 'Lost Rock Band Network 2.0',
     code: 'lostRBN2',
-    outdated: false,
     folderName: 'O839301LOSTRBNPACK01',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '',
+      extractedRPCS3: 'f89b61663aebf2f346dcbda2ec46e16e95fde44ec20139aa66deeaba35fb9312',
       pkg: '87c2b20161d07d254bd856c60631324c0d44ccc177e77042990799b9a6fbe959',
       stfs: '',
     },
@@ -764,7 +712,7 @@ export const isRB3FolderNameFreeOnRPCS3 = async (devhdd0Path: DirPathLikeTypes, 
   let proof = true
   const devhdd0 = isRPCS3Devhdd0PathValid(devhdd0Path)
   const allOfficialFolderNames = officialPackages.filter((pack) => pack.packageType === 'rb3').map((pack) => pack.folderName)
-  const allUnofficialFolderNames = (await devhdd0.gotoDir('game/BLUS30463/USRDIR').readDir()).filter((dir) => dir instanceof DirPath && dir.name !== 'gen' && !allOfficialFolderNames.includes(dir.name))
+  const allUnofficialFolderNames = (await devhdd0.gotoDir('game/BLUS30463/USRDIR').readDir()).filter((dir) => dir instanceof DirPath && dir.name !== 'gen' && dir.name !== 'custom_textures' && !allOfficialFolderNames.includes(dir.name))
   const allFolderNames = [...allOfficialFolderNames, ...allUnofficialFolderNames]
 
   if (allFolderNames.includes(folderName)) proof = false
