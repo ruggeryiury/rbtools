@@ -1,3 +1,4 @@
+import { platform } from 'node:os'
 import { spawn } from 'node:child_process'
 import { execAsync, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes, type DirPath, pathLikeToDirPath, type FilePath } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
@@ -117,6 +118,12 @@ export type PreviewAudioFormatTypes = 'wav' | 'flac' | 'ogg' | 'mp3'
  * API calls as static methods for Python scripts of RBTools.
  */
 export class PythonAPI {
+  /**
+   * Returns the correct python executable name across many OS'.
+   * - - - -
+   * @returns {'py' | 'python3'}
+   */
+  static getPythonExecName = (): 'py' | 'python3' => (platform() === 'win32' ? 'py' : 'python3')
   // #region Image/Texture
 
   /**
@@ -127,7 +134,7 @@ export class PythonAPI {
    */
   static async imageFileStat(imgFilePath: FilePathLikeTypes): Promise<ImageFileStatPythonObject> {
     const pythonScript = 'img_file_stat.py'
-    const command = `python "${pythonScript}" "${pathLikeToString(imgFilePath)}" -p`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${pathLikeToString(imgFilePath)}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     const returnValue = JSON.parse(stdout) as ImageFileStatPythonObject
@@ -157,7 +164,7 @@ export class PythonAPI {
     )
     const dest = pathLikeToFilePath(destFilePath).changeFileExt(toFormat)
     const pythonScript = 'image_converter.py'
-    const command = `python "${pythonScript}" "${pathLikeToString(srcFilePath)}" "${pathLikeToString(dest)}" --width ${opts.width.toString()} --height ${opts.height.toString()} --interpolation ${opts.interpolation.toUpperCase()} --quality ${opts.quality.toString()}`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${pathLikeToString(srcFilePath)}" "${pathLikeToString(dest)}" --width ${opts.width.toString()} --height ${opts.height.toString()} --interpolation ${opts.interpolation.toUpperCase()} --quality ${opts.quality.toString()}`
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return new ImageFile(destFilePath)
@@ -183,8 +190,8 @@ export class PythonAPI {
         options
       )
 
-      const pythonScript = 'image_buffer_processor.py'
-      const process = spawn('python', [pythonScript], { cwd: RBTools.pyFolder.path, windowsHide: true })
+      const pythonScript = RBTools.pyFolder.gotoFile('image_buffer_processor.py')
+      const process = spawn(PythonAPI.getPythonExecName(), [pythonScript.path], { windowsHide: true })
       const imgBase64 = Buffer.isBuffer(imgPathOrBuffer) ? imgPathOrBuffer.toString('base64') : pathLikeToFilePath(imgPathOrBuffer).readSync().toString('base64')
 
       let stdout = ''
@@ -201,9 +208,9 @@ export class PythonAPI {
         if (code === 0) {
           resolve(Buffer.from(stdout, 'base64'))
         } else if (code === null) {
-          reject(new Error(`Python script exited with unknown code: ${stderr}`))
+          reject(new Error(`${PythonAPI.getPythonExecName()} script exited with unknown code: ${stderr}`))
         } else {
-          reject(new Error(`Python script exited with code ${code.toString()}: ${stderr}`))
+          reject(new Error(`${PythonAPI.getPythonExecName()} script exited with code ${code.toString()}: ${stderr}`))
         }
       })
 
@@ -238,9 +245,9 @@ export class PythonAPI {
         if (code === 0) {
           resolve(JSON.parse(stdout) as ImageFileStatPythonObject)
         } else if (code === null) {
-          reject(new Error(`Python script exited with unknown code: ${stderr}`))
+          reject(new Error(`${PythonAPI.getPythonExecName()} script exited with unknown code: ${stderr}`))
         } else {
-          reject(new Error(`Python script exited with code ${code.toString()}: ${stderr}`))
+          reject(new Error(`${PythonAPI.getPythonExecName()} script exited with code ${code.toString()}: ${stderr}`))
         }
       })
 
@@ -260,7 +267,7 @@ export class PythonAPI {
     const tex = pathLikeToFilePath(texWiiPath)
     const base64Header = texHeader.data.toString('base64')
     const pythonScript = 'texwii_to_base64_buffer.py'
-    const command = `python "${pythonScript}" "${tex.path}" -tpl "${base64Header}" -p`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${tex.path}" -tpl "${base64Header}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     const [dataURL] = stdout.split('\r\n')
@@ -277,7 +284,7 @@ export class PythonAPI {
    */
   static async audioFileStat(audioFilePath: FilePathLikeTypes): Promise<AudioFileStatPythonObject> {
     const pythonScript = 'audio_file_stat.py'
-    const command = `python "${pythonScript}" "${pathLikeToString(audioFilePath)}" -p`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${pathLikeToString(audioFilePath)}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     const returnValue = JSON.parse(stdout) as AudioFileStatPythonObject
@@ -299,7 +306,7 @@ export class PythonAPI {
     for (const track of tracks) {
       audioFilesInput += `"${pathLikeToString(track)}" `
     }
-    const command = `python "${pythonScript}" ${audioFilesInput}${encrypt ? '-e' : ''}-d "${pathLikeToString(destPath)}"`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" ${audioFilesInput}${encrypt ? '-e' : ''}-d "${pathLikeToString(destPath)}"`
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return new MOGGFile(destPath)
@@ -313,7 +320,7 @@ export class PythonAPI {
    */
   static async moggFileStat(moggFilePath: FilePathLikeTypes): Promise<MOGGFileStatPythonObject> {
     const pythonScript = 'mogg_file_stat.py'
-    const command = `python "${pythonScript}" "${pathLikeToString(moggFilePath)}" -p`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${pathLikeToString(moggFilePath)}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     // if (isDev()) console.log(`RBTools Python script: ${pythonScript}\n----------------------------------\n`, stdout.trim(), '\n\nEND OF PROGRAM\n----------------------------------')
     if (stderr) throw new Error(stderr)
@@ -338,7 +345,7 @@ export class PythonAPI {
     const enc = pathLikeToFilePath(encMoggPath)
     const dec = pathLikeToFilePath(decMoggPath)
     const pythonScript = 'decrypt_mogg.py'
-    const command = `python "${pythonScript}" "${enc.path}" "${dec.path}"`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${enc.path}" "${dec.path}"`
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return new MOGGFile(dec)
@@ -361,7 +368,7 @@ export class PythonAPI {
     const tracksStr = JSON.stringify(genAudioFileStructure(songdata))
     const tracks = Buffer.from(tracksStr).toString('base64')
     const pythonScript = 'mogg_track_extractor.py'
-    const command = `python "${pythonScript}" "${mogg.path}" -t "${tracks}" -o "${dest.path}"`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${mogg.path}" -t "${tracks}" -o "${dest.path}"`
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return dest
@@ -384,7 +391,7 @@ export class PythonAPI {
     const tracks = Buffer.from(JSON.stringify(genAudioFileStructure(songdata))).toString('base64')
 
     const pythonScript = 'mogg_preview_creator.py'
-    const command = `python "${pythonScript}" "${mogg.path}" -t "${tracks}" -ps ${songdata.preview[0].toString()} -o "${dest.path}" -f "${format}"${mixCrowd ? ' -c' : ''}`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${mogg.path}" -t "${tracks}" -ps ${songdata.preview[0].toString()} -o "${dest.path}" -f "${format}"${mixCrowd ? ' -c' : ''}`
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return dest
@@ -400,7 +407,7 @@ export class PythonAPI {
    */
   static async midiFileStat(midiFilePath: FilePathLikeTypes): Promise<MIDIFileStatPythonObject> {
     const pythonScript = 'midi_file_stat.py'
-    const command = `python "${pythonScript}" "${pathLikeToString(midiFilePath)}" -p`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${pathLikeToString(midiFilePath)}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     const returnValue = JSON.parse(stdout) as MIDIFileStatPythonObject
@@ -418,7 +425,7 @@ export class PythonAPI {
   static async stfsFileStat(stfsFilePath: FilePathLikeTypes): Promise<STFSFileStatRawObject> {
     const stfs = pathLikeToFilePath(stfsFilePath)
     const pythonScript = 'stfs_file_stat.py'
-    const command = `python "${pythonScript}" "${stfs.path}" -p`
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${stfs.path}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     const returnValue = JSON.parse(stdout) as STFSFileStatRawObject
@@ -437,7 +444,7 @@ export class PythonAPI {
     const stfs = pathLikeToFilePath(stfsFilePath)
     const dest = pathLikeToDirPath(destPath)
     const pythonScript = 'stfs_extract.py'
-    let command = `python "${pythonScript}" "${stfs.path}" "${dest.path}"`
+    let command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${stfs.path}" "${dest.path}"`
     if (extractOnRoot) command += ' --extract-on-root'
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
@@ -457,7 +464,7 @@ export class PythonAPI {
     const stfs = pathLikeToFilePath(stfsFilePath)
     const dest = pathLikeToDirPath(destPath)
     const pythonScript = songs.length === 0 ? 'stfs_extract.py' : 'stfs_extract_selected_songs.py'
-    let command = `python "${pythonScript}" "${stfs.path}" "${dest.path}"`
+    let command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${stfs.path}" "${dest.path}"`
     if (extractOnRoot) command += ' --extract-on-root'
     if (songs.length > 0) {
       command += ` --songs ${songs.map((s) => `"${s}"`).join(' ')}`

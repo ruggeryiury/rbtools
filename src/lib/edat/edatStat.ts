@@ -153,16 +153,6 @@ export interface EDATFileStatObject {
 export const edatStat = async (edatFilePath: FilePathLikeTypes): Promise<EDATFileStatObject> => {
   const edat = pathLikeToFilePath(edatFilePath)
   const reader = await BinaryReader.fromFile(edatFilePath)
-
-  const isUSRDIRPathValid = (): boolean => {
-    const usrdir = edat.gotoDir('../../../')
-    const eboot = usrdir.gotoFile('EBOOT.BIN')
-    const gen = usrdir.gotoDir('gen')
-    if (usrdir.exists && eboot.exists && gen.exists) return true
-    return false
-  }
-
-  if (!isUSRDIRPathValid()) throw new Error("RBTools can only decrypt EDAT files that's installed on the RPCS3 RB3 DLC folder.")
   const magic = await reader.readUInt32BE()
 
   // NPD

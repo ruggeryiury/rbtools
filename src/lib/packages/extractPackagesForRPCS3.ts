@@ -33,6 +33,10 @@ export interface RPCS3ExtractionOptions {
 
 export interface RPCS3PackageExtractionObject {
   /**
+   * The path where the pack was installed.
+   */
+  path: DirPath
+  /**
    * The path to temporary folder created to ultimately gather all package files to move to the actual package folder inside the `dev_hdd0` folder.
    */
   mainTempFolder: DirPath
@@ -300,9 +304,11 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
             await tempDecEDAT.move(oldMIDIPath, true)
           }
 
-          const newDevkLic = EDATFile.genDevKLicHash(packageFolderName)
-          const newContentID = EDATFile.genContentID(packageFolderName.toUpperCase())
-          await BinaryAPI.edatToolEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
+          if (forceEncryption === 'enabled') {
+            const newDevkLic = EDATFile.genDevKLicHash(packageFolderName)
+            const newContentID = EDATFile.genContentID(packageFolderName.toUpperCase())
+            await BinaryAPI.edatToolEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
+          } else await oldMIDIPath.move(newMIDIPath)
         }
       }
 
@@ -392,6 +398,7 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
   // Delete anything residual from temp folder
   await mainTempFolder.deleteDir()
   return {
+    path: newFolder,
     mainTempFolder,
     tempFolders,
     packSize,

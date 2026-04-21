@@ -236,6 +236,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
         allPackagesSize += packageSize
 
         const songsCount = parsedData.songs.length
+        if (songsCount === 0) continue
         const entriesIDs = parsedData.songs.map((song) => song.id).toSorted()
         const songnames = parsedData.songs.map((song) => song.songname).toSorted()
         const songIDs = parsedData.songs.map((song) => song.song_id).toSorted()
@@ -292,6 +293,7 @@ export const rpcs3GetSongPackagesStats = async (devhdd0Path: DirPathLikeTypes, o
         allPackagesSize += packageSize
 
         const songsCount = parsedData.songs.length
+        if (songsCount === 0) continue
         const entriesIDs = parsedData.songs.map((song) => song.id).toSorted()
         const songnames = parsedData.songs.map((song) => song.songname).toSorted()
         const songIDs = parsedData.songs.map((song) => song.song_id).toSorted()

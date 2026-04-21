@@ -31,6 +31,10 @@ export interface STFSExtractionOptions {
 
 export interface STFSPackageExtractionObject {
   /**
+   * The path where the pack was extracted.
+   */
+  path: DirPath
+  /**
    * The path to temporary folder created to ultimately gather all package files to move to the actual extracted STFS package folder.
    */
   mainTempFolder: DirPath
@@ -360,6 +364,7 @@ export const extractPackagesForExtractedSTFS = async (packages: RB3PackageLikeTy
   // Delete anything residual from temp folder
   await mainTempFolder.deleteDir()
   return {
+    path: dest,
     mainTempFolder,
     tempFolders,
     packSize,

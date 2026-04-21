@@ -28,7 +28,6 @@ class STFSFileStat(STFSFileStatRequired, STFSFileStatOptional):
 def stfs_file_stat(file_path: str) -> STFSFileStat:
     con = STFS(file_path)
     status = {
-        "path": file_path,
         "name": str(con.display_name_blob.decode("utf-16be")).replace("\x00", ""),
         "desc": str(con.display_description_blob.decode("utf-16be")).replace(
             "\x00", ""
@@ -66,22 +65,13 @@ def stfs_file_stat(file_path: str) -> STFSFileStat:
 
     try:
         dta_file_contents_bytes = con.read_file(dta_file)
-
-        try:
-            status["dta"] = dta_file_contents_bytes.decode().replace('\ufeff', '')
-        except UnicodeDecodeError:
-            status["dta"] = dta_file_contents_bytes.decode("latin-1")
+        status["dta"] = dta_file_contents_bytes.decode("latin-1")
     except AttributeError:
         pass
 
     try:
         upg_file_contents_bytes = con.read_file(upg_file)
-
-        try:
-            status["upgrades"] = upg_file_contents_bytes.decode().replace(
-                '\ufeff', '')
-        except UnicodeDecodeError:
-            status["upgrades"] = upg_file_contents_bytes.decode("latin-1")
+        status["upgrades"] = upg_file_contents_bytes.decode("latin-1")
     except AttributeError:
         pass
 

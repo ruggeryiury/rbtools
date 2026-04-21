@@ -6,6 +6,19 @@ import { RBTools } from './RBTools'
 import { inspect } from 'node:util'
 import { isValidURL } from '../utils.exports'
 
+export interface DTAParserJSONRepresentation {
+  /**
+   * An array with songs with complete information to work properly on Rock Band 3.
+   */
+  songs: RB3CompatibleDTAFile[]
+  /**
+   * An array with updates that will be applied to its respective songs, if the song is found on `this.songs`.
+   *
+   * Updates are only stringified directly when there's no entries on `this.songs`.
+   */
+  updates: DTAFileUpdateObject[]
+}
+
 /**
  * A class with methods related to DTA file parsing.
  *
@@ -108,6 +121,13 @@ export class DTAParser {
    */
   updates: DTAFileUpdateObject[]
 
+  /**
+   * A class with methods related to DTA file parsing.
+   *
+   * This class only works with DTA files of songs and metadata updates, and must not be used to parse any other type of DTA script.
+   * - - - -
+   * @param {RB3CompatibleDTAFile | DTAFileUpdateObject | (RB3CompatibleDTAFile | DTAFileUpdateObject)[]} songs `OPTIONAL` A parsed song object or an array of parsed song objects.
+   */
   constructor(songs?: RB3CompatibleDTAFile | DTAFileUpdateObject | (RB3CompatibleDTAFile | DTAFileUpdateObject)[]) {
     this.songs = []
     this.updates = []
@@ -440,5 +460,17 @@ export class DTAParser {
 
   [inspect.custom]() {
     return `DTAParser { ${this.songs.length} Song${this.songs.length === 1 ? '' : 's'}, ${this.updates.length} Updates }`
+  }
+
+  /**
+   * Returns a JSON representation of the `DTAParser` instance, including parsed songs and updates.
+   * - - - -
+   * @returns {DTAParserJSONRepresentation}
+   */
+  toJSON(): DTAParserJSONRepresentation {
+    return {
+      songs: this.songs,
+      updates: this.updates,
+    }
   }
 }

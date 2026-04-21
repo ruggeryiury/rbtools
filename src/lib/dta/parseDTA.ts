@@ -257,6 +257,8 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
     }
   }
 
+  // console.log(tracksCount)
+
   if (!(tracksCount[5] > 2) && !isTracksCountEmpty(tracksCount)) map.set('tracks_count', tracksCount as RB3CompatibleDTAFile['tracks_count'])
   if (tracksCount[3] > 0 && map.has('rank_vocals') && (map.get('rank_vocals') as number) > 0 && !map.has('vocal_parts')) map.set('vocal_parts', 1)
   if (preview[1] !== 0) map.set('preview', preview as RB3CompatibleDTAFile['preview'])

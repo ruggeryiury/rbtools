@@ -49,7 +49,11 @@ export interface PKGFileSongPackageStatObject {
   contentsHash: string
 }
 
-export interface PKGFileJSONRepresentation extends FilePathJSONRepresentation, Omit<PKGFileSongPackageStatObject, 'dta' | 'upgrades'> {
+export interface PKGFileJSONRepresentation extends Omit<PKGFileSongPackageStatObject, 'dta' | 'upgrades'> {
+  /**
+   * A JSON representation with stats of the file path.
+   */
+  path: FilePathJSONRepresentation
   /**
    * The contents of the package's DTA file.
    */
@@ -138,10 +142,9 @@ export class PKGFile {
    * @returns {Promise<PKGFileJSONRepresentation>}
    */
   async toJSON(): Promise<PKGFileJSONRepresentation> {
-    const pathJSON = this.path.toJSON()
     const pkgStat = await this.stat()
     return {
-      ...pathJSON,
+      path: this.path.toJSON(),
       ...pkgStat,
       dta: pkgStat.dta.songs,
       upgrades: pkgStat.upgrades ? pkgStat.upgrades.updates : undefined,

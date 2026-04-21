@@ -35,7 +35,11 @@ export type STFSFileStatObject = Omit<STFSFileStatRawObject, 'dta' | 'upgrades'>
   contentsHash: string
 }
 
-export interface STFSFileJSONRepresentation extends FilePathJSONRepresentation, Omit<STFSFileStatObject, 'dta' | 'upgrades'> {
+export interface STFSFileJSONRepresentation extends Omit<STFSFileStatObject, 'dta' | 'upgrades'> {
+  /**
+   * A JSON representation with stats of the file path.
+   */
+  path: FilePathJSONRepresentation
   /**
    * The contents of the package's DTA file.
    */
@@ -122,10 +126,11 @@ export class STFSFile {
    */
   async toJSON(): Promise<STFSFileJSONRepresentation> {
     const rawStats = await this.stat()
-    const stats = { ...rawStats, dta: rawStats.dta.songs, upgrades: rawStats.upgrades?.updates ?? undefined }
     return {
-      ...this.path.toJSON(),
-      ...stats,
+      path: this.path.toJSON(),
+      ...rawStats,
+      dta: rawStats.dta.songs,
+      upgrades: rawStats.upgrades?.updates ?? undefined,
     }
   }
 

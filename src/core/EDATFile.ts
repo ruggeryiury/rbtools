@@ -1,4 +1,4 @@
-import { BinaryReader, createHashFromBuffer, FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, createHashFromBuffer, FilePath, pathLikeToFilePath, randomByteFromRanges, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
 import { BinaryAPI, MIDIFile } from '../core.exports'
 import { edatStat, ps3GameIDs, type EDATFileStatObject, type RockBandPS3TitleIDs } from '../lib.exports'
@@ -53,7 +53,7 @@ export class EDATFile {
       const diff = 36 - (contentID + text).length
       contentID += text
       for (let i = 0; i < diff; i++) {
-        contentID += '_'
+        contentID += randomByteFromRanges(1).toString('hex').toUpperCase()
       }
     } else contentID += text
 
@@ -167,6 +167,7 @@ export class EDATFile {
       options
     )
     const dest = pathLikeToFilePath(destPath)
+    dest.changeThisFileExt('.mid')
     await BinaryAPI.edatToolDecrypt(this.path, devKLicHash, dest)
     return new MIDIFile(dest)
   }

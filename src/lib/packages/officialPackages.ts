@@ -711,10 +711,10 @@ export const getOfficialSongPackageStatsFromPKGFolderName = (folderName: string)
 export const isRB3FolderNameFreeOnRPCS3 = async (devhdd0Path: DirPathLikeTypes, folderName: string): Promise<boolean> => {
   let proof = true
   const devhdd0 = isRPCS3Devhdd0PathValid(devhdd0Path)
-  const allOfficialFolderNames = officialPackages.filter((pack) => pack.packageType === 'rb3').map((pack) => pack.folderName)
-  const allUnofficialFolderNames = (await devhdd0.gotoDir('game/BLUS30463/USRDIR').readDir()).filter((dir) => dir instanceof DirPath && dir.name !== 'gen' && dir.name !== 'custom_textures' && !allOfficialFolderNames.includes(dir.name))
-  const allFolderNames = [...allOfficialFolderNames, ...allUnofficialFolderNames]
+  const allOfficialFolderNames = officialPackages.filter((pack) => pack.packageType === 'rb3').map((pack) => pack.folderName.toLowerCase())
+  const allUnofficialFolderNames = (await devhdd0.gotoDir('game/BLUS30463/USRDIR').readDir()).filter((dir) => dir instanceof DirPath && dir.name !== 'gen' && dir.name !== 'custom_textures' && !allOfficialFolderNames.includes(dir.name)).map((pack) => pack.name.toLowerCase())
+  const allFolderNames: string[] = [...allOfficialFolderNames, ...allUnofficialFolderNames]
 
-  if (allFolderNames.includes(folderName)) proof = false
+  if (allFolderNames.includes(folderName.toLowerCase())) proof = false
   return proof
 }
