@@ -1,5 +1,5 @@
 import { MyObject } from 'node-lib'
-import { customSourceIfdefDeconstructor, isTracksCountEmpty, sortDTAMap, type DTAFileKeys, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
+import { customSourceIfdefDeconstructor, instrumentToTracksCountIndex, isTracksCountEmpty, sortDTAMap, type DTAFileKeys, type PartialDTAFile, type RB3CompatibleDTAFile } from '../../lib.exports'
 import { slashQToQuote } from '../../utils.exports'
 
 /**
@@ -9,27 +9,6 @@ import { slashQToQuote } from '../../utils.exports'
  * @returns {RB3CompatibleDTAFile | PartialDTAFile}
  */
 export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTAFile => {
-  const keyToTracksCountIndex = (key: string): number => {
-    switch (key) {
-      case 'drum':
-        return 0
-
-      case 'bass':
-        return 1
-
-      case 'guitar':
-        return 2
-
-      case 'vocals':
-        return 3
-
-      case 'keys':
-        return 4
-
-      default:
-        throw new Error(`DTA Parsing error: Tried to find tracks count index for unknown key "${key}"`)
-    }
-  }
   const map = new MyObject<RB3CompatibleDTAFile>()
 
   const allStrings = songContent
@@ -130,14 +109,14 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
       if (tracksIndex === -1) {
         tracksStarted = false
       } else if (tracksName && key) {
-        tracksCount[keyToTracksCountIndex(tracksName)] = valuesLength + 1
+        tracksCount[instrumentToTracksCountIndex(tracksName)] = valuesLength + 1
         tracksName = ''
         tracksIndex++
       } else if (key && isNaN(Number(key))) {
         if (!key.startsWith(';')) {
           tracksName = key
           if (valuesLength === 1) {
-            tracksCount[keyToTracksCountIndex(key)] = valuesLength
+            tracksCount[instrumentToTracksCountIndex(key)] = valuesLength
             tracksName = ''
           }
           tracksIndex++

@@ -1,6 +1,7 @@
 export * from './core/BinaryAPI'
 export * from './core/DTAParser'
 export * from './core/EDATFile'
+export * from './core/GoCentralAPI'
 export * from './core/ImageFile'
 export * from './core/MAGMAProject'
 export * from './core/MIDIFile'

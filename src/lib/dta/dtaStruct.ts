@@ -780,7 +780,7 @@ export type DTAFileUpdateObject = PartialDTAFile & {
   newID?: string
 }
 
-export type DTAFileBatchUpdateObject = Omit<PartialDTAFile, 'id' | 'songname' | 'song_id'>
+export type DTAFileBatchUpdateObject = Omit<PartialDTAFile, 'id' | 'songname' | 'song_id' | 'original_id'>
 
 export type DTAObjectTypes = RB3CompatibleDTAFile | PartialDTAFile | PartialDTAFile[]
 
@@ -935,4 +935,31 @@ export const customSourceIfdefDeconstructor = (song: MyObject<RB3CompatibleDTAFi
   if (hasAnyCustomSource) song.set('customsource', customSource.toJSON())
 
   return song
+}
+
+/**
+ * Gets the index on the `tracks_count` array from a specific instrument
+ * @param instrument
+ * @returns
+ */
+export const instrumentToTracksCountIndex = (instrument: LiteralUnion<'drum' | 'bass' | 'guitar' | 'vocals' | 'keys', string>): number => {
+  switch (instrument) {
+    case 'drum':
+      return 0
+
+    case 'bass':
+      return 1
+
+    case 'guitar':
+      return 2
+
+    case 'vocals':
+      return 3
+
+    case 'keys':
+      return 4
+
+    default:
+      throw new Error(`DTA Parsing error: Tried to find tracks count index for unknown insrument "${instrument}"`)
+  }
 }
