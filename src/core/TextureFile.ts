@@ -1,4 +1,4 @@
-import { BinaryReader, BinaryWriter, type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, BinaryWriter, type FilePath, pathLikeToFilePath, type FilePathJSONRepresentation, type FilePathLikeTypes, StreamWriter } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
 import { PythonAPI, type ImageConvertingOptions, type ImageFile, type ImageFormatTypes } from '../core.exports'
 import { getDDSHeader, getTPLHeader, texWiiStat, texWiiToImage, texXboxPs3Stat, texXboxPs3ToImage, type TextureFileStatReturnObject } from '../lib.exports'
@@ -125,8 +125,30 @@ export class TextureFile {
     writer.write(srcHeader.data)
     writer.write(srcContents)
 
-    const base64 = (await PythonAPI.imageBufferProcessor(writer.toBuffer(), 'webp', { height: 256, width: 256 })).toString('base64')
+    const base64 = (await PythonAPI.imageBufferProcessor(writer.toBuffer(), 'webp', { height: srcHeader.height, width: srcHeader.width })).toString('base64')
 
     return `data:image/webp;base64,${base64}`
+  }
+
+  /**
+   * Quicks interchange between PNG_XBOX to PNG_PS3 formats by swapping the byte order.
+   * - - - -
+   * @param {FilePathLikeTypes} destPath The destination path of the new converted image. The new image extension is automatically placed based on the `toFormat` argument.
+   * @param {Exclude<TextureFormatTypes, 'png_wii'>} toFormat The format of the new converted image.
+   * @returns {Promise<TextureFile>}
+   */
+  async convertToTexture(destPath: FilePathLikeTypes, toFormat: Exclude<TextureFormatTypes, 'png_wii'>): Promise<TextureFile> {
+    const dest = pathLikeToFilePath(destPath).changeFileExt(toFormat)
+    if (this.path.ext.toLowerCase() === '.png_wii') throw new Error('This method can\'t convert from PNG_WII files, use "convertToImage" method instead.')
+    if (this.path.ext.toLowerCase() === `.${toFormat.toLowerCase()}`) throw new Error(`Tried to convert a ${this.path.ext.slice(1).toUpperCase()} file for the same format.`)
+
+    const reader = await BinaryReader.fromFile(this.path)
+    const writer = await StreamWriter.toFile(dest)
+    writer.write(await reader.read(0x20))
+    writer.write((await reader.read()).swap16())
+    await reader.close()
+    await writer.close()
+
+    return new TextureFile(dest)
   }
 }

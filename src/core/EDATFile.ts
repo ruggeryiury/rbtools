@@ -1,5 +1,4 @@
 import { BinaryReader, createHashFromBuffer, FilePath, pathLikeToFilePath, randomByteFromRanges, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
-import { useDefaultOptions } from 'use-default-options'
 import { BinaryAPI, MIDIFile } from '../core.exports'
 import { edatStat, ps3GameIDs, type EDATFileStatObject, type RockBandPS3TitleIDs } from '../lib.exports'
 
@@ -46,11 +45,11 @@ export class EDATFile {
   static genContentID(text: string, game: RockBandPS3TitleIDs = 'rb3'): string {
     let contentID = `UP${game === 'rb1' ? '0002' : '8802'}-${ps3GameIDs[game]}_00-`
     text = text.replace(/\s+/g, '').toUpperCase()
-    if ((contentID + text).length > 36) {
+    if ((contentID + text).length > 0x30) {
       contentID += text
-      contentID = contentID.slice(0, 36)
-    } else if ((contentID + text).length < 36) {
-      const diff = 36 - (contentID + text).length
+      contentID = contentID.slice(0, 0x30)
+    } else if ((contentID + text).length < 0x30) {
+      const diff = 0x30 - (contentID + text).length
       contentID += text
       for (let i = 0; i < diff; i++) {
         contentID += randomByteFromRanges(1).toString('hex').toUpperCase()
@@ -159,16 +158,12 @@ export class EDATFile {
       const destPath = options.destPath ? pathLikeToFilePath(options.destPath) : FilePath.of(`${stat.root}/${stat.name}`)
       return new MIDIFile(await this.path.copy(destPath))
     }
-    const { destPath, devKLicHash } = useDefaultOptions(
-      {
-        destPath: FilePath.of(`${stat.root}/${stat.name}`),
-        devKLicHash: stat.devKLicHash ?? '',
-      },
-      options
-    )
-    const dest = pathLikeToFilePath(destPath)
+
+    const devKLicHash = stat.devKLicHash ?? ''
+    const dest = options.destPath ? pathLikeToFilePath(options.destPath) : FilePath.of(`${stat.root}/${stat.name}`)
+
     dest.changeThisFileExt('.mid')
-    await BinaryAPI.edatToolDecrypt(this.path, devKLicHash, dest)
+    await BinaryAPI.makeNPDataDecrypt(this.path, devKLicHash, dest)
     return new MIDIFile(dest)
   }
 }

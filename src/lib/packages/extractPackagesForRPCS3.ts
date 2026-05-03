@@ -241,12 +241,8 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
         if (temp.type === 'pkg') await oldPNGPath.move(newPNGPath, true)
         else {
           // Xbox PNGs must be converted to PS3
-          const tempPNG = pathLikeToFilePath(temporaryFile({ extension: 'png' }))
           const tex = new TextureFile(oldPNGPath)
-          const newImg = await tex.convertToImage(tempPNG, 'png')
-
-          await newImg.convertToTexture(newPNGPath, 'png_ps3')
-          await tempPNG.delete()
+          await tex.convertToTexture(newPNGPath, 'png_ps3')
         }
 
         // MOGG
@@ -289,7 +285,7 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
         else if (temp.type === 'stfs' && forceEncryption === 'enabled') {
           const newDevkLic = EDATFile.genDevKLicHash(packageFolderName)
           const newContentID = EDATFile.genContentID(packageFolderName.toUpperCase())
-          await BinaryAPI.edatToolEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
+          await BinaryAPI.makeNPDataEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
         }
         // MIDI might be encrypted for PKG files
         else if (temp.type === 'pkg') {
@@ -300,14 +296,14 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
             // Original MIDI must be decrypted anyway
             const tempDecEDAT = pathLikeToFilePath(temporaryFile({ extension: 'mid' }))
             const oldDevklic = EDATFile.genDevKLicHash(temp.stat.folderName)
-            await BinaryAPI.edatToolDecrypt(oldMIDIPath, oldDevklic, tempDecEDAT)
+            await BinaryAPI.makeNPDataDecrypt(oldMIDIPath, oldDevklic, tempDecEDAT)
             await tempDecEDAT.move(oldMIDIPath, true)
           }
 
           if (forceEncryption === 'enabled') {
             const newDevkLic = EDATFile.genDevKLicHash(packageFolderName)
             const newContentID = EDATFile.genContentID(packageFolderName.toUpperCase())
-            await BinaryAPI.edatToolEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
+            await BinaryAPI.makeNPDataEncrypt(oldMIDIPath, newContentID, newDevkLic, newMIDIPath)
           } else await oldMIDIPath.move(newMIDIPath)
         }
       }
@@ -333,8 +329,8 @@ export const extractPackagesForRPCS3 = async (packages: RB3PackageLikeType[], de
   if (updates.length > 0 || updateAllSongs !== null) parser.applyUpdatesToExistingSongs(true)
 
   parser.sort('ID')
-  parser.patchSongsEncodings()
   parser.patchCores()
+  parser.patchSongsEncodings()
 
   try {
     await parser.export(newDTAPath)

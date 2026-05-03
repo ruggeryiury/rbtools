@@ -32,6 +32,7 @@
 | Package name   | Install command            | Description                                                                         | PyPI link                                        |
 | -------------- | -------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
 | `audioop-lts`  | `pip install audioop-lts`  | LTS Port of Python `audioop`.                                                       | [[link]](https://pypi.org/project/audioop-lts/)  |
+| `chardet`      | `pip install chardet`      | Universal character encoding detector                                               | [[link]](https://pypi.org/project/chardet)       |
 | `cryptography` | `pip install cryptography` | A package which provides cryptographic recipes and primitives to Python developers. | [[link]](https://pypi.org/project/cryptography/) |
 | `mido`         | `pip install mido`         | MIDI Objects for Python.                                                            | [[link]](https://pypi.org/project/mido/)         |
 | `puremagic`    | `pip install puremagic`    | Pure python implementation of magic file detection.                                 | [[link]](https://pypi.org/project/mido/)         |

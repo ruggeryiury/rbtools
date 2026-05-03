@@ -84,7 +84,7 @@ export const officialPackages: OfficialSongPackageStats[] = [
     folderName: 'RB2-Rock-Band-2-Export',
     packageType: 'rb3',
     hashes: {
-      extractedRPCS3: '72afb485363fba9bbbf7e92e570e796c2245a0cb82d3081e1a88290a306c154d',
+      extractedRPCS3: '755d288c012fd07dd5371bc6da7665f920608fa1ac3ec2b32fa9a4b4d5c23d6b',
       pkg: '92462fe7347aa14446b5b38409c7a91c48564fd4932d76e0b4e83a52fb3ca5ce',
       stfs: '',
     },

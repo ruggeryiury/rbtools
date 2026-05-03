@@ -20,12 +20,13 @@ def mogg_mono_splitter(mogg_file_path: Union[str, PathLike[str]]) -> List[AudioS
         List[AudioSegment]: A list with mono `AudioSegments` of the MOGG file.
     """
     fin = open(mogg_file_path, "rb")
-    oggbytes = BytesIO(decrypt_mogg_bytes(True, False, fin.read()))
+    oggbytes = BytesIO(decrypt_mogg_bytes(True, False, fin))
     fin.close()
 
     oggtracks = mogg_import_channel_order_fixer(
         AudioSegment.from_ogg(oggbytes).split_to_mono()
     )
+    oggbytes.close()
     return oggtracks
 
 
@@ -33,7 +34,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="RBTools: MOGG Mono Splitter", epilog="By Ruggery Iury Corrêa."
     )
-    parser.add_argument("mogg_file_path", help="The path to the MOGG file", type=str)
+    parser.add_argument(
+        "mogg_file_path", help="The path to the MOGG file", type=str)
     parser.add_argument(
         "-f",
         "--format",
