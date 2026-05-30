@@ -1,9 +1,10 @@
 import { platform } from 'node:os'
 import { spawn } from 'node:child_process'
-import { execAsync, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes, type DirPath, pathLikeToDirPath, type FilePath } from 'node-lib'
+import { execAsync, FilePath, pathLikeToFilePath, pathLikeToString, type DirPathLikeTypes, type FilePathLikeTypes, type DirPath, pathLikeToDirPath } from 'node-lib'
 import { useDefaultOptions } from 'use-default-options'
 import { ImageFile, MOGGFile, RBTools, type ImageConvertingOptions, type ImageFormatTypes } from '../core.exports'
 import { genAudioFileStructure, type RB3CompatibleDTAFile, type TPLHeaderParserObject } from '../lib.exports'
+import { temporaryFile } from 'tempy'
 
 // #region Types
 
@@ -426,10 +427,14 @@ export class PythonAPI {
   static async stfsFileStat(stfsFilePath: FilePathLikeTypes): Promise<STFSFileStatRawObject> {
     const stfs = pathLikeToFilePath(stfsFilePath)
     const pythonScript = 'stfs_file_stat.py'
-    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${stfs.path}" -p`
-    const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
+    const tempJSON = FilePath.of(temporaryFile({ extension: 'json' }))
+    const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${stfs.path}" -s "${tempJSON.path}"`
+    const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
-    const returnValue = JSON.parse(stdout) as STFSFileStatRawObject
+
+    const jsonContents = await tempJSON.read('utf8')
+    const returnValue = JSON.parse(jsonContents) as STFSFileStatRawObject
+    await tempJSON.delete()
     return returnValue
   }
 

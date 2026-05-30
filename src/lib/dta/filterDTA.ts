@@ -18,7 +18,7 @@ export interface DTAFilterGenericHeaders {
   songsIndexes: number[]
 }
 
-export type DTAFilterTypes = 'title' | 'artist' | 'genre' | 'decade' | 'yearReleased' | 'difficulty'
+export type DTAFilterTypes = 'title' | 'artist' | 'genre' | 'decade' | 'yearReleased' | 'difficulty' | 'songRating'
 
 export interface DTAFilterGenericObject {
   /**
@@ -354,7 +354,7 @@ export const filterDTAByArtist = (songs: RB3CompatibleDTAFile[], options?: DTAFi
 
   const sortedSongs = insertIndexOnSongsArray(songs).sort((a, b) => {
     // 1. Artist
-    let val = collator.compare(leadingArticleToTrailing(a.artist), leadingArticleToTrailing(b.artist))
+    let val = collator.compare(leadingArticleToTrailing(a.artist).toLowerCase(), leadingArticleToTrailing(b.artist).toLowerCase())
     if (val !== 0) return val
 
     // 2. Album (undefined goes LAST)
@@ -362,7 +362,7 @@ export const filterDTAByArtist = (songs: RB3CompatibleDTAFile[], options?: DTAFi
     if (!a.album_name && b.album_name) return 1
 
     if (a.album_name && b.album_name) {
-      val = collator.compare(leadingArticleToTrailing(a.album_name), leadingArticleToTrailing(b.album_name))
+      val = collator.compare(leadingArticleToTrailing(a.album_name).toLowerCase(), leadingArticleToTrailing(b.album_name).toLowerCase())
       if (val !== 0) return val
     }
 
@@ -394,13 +394,13 @@ export const filterDTAByArtist = (songs: RB3CompatibleDTAFile[], options?: DTAFi
   const artistArray = Array.from(allArtists.values()) as string[]
 
   for (const artist of artistArray) {
-    const artistSort = leadingArticleToTrailing(artist).toLowerCase()
+    const artistSort = leadingArticleToTrailing(artist)
     const allSongsFromArtist: RB3CompatibleDTAFileWithIndex[] = []
     const artistSongs: RB3CompatibleDTAFileWithIndex[] = []
     const allAlbums = new Set()
 
     for (const song of sortedSongs) {
-      if (leadingArticleToTrailing(song.artist).toLowerCase() === artistSort) allSongsFromArtist.push(song)
+      if (leadingArticleToTrailing(song.artist).toLowerCase() === artistSort.toLowerCase()) allSongsFromArtist.push(song)
     }
 
     for (const song of allSongsFromArtist) allAlbums.add(song.album_name)
@@ -440,14 +440,59 @@ export const filterDTAByArtist = (songs: RB3CompatibleDTAFile[], options?: DTAFi
       if (!song.album_name) artistSongs.push(song)
     }
 
-    artistSongs.sort((a, b) => collator.compare(leadingArticleToTrailing(a.name), leadingArticleToTrailing(b.name)))
+    artistSongs.sort((a, b) => collator.compare(leadingArticleToTrailing(a.name).toLowerCase(), leadingArticleToTrailing(b.name).toLowerCase()))
 
-    headers.push({ name: artist, code: formatStringFromDTA(null, leadingArticleToTrailing(artist), 'id'), albums: validAlbumsArray.map((val) => ({ ...val, songsIndexes: val.songsIndexes.map((val2) => val2.index) })), songsIndexes: artistSongs.map((val) => val.index), songsCount: allSongsFromArtist.length })
+    headers.push({ name: artist, code: formatStringFromDTA(null, leadingArticleToTrailing(artist), 'id'), albums: validAlbumsArray.map((val) => ({ ...val, songsIndexes: val.songsIndexes.map((val2) => val2.index) })), songsIndexes: Array.from(new Set(artistSongs.map((val) => val.index))), songsCount: allSongsFromArtist.length })
   }
 
   return {
     type: 'artist',
     headers,
+    songsCount: sortedSongs.length,
+  }
+}
+
+/**
+ * Filters and catalogs an array of parsed songs data by song rating into a header-based sorting object used in-game.
+ * - - - -
+ * @param {RB3CompatibleDTAFile[]} songs An array of parsed songs data to be filtered and cataloged.
+ * @param {DTAFilterOptions | undefined} options `OPTIONAL` An object with parameters that tweaks the filtering functionality.
+ * @returns {DTAFilterGenericObject}
+ */
+export const filterDTABySongRating = (songs: RB3CompatibleDTAFile[], options?: DTAFilterOptions): DTAFilterGenericObject => {
+  const { filterEmptyHeader } = useDefaultOptions<DTAFilterOptions>({ filterEmptyHeader: true, instrument: 'band' }, options)
+  const sortedSongs = insertIndexOnSongsArray(songs).sort(useSongGenericCatalogSort)
+
+  const headers: DTAFilterGenericHeaders[] = [
+    {
+      code: 'songRating1',
+      name: 'Family Friendly',
+      songsIndexes: [],
+    },
+    {
+      code: 'songRating2',
+      name: 'Supervision Recommended',
+      songsIndexes: [],
+    },
+    {
+      code: 'songRating3',
+      name: 'Mature Content',
+      songsIndexes: [],
+    },
+    {
+      code: 'songRating4',
+      name: 'No Rating',
+      songsIndexes: [],
+    },
+  ]
+
+  for (const song of sortedSongs) {
+    headers[song.rating - 1].songsIndexes.push(song.index)
+  }
+
+  return {
+    type: 'songRating',
+    headers: filterEmptyHeader ? headers.filter((val) => val.songsIndexes.length > 0) : headers,
     songsCount: sortedSongs.length,
   }
 }

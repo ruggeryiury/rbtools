@@ -60,7 +60,7 @@ export interface RPCS3SongPackagesObject {
   /**
    * An object with known properties of the official song package where the installed song package belongs to. The value might be `undefined` if the song package contents hash does not match any official song package contents hash.
    */
-  official: OfficialSongPackageStats | undefined
+  official?: OfficialSongPackageStats
 }
 
 export interface RPCS3SongPackagesData {

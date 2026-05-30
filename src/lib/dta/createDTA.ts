@@ -1,7 +1,7 @@
 import { useDefaultOptions } from 'use-default-options'
 import type { RequiredDeep } from 'type-fest'
 import type { MAGMAProjectSongData } from '../../core.exports'
-import { dta, genNumericSongID, channelsCountToPanArray, rankValuesToDTARankSystem, type AnimTempoNames, type BandFailCueNames, type BandRankingNames, type BandRankingNumbers, type DrumBankNames, type RB3CompatibleDTAFile, type PercussionBankNames, type SongGameOriginNames, type SongGenreNames, type SongRatingNames, type SongScrollSpeedNames, type VocalParts, type VocalPartsNames, type SongEncoding, containsLatin1SpecificChars, type SoloFlags, bandAverageRankCalculator, type MAGMALanguagesTypes, type CustomSourceValuesObject, type VocalGenderNames } from '../../lib.exports'
+import { dta, genNumericSongID, channelsCountToPanArray, rankValuesToDTARankSystem, type AnimTempoNames, type BandFailCueNames, type BandRankingNames, type BandRankingNumbers, type DrumBankNames, type RB3CompatibleDTAFile, type PercussionBankNames, type SongGameOriginNames, type SongGenreNames, type SongRatingNames, type SongScrollSpeedNames, type VocalParts, type VocalPartsNames, type SoloFlags, bandAverageRankCalculator, type MAGMALanguagesTypes, type CustomSourceValuesObject, type VocalGenderNames } from '../../lib.exports'
 import { MyObject } from 'node-lib'
 import { getKeyFromMapValue } from '../../utils.exports'
 
@@ -327,6 +327,7 @@ export interface SongDataCreationObject {
   author?: string
   stringsAuthor?: string
   keysAuthor?: string
+  coveredBy?: string
   /**
    * An array with the languages of the song.
    */
@@ -411,6 +412,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
     author,
     keysAuthor,
     stringsAuthor,
+    coveredBy,
     languages,
     multitrack,
     unpitchedVocals,
@@ -465,8 +467,9 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
       packName: '',
       loadingPhrase: '',
       author: '',
-      keysAuthor: '',
       stringsAuthor: '',
+      keysAuthor: '',
+      coveredBy: '',
       languages: ['English'],
       multitrack: null,
       unpitchedVocals: false,
@@ -742,23 +745,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
   map.set('format', format)
   map.set('version', version)
   map.set('game_origin', getKeyFromMapValue(dta.gameOrigin, gameOrigin) as RB3CompatibleDTAFile['game_origin'])
-  map.set(
-    'encoding',
-    ((): SongEncoding => {
-      let hasNonASCIIChars = false
-
-      if (name && containsLatin1SpecificChars(name)) hasNonASCIIChars = true
-      if (artist && containsLatin1SpecificChars(artist)) hasNonASCIIChars = true
-      if (albumName && containsLatin1SpecificChars(albumName)) hasNonASCIIChars = true
-      if (packName && containsLatin1SpecificChars(packName)) hasNonASCIIChars = true
-      if (author && containsLatin1SpecificChars(author)) hasNonASCIIChars = true
-      if (keysAuthor && containsLatin1SpecificChars(keysAuthor)) hasNonASCIIChars = true
-      if (stringsAuthor && containsLatin1SpecificChars(stringsAuthor)) hasNonASCIIChars = true
-      if (loadingPhrase && containsLatin1SpecificChars(loadingPhrase)) hasNonASCIIChars = true
-
-      return hasNonASCIIChars ? 'utf8' : 'latin1'
-    })()
-  )
+  map.set('encoding', 'latin1')
   map.set('rating', Number(getKeyFromMapValue(dta.rating, rating)) as RB3CompatibleDTAFile['rating'])
 
   map.set('genre', getKeyFromMapValue(dta.genre, g) as RB3CompatibleDTAFile['genre'])
@@ -775,6 +762,7 @@ export const createDTA = (songdata: SongDataCreationObject): RB3CompatibleDTAFil
   if (author) map.set('author', author)
   if (stringsAuthor) map.set('strings_author', stringsAuthor)
   if (keysAuthor) map.set('keys_author', keysAuthor)
+  if (coveredBy) map.set('covered_by', coveredBy)
 
   if (typeof songKey === 'object') {
     switch (songKey.key) {
