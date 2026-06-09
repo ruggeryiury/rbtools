@@ -1,5 +1,6 @@
-import { DTAParser, type MAGMAProjectSongData } from '../core.exports'
+import { type MAGMAProjectSongData } from '../core.exports'
 import { sortDTA, type RB3CompatibleDTAFile } from '../lib.exports'
+import { DTAParser } from './DTAParser'
 
 export class RuggyCustoms {
   static readonly magmaConfig: MAGMAProjectSongData = {

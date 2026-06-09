@@ -323,7 +323,6 @@ export class PythonAPI {
     const pythonScript = 'mogg_file_stat.py'
     const command = `${PythonAPI.getPythonExecName()} "${pythonScript}" "${pathLikeToString(moggFilePath)}" -p`
     const { stderr, stdout } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
-    // if (isDev()) console.log(`RBTools Python script: ${pythonScript}\n----------------------------------\n`, stdout.trim(), '\n\nEND OF PROGRAM\n----------------------------------')
     if (stderr) throw new Error(stderr)
     const returnValue = JSON.parse(
       stdout
@@ -475,7 +474,6 @@ export class PythonAPI {
     if (songs.length > 0) {
       command += ` --songs ${songs.map((s) => `"${s}"`).join(' ')}`
     }
-    // console.log('Running command:', command)
     const { stderr } = await execAsync(command, { windowsHide: true, cwd: RBTools.pyFolder.path })
     if (stderr) throw new Error(stderr)
     return dest
