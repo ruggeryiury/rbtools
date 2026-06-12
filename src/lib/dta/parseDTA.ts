@@ -101,7 +101,7 @@ export const parseDTA = (songContent: string): RB3CompatibleDTAFile | PartialDTA
     else if (i === 1 && key) map.set('id', key)
     // On unfinished strings, if key equals to `"` it means that the string has finished
     else if (unfinishedString) {
-      if (key === '"') unfinishedString = false
+      if (valuesJoin.endsWith('"')) unfinishedString = false
     }
 
     // This is where tracks count gets counted
