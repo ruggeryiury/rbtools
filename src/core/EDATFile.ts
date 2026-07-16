@@ -1,4 +1,4 @@
-import { BinaryReader, createHashFromBuffer, FilePath, pathLikeToFilePath, randomByteFromRanges, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
+import { BinaryReader, createHashFromBuffer, FilePath, pathLikeToFilePath, randomBytesFromRanges, type FilePathJSONRepresentation, type FilePathLikeTypes } from 'node-lib'
 import { BinaryAPI, MIDIFile } from '../core.exports'
 import { edatStat, ps3GameIDs, type EDATFileStatObject, type RockBandPS3TitleIDs } from '../lib.exports'
 
@@ -40,9 +40,9 @@ export class EDATFile {
    * - - - -
    * @param {string} text The custom text to place on the Content ID.
    * @param {RockBandPS3TitleIDs} game `OPTIONAL`. Default is `rb3`.
-   * @returns {string}
+   * @returns {Promise<string>}
    */
-  static genContentID(text: string, game: RockBandPS3TitleIDs = 'rb3'): string {
+  static async genContentID(text: string, game: RockBandPS3TitleIDs = 'rb3'): Promise<string> {
     let contentID = `UP${game === 'rb1' ? '0002' : '8802'}-${ps3GameIDs[game]}_00-`
     text = text.replace(/\s+/g, '').toUpperCase()
     if ((contentID + text).length > 0x30) {
@@ -52,7 +52,7 @@ export class EDATFile {
       const diff = 0x30 - (contentID + text).length
       contentID += text
       for (let i = 0; i < diff; i++) {
-        contentID += randomByteFromRanges(1).toString('hex').toUpperCase()
+        contentID += (await randomBytesFromRanges(1)).toString('hex').toUpperCase()
       }
     } else contentID += text
 

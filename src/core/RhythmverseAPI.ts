@@ -333,6 +333,7 @@ export type ProcessedRhythmverseSongData = Omit<PartialDTAFile, 'id' | 'album_ar
 export interface ProcessedRhythmverseObject {
   records: RawRhythmverseResponse['data']['records']
   pagination: RawRhythmverseResponse['data']['pagination']
+  totalPages: number
   songs: ProcessedRhythmverseSongData[]
 }
 
@@ -351,6 +352,61 @@ const updateProgress = (message: string): void => {
 
 /** A class with static methods to fetch songs from Rhythmverse database. */
 export class RhythmverseAPI {
+  /**
+   * Calculates
+   * - - - -
+   * @param {RawRhythmverseResponse} results
+   * @returns {number}
+   */
+  static calculatePagesFromResults(results: RawRhythmverseResponse): number {
+    return Math.ceil(results.data.records.total_filtered / Number(isNaN(Number(results.data.pagination.records)) ? 25 : Number(results.data.pagination.records)))
+  }
+  static async search(text?: string, options?: RhythmverseFetchingOptions): Promise<RawRhythmverseResponse> {
+    if (text && text.length > 0) return await this.searchText(text, options)
+
+    const opts = useDefaultOptions<RhythmverseFetchingOptions>(
+      {
+        source: 'rb3xbox',
+        sortBy: 'updateDate',
+        sortOrder: 'asc',
+        page: 1,
+        records: 25,
+        fullBand: false,
+        multitrack: false,
+        pitchedVocals: true,
+      },
+      options
+    )
+
+    const reqURL: string = rhythmverseAPISourceURL[opts.source]
+
+    const urlParams: Record<string, string> = {
+      'sort[0][sort_by]': rhythmverseOptsLocale[opts.sortBy],
+      'sort[0][sort_order]': rhythmverseOptsLocale[opts.sortOrder],
+      page: opts.page.toString(),
+      records: opts.records.toString(),
+      data_type: 'full',
+    }
+    if (opts.fullBand) urlParams.fullband = 'true'
+    if (opts.multitrack) urlParams.audio = 'full'
+    if (opts.pitchedVocals) urlParams.vocals = 'pitched'
+
+    if (opts.sortBy === 'updateDate') urlParams['sort[0][sort_order]'] = 'DESC'
+
+    const reqData = new URLSearchParams(urlParams).toString()
+    const reqHeaders = { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+
+    try {
+      const res = await axios.post<RawRhythmverseResponse>(reqURL, reqData, {
+        headers: reqHeaders,
+      })
+
+      return res.data
+    } catch (err) {
+      if (err instanceof AxiosError) throw new Error(err.message, { cause: err })
+      else throw err
+    }
+  }
   /**
    * Searchs a text through the Rhythmverse database.
    * - - - -
@@ -577,6 +633,7 @@ export class RhythmverseAPI {
     return {
       pagination,
       records,
+      totalPages: RhythmverseAPI.calculatePagesFromResults(data),
       songs: allSongs,
     }
   }
