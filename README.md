@@ -1,3 +1,7 @@
+# IMPORTANT NOTE!
+
+This package has been deprecated since all it's source files are embedded into [Rockshelf](https://github.com/ruggeryiury/rockshelf).
+
 <div align=center>
 <img src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg' width='30px' title='JavaScript'/>
 <img src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' width='30px' title='TypeScript'/>
